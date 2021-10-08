@@ -1,6 +1,4 @@
-/**
- * Support for records.html
- */
+
 // For escaping solr query terms
 const SOLR_RESERVED = [' ', '+', '-', '&', '!', '(', ')', '{', '}', '[', ']', '^', '"', '~', '*', '?', ':', '\\'];
 const SOLR_VALUE_REGEXP = new RegExp("(\\" + SOLR_RESERVED.join("|\\") + ")", "g");
@@ -29,7 +27,7 @@ if (!library)
    var library = {};
 
 async function getSolrRecords(q, fq=[], start=0, num_rows=TABLE_ROWS, sorters=[]) {
-    var _url = new URL("https://mars.cyverse.org/thing/select", document.location);
+    var _url = new URL("/thing/select", SERVICE_ENDPOINT);
     let params = _url.searchParams;
     let _fields = [];
     COLUMNS.forEach(_c => _fields.push(_c.field));
@@ -93,7 +91,7 @@ function recordsOnLoad(tabulatorDivId) {
     data_table = new Tabulator(`#${tabulatorDivId}`, {
         pagination: "remote",
         paginationSize: TABLE_ROWS,
-        ajaxURL: "https://mars.cyverse.org/thing/select",
+        ajaxURL: SERVICE_ENDPOINT+"/thing/select",
         ajaxSorting:true,
         //ajaxProgressiveLoad: "scroll",
         ajaxRequestFunc: _doSolrLoad,
@@ -127,10 +125,9 @@ function selectRow(_id) {
 
 //show specified identifier record
 async function showRawRecord(id) {
-    const MARS = "https://mars.cyverse.org";
-    const raw_url = MARS+`/thing/${encodeURIComponent(id)}?format=original`;
-    const xform_url = MARS+`/thing/${encodeURIComponent(id)}?format=core`;
-    let solr_url = new URL("/thing/select", MARS);
+    const raw_url = SERVICE_ENDPOINT+`/thing/${encodeURIComponent(id)}?format=original`;
+    const xform_url = SERVICE_ENDPOINT+`/thing/${encodeURIComponent(id)}?format=core`;
+    let solr_url = new URL("/thing/select", SERVICE_ENDPOINT);
     let params = solr_url.searchParams;
     params.append("q", `id:${escapeLucene(id)}`);
     params.append("wt", "json");
