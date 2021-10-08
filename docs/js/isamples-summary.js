@@ -14,11 +14,11 @@ export class ISamplesSummary extends LitElement {
             display: block;
             /* border: dotted 1px gray; */
             padding: 16px;
-            font-family: monospace;
+            font-family: var(--mono-font, monospace);
             font-size: 1.1em;
         }
         table {
-            min-width: 600px;
+            min-width: 50rem;
             padding-top: 2rem;
             border-spacing: 0;
         }
@@ -133,14 +133,14 @@ export class ISamplesSummary extends LitElement {
                 const fn = this._data.fields[f];
                 const th = html`<thead>
                 <tr>
-                    <th>${fn}</th>
+                    <th style="width:18rem">${fn}</th>
                     ${sources.map((src) => html`<th>${src}</th>`)}
                     <th>Total</th>
                 </tr>
                 </thead>`
                 for (const [cat, data] of Object.entries(this._data.facets[fn])) {
                     if (cat !== '_keys') {
-                        let row = [html`<td>${cat}</td>`];
+                        let row = [html`<td style="width:18rem">${cat}</td>`];
                         for (let s=0; s < sources.length; s += 1) {
                             const src = sources[s];
                             row.push(html`<td @click=${this.setFQ(data[src].fq)}>${data[src].v}</td>`);
@@ -157,14 +157,14 @@ export class ISamplesSummary extends LitElement {
             <table>
                 <thead>
                     <tr>
-                        <th></th>
+                        <th style="width:18rem"></th>
                         ${sources.map((src) => html`<th>${src}</th>`)}
                         <th>Total</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Records</td>
+                        <td style="width:18rem">Records</td>
                         ${sources.map((src) => html`
                             <td @click=${this.setFQ(this._data.totals[src].fq)}>${this._data.totals[src].v}</td>
                         `)}

@@ -69,7 +69,7 @@ function getPivotTotal(pdata, f0) {
 
 export async function getSolrRecordSummary(Q, SQ=null, TQ=null, FQ=null, facets=DEFAULT_FACETS) {
     const TOTAL = "Total";
-    let _url = new URL("/thing/select", document.location);
+    let _url = new URL("/thing/select", SERVICE_ENDPOINT);
     let params = _url.searchParams;
     params.append("q", Q);
     if (isNN(SQ)) {
