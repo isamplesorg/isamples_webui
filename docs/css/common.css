@@ -1,0 +1,85 @@
+/* https://simplecss.org/ */
+@import 'https://cdn.simplecss.org/simple.min.css';
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;1,400;1,600&display=swap');
+:root {
+    --bg: #ffffff;
+    --accent-bg: #fefeff;
+    --base-fontsize: 0.8em;
+    --mono-font: 'Cousine', 'Monaco', Consolas, Menlo, 'Andale Mono', 'Ubuntu Mono', monospace;
+    --text-font: 'Montserrat', sans-serif;
+    --max-body-width: 95%;
+}
+
+body {
+    font-size: var(--base-fontsize, 1em);
+    max-width: var(--max-body-width, 95%);
+    font-family: var(--text-font);
+}
+
+h1 {
+    font-size: 1.3rem;
+}
+
+h2 {
+    font-size: 1.2rem;
+}
+
+h3 {
+    font-size: 1.1rem;
+}
+
+h4 {
+    font-size: 1.0rem;
+}
+
+header {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+code, kbd, pre, pre span, samp {
+    font-family: var(--mono-font, monospace);
+    font-size: 0.8rem; /* make mono and body text more similar in appearance*/
+}
+
+table {
+    font-size: 1rem;
+}
+
+input {
+    font-family: var(--mono-font, monospace);
+}
+
+details {
+    border: none;
+}
+
+/*
+.active {
+    background: #BAEFBA;
+}
+*/
+
+.data {
+    font-family: var(--mono-font);
+}
+
+.query {
+   width: 95%;
+}
+
+/**
+JSON formatting
+ */
+
+.json-key           { color: brown; }
+.json-string        { color: olive; }
+.json-number        { color: navy; }
+.json-boolean       { color: teal; }
+.json-null          { color: dimgray; }
+.json-mark          { color: black; }
+a.json-link         { color: purple; transition: all 400ms; }
+a.json-link:visited { color: slategray; }
+a.json-link:hover   { color: blueviolet; }
+a.json-link:active  { color: slategray; }

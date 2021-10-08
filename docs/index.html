@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Records</title>
+    <link rel="stylesheet" href="https://unpkg.com/tabulator-tables@4.9.3/dist/css/tabulator.min.css">
+    <!-- Githuub project link webcomponent -->
+    <script type="module" src="https://unpkg.com/gh-corner-wc/gh-corner.js?module"></script>
+    <!-- Webcomponent for manging overall query state -->
+    <script type="module" src="js/isamples-state.js"></script>
+
+    <script type="module" src="js/isamples-summary.js"></script>
+
+    <!-- Table component-->
+    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.9.3/dist/js/tabulator.min.js"></script>
+    <!-- js library pretty print json -->
+    <link rel=stylesheet href=https://cdn.jsdelivr.net/npm/pretty-print-json@1.1/dist/pretty-print-json.css>
+    <script src=https://cdn.jsdelivr.net/npm/pretty-print-json@1.1/dist/pretty-print-json.min.js></script>
+    <link rel="stylesheet" href="css/common.css"/>
+
+    <!-- customization of the behavior of the record table -->
+    <script type="text/javascript" src="js/records.js"></script>
+    <style>
+        #records {
+            height: 40vh;
+        }
+        .infoContainer {
+            margin-top:1.0rem;
+            display: flex;
+            flex-direction: row;
+            height: calc(100% - 25px);
+            height: -moz-calc(100% - 25px);
+            height: -webkit-calc(100% - 25px);
+            box-sizing: border-box;
+        }
+
+        .infoChild {
+            width: 50%;
+            background-color: white;
+        }
+
+        div.infoChild pre {
+            padding-top: 0;
+            padding-left: 0;
+            padding-bottom: 0;
+            padding-right: 0;
+            margin-top: 0;
+            margin-right: 0.5rem;
+            white-space: pre-wrap;
+            border: 1px dotted grey;
+            font-family: var(--mono-font);
+        }
+        .infoChild pre span {
+            font-size: inherit;
+        }
+
+        .tabulator {
+            font-family: var(--mono-font);
+            font-size: inherit;
+            vertical-align: auto;
+        }
+
+        .tabulator-row .tabulator-cell{
+            padding-top:4px;
+            padding-bottom: 0;
+            padding-left: 4px;
+            padding-right: 4px;
+            vertical-align: center;
+        }
+
+        .tabulator-row.tabulator-row-even {
+            background: #ffffff;
+        }
+        .tabulator-row.tabulator-row-odd {
+            background: #ffffff;
+        }
+        .tabulator-row.tabulator-selected {
+            background-color: lightblue;
+        }
+
+        .tabulator-page {
+            color: #333333;
+            font-size: inherit;
+        }
+        .records-footer {
+            float: left;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <gh-corner user="isamplesorg" repo=""></gh-corner>
+    <section id="query-section">
+        <isamples-state id="query-state"></isamples-state>
+        <div id="records"></div>
+    </section>
+    <details open>
+        <summary>Selected Row Record</summary>
+    <section class="infoContainer">
+        <div class="infoChild" id="InfoLeft" >
+            <span class="label">Source Record</span>
+            <pre id="record_original">
+
+                Select a row to view source record.
+            </pre>
+        </div>
+        <div class="infoChild" id="InfoRight">
+            <details>
+                <summary>iSamples Solr Record</summary>
+                <pre id="record_solr">
+
+                    Select a row to view solr record.
+                </pre>
+            </details>
+            <details open>
+                <summary>iSamples Core Record</summary>
+                <pre id="record_xform">
+
+                    Select a row to view transformed record.
+                </pre>
+            </details>
+        </div>
+    </section>
+    </details>
+</main>
+<footer>
+    <p>Placeholder</p>
+</footer>
+<script>
+    /**
+     * Respond to query_state_changed events emitted by the query-section element.
+     * Ask the data_table to update the data with the query elements in the
+     * detail of the event.
+     */
+    let _ele = document.getElementById("query-section");
+    _ele.addEventListener("query_state_changed", e => {
+        //#records is the selector for the div to which the Tabulator instance is attached
+        const tables = Tabulator.prototype.findTable("#records");
+        if (tables.length > 0) {
+            const data_table = tables[0];
+            data_table.setData("https://mars.cyverse.org/thing/select", {q:e.detail.q});
+        }
+    });
+
+    /**
+     * Initialize the records view once the DOM has loaded.
+     */
+    window.onload = function() {
+        recordsOnLoad('records');
+    }
+</script>
+</body>
+</html>
