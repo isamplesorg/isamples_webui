@@ -2,7 +2,69 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Records</title>
+    <title>iSamples Records</title>
+    <script type="application/ld+json">
+      {
+          "@context":"https://schema.org/",
+          "@type":"WebPage",
+          "@id":"index.html",
+          "creator": {
+              "@id": "#isamples-project"
+          },
+          "contributor": {
+            "@type": "Person",
+            "@id": "https://orcid.org/0000-0002-6513-4996",
+            "name": "Dave Vieglais"
+          },
+          "keywords": ["iSamples", "physical-samples", "NSF-Project"],
+          "description":"Web interface for iSamples Central or Box",
+          "url":"https://isamplesorg.github.io/isamples_webui/",
+          "archivedAt":"https://github.com/isamplesorg/isamples_webui",
+          "dateCreated":"2021-10-08",
+          "dateModified":"2021-10-08",
+          "isPartOf":"https://github.com/isamplesorg"
+      }
+    </script>
+    <script type="application/ld+json" id="isamples-project">
+    {
+        "@context": "https://schema.org/",
+        "@graph": [
+            {
+                "@type": "ResearchProject",
+                "@id": "#isamples-project",
+                "name": "Collaborative Research: Frameworks: Internet of Samples: Toward an Interdisciplinary Cyberinfrastructure for Material Samples",
+                "funder": {"@id": "nsf"},
+                "sponsor": {"@id": "nsf"}
+            },
+            {
+                "@type": "MonetaryGrant",
+                "url": "https://nsf.gov/awardsearch/showAward?AWD_ID=2004839",
+                "fundedItem": {"@id": "#isamples-project"}
+            },
+            {
+                "@type": "MonetaryGrant",
+                "url": "https://nsf.gov/awardsearch/showAward?AWD_ID=2004562",
+                "fundedItem": {"@id": "#isamples-project"}
+            },
+            {
+                "@type": "MonetaryGrant",
+                "url": "https://nsf.gov/awardsearch/showAward?AWD_ID=2004642",
+                "fundedItem": {"@id": "#isamples-project"}
+            },
+            {
+                "@type": "MonetaryGrant",
+                "url": "https://nsf.gov/awardsearch/showAward?AWD_ID=2004815",
+                "fundedItem": {"@id": "#isamples-project"}
+            },
+            {
+                "@type": "Organization",
+                "@id": "nsf",
+                "name": "National Sicence Foundation",
+                "url": "https://nsf.gov/"
+            }
+        ]
+    }
+    </script>
     <link rel="stylesheet" href="https://unpkg.com/tabulator-tables@4.9.3/dist/css/tabulator.min.css">
     <!-- Githuub project link webcomponent -->
     <script type="module" src="https://unpkg.com/gh-corner-wc/gh-corner.js?module"></script>
