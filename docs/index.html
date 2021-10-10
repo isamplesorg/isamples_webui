@@ -217,7 +217,15 @@
         const tables = Tabulator.prototype.findTable("#records");
         if (tables.length > 0) {
             const data_table = tables[0];
-            data_table.setData(SERVICE_ENDPOINT+"/thing/select", {q:e.detail.q});
+            console.log("Detail:", e.detail);
+            let params = { q: e.detail.q, fq:[] };
+            if (e.detail.hasOwnProperty('filter')) {
+                for (const [k,v] of Object.entries(e.detail.filter)) {
+                    params.fq.push(v);
+                }
+            }
+            console.log(`Update, params = ${params}`);
+            data_table.setData(SERVICE_ENDPOINT+"/thing/select", params);
         }
     });
 

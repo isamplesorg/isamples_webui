@@ -3,6 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <title>Overview</title>
+    <!-- **************  -->
+<!-- Optional: Required for resizing panel height -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/RickStrahl/jquery-resizable@0.32/dist/jquery-resizable.min.js"></script>
+
+<!-- Optional: Required for logging arrays and objects -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/native-promise-only/0.8.1/npo.js"></script> <!-- Optional: A polyfill for native ES6 Promises (Not required for modern browsers) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/5.26.2/jsoneditor.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/5.26.2/jsoneditor-minimalist.min.js"></script>
+
+<!-- Optional: Required for logging DOM elements with syntax highlighting -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/themes/prism.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/prism.min.js" data-manual></script>
+
+<!-- Required: Code for console-panel -->
+<link rel="stylesheet" href="css/console-panel.css" />
+<script src="js/console-panel.js"></script>
+<script>
+    consolePanel.enable();
+
+    /*! based on tiny Js Pub/Sub
+     * http://anasnakawa.com/
+     * Copyright (c) Anas Nakawa
+     * inspired by Ben Alman's tiny one <https://gist.github.com/cowboy/661855>
+     * MIT License
+     */
+    (function( p ) {
+
+      var e = p.e = {};
+
+      p.publish = function( name, data ) {
+        ( e[ name ] = e[ name ] || new CustomEvent( name, {detail: data} ) );
+        dispatchEvent( e[ name ] );
+      };
+
+      p.subscribe = function( name, handler) {
+        addEventListener( name, handler );
+      };
+
+      p.unsubscribe = function( name, handler ) {
+        removeEventListener( name, handler );
+      };
+
+    })( this.pubsub = {} );
+</script>
+    <!-- **************  -->
+
     <link rel="stylesheet" href="css/common.css" />
     <!--<link rel="stylesheet" href="https://unpkg.com/gutenberg-css@0.6" media="print">-->
 

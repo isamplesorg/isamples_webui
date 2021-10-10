@@ -72,6 +72,15 @@ async function getSolrRecords(q, fq=[], start=0, num_rows=TABLE_ROWS, sorters=[]
     return rows;
 }
 
+/**
+ * Handles ajax request from tabulator to retrieve a page of records
+ *
+ * @param url
+ * @param config
+ * @param params
+ * @returns {Promise<{data: *[], last_page: number}>}
+ * @private
+ */
 function _doSolrLoad(url, config, params){
     const _start = (params.page-1) * params.size;
     const _q = params.q || DEFAULT_Q;
@@ -125,14 +134,18 @@ function selectRow(_id) {
 
 //show specified identifier record
 async function showRawRecord(id) {
-    const raw_url = SERVICE_ENDPOINT+`/thing/${encodeURIComponent(id)}?format=original`;
-    const xform_url = SERVICE_ENDPOINT+`/thing/${encodeURIComponent(id)}?format=core`;
-    let solr_url = new URL("/thing/select", SERVICE_ENDPOINT);
-    let params = solr_url.searchParams;
-    params.append("q", `id:${escapeLucene(id)}`);
-    params.append("wt", "json");
-    params.append("fl", "*");
-    params.append("rows", 1);
+    const raw_url = new URL(`/thing/${encodeURIComponent(id)}`, SERVICE_ENDPOINT);
+    raw_url.searchParams.append("format","original");
+
+    const xform_url = new URL(`/thing/${encodeURIComponent(id)}`, SERVICE_ENDPOINT);
+    xform_url.searchParams.append("format","core");
+
+    const solr_url = new URL("/thing/select", SERVICE_ENDPOINT);
+    solr_url.searchParams.append("q", `id:${escapeLucene(id)}`);
+    solr_url.searchParams.append("wt", "json");
+    solr_url.searchParams.append("fl", "*");
+    solr_url.searchParams.append("rows", 1);
+
     await Promise.all([
         fetch(raw_url)
             .then(response => response.json())

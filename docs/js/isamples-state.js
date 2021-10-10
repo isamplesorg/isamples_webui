@@ -24,34 +24,83 @@ export class ISamplesState extends LitElement {
     static get properties() {
         return {
             q: {type: String},
-            tq: {type: String},
-            sq: {type: String},
-            fq: {type: String, state:true},
-            fqs: {type: Object, state: true},
+            _fqs: {
+                state: true,
+                type: Object,
+                hasChanged(newVal, oldVal) {
+                    console.log("isamples-state._fqs.hasChanged",newVal, oldVal);
+                    return true;
+                    if (oldVal === undefined) {
+                        return true;
+                    }
+                    if (Object.keys(newVal).length !== Object.keys(oldVal).length) {
+                        return true;
+                    }
+                    for (const [k,v] of Object.entries(newVal)) {
+                        if (! k in oldVal) {
+                            return true;
+                        }
+                        if (oldVal[k] !== v) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            },
         };
-    }
-
-    // https://lit.dev/docs/components/events/#understanding-this-in-event-listeners
-    _handleFQChanged = (e) => {
-        console.log("query_changed: ", e);
-        this.fq = e.detail.fq;
-        this._dispatchQueryChanged();
-    }
-
-    setFq(fq) {
-        console.log(`received fq = ${fq}`);
-        this.fq = fq;
-        this._dispatchQueryChanged()
     }
 
     constructor() {
         super();
         this.q = "*:*";
-        this.tq = "";
-        this.sq = "";
-        this.fq = "";
-        this.fqs = {};
-        this.addEventListener('fq_changed', this._handleFQChanged);
+        this._fqs = {};
+        this._subscribers = [];
+        this.addEventListener('query_changed', this._handleChanged);
+        //pubsub.subscribe('filter_changed', this._handleQueryChanged);
+    }
+
+    subscribe(target) {
+        if (this._subscribers.includes(target)) {
+            console.warn("isamples-state, already subscribed: ", target);
+            return
+        }
+        this._subscribers.push(target);
+    }
+
+    unsubscribe(target) {
+        let index = this._subscribers.indexOf(target);
+        if (index > -1) {
+            this._subscribers.splice(index, 1);
+        }
+    }
+
+    getFilters() {
+        return {
+            q: this.q,
+            fqs: Object.assign({}, this._fqs)
+        };
+    }
+
+    /**
+     * Handles query change events sent from slots or other children
+     * https://lit.dev/docs/components/events/#understanding-this-in-event-listeners
+     *
+     * @param e event, detail contains key, value
+     * @private
+     */
+    _handleQueryChanged = (e) => {
+        console.log("isamples-state._handleQueryChanged: ", e);
+        if (e.detail.hasOwnProperty("name")) {
+            if (e.detail.name === "q") {
+                this.q = e.detail.value;
+                this._notifyQueryChanged();
+            } else if (e.detail.name in this._fqs) {
+                this._fqs[e.detail.name] = e.detail.value
+                this._notifyQueryChanged();
+            } else {
+                console.warn(`"Received unexpected event detail name: ${e.detail.name}`)
+            }
+        }
     }
 
     get _slottedChildren() {
@@ -61,33 +110,64 @@ export class ISamplesState extends LitElement {
     }
 
     /**
-     * Calls queryChanged on all slotted elements that have that method.
+     * Calls queryChanged on all slotted elements and all subscribers
+     * that have that method.
      */
-    _dispatchQueryChanged() {
-        console.log("query_changed");
+    _notifyQueryChanged() {
+        console.log("isamples-state._notifyQueryChanged");
         const children = this._slottedChildren;
-        const data = {q:this.q, tq:this.tq, sq: this.sq, fq: this.fq};
+        const data = {q:this.q, fqs:Object.assign({}, this._fqs)};
         for (const k in children) {
             const child = children[k];
             if (typeof child.queryChanged === 'function') {
+                console.log("isamples-state._notifyQueryChanges.slot");
                 child.queryChanged(data);
+            }
+        }
+        for (const k in this._subscribers) {
+            const sub = this._subscribers[k];
+            if (typeof sub.queryChanged === 'function') {
+                console.log("isamples-state._notifyQueryChanges.sub");
+                sub.queryChanged(data);
             }
         }
     }
 
+    setFilter(name, fq) {
+        console.log(`isamples-state.setFilter fq = ${name} : ${fq}`);
+        this._fqs[name] = fq;
+        this._fqs = Object.assign({}, this._fqs);
+        this._notifyQueryChanged()
+    }
+
+
+    /**
+     * Called when a property is updated
+     *
+     * The changed value contains the previous value(s). The properties
+     * of this contain the new values when the method is called.
+     *
+     * @param changed: previous value
+     */
     updated(changed) {
-        let detail = {}
-        if (changed.has('q')) {
-            detail.q = this.q;
-            this._dispatchQueryChanged()
-        }
-        if (Object.keys(detail).length > 0) {
+        console.log(`isamples-state.updated: `,changed);
+        let _notify = false;
+        changed.forEach((_change, key, map) => {
+            if (key === "q" && _change !== undefined) {
+                _notify = true;
+            }
+        });
+        if (_notify) {
             const event = new CustomEvent("query_state_changed", {
-                detail: detail,
+                detail: {
+                    q: this.q,
+                    filter: this._fqs
+                },
                 bubbles: true,
                 composed: true
             });
             this.dispatchEvent(event);
+            this._notifyQueryChanged()
         }
     }
 
@@ -101,12 +181,12 @@ export class ISamplesState extends LitElement {
 
     render() {
         return html`
-            <details>
+            <details open>
                 <summary>Q:
                     <input .value=${this.q} @change=${this.qChanged} size="100"/><button type="button" @click=${this.setDefaults}>*:*</button>
                 </summary>
                 <table>
-                    ${Object.keys(this.fqs).map((k) => html`<tr><td>${k}</td><td class=".query">${this.fqs[k]}</td></tr>`)}
+                    ${Object.keys(this._fqs).map((k) => html`<tr><td>${k}</td><td class=".query">${this._fqs[k]}</td></tr>`)}
                 </table>
             </details>
             <slot ></slot>

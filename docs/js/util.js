@@ -67,19 +67,13 @@ function getPivotTotal(pdata, f0) {
 }
 
 
-export async function getSolrRecordSummary(Q, SQ=null, TQ=null, FQ=null, facets=DEFAULT_FACETS) {
+export async function getSolrRecordSummary(Q, FQ=[], facets=DEFAULT_FACETS) {
     const TOTAL = "Total";
     let _url = new URL("/thing/select", SERVICE_ENDPOINT);
     let params = _url.searchParams;
     params.append("q", Q);
-    if (isNN(SQ)) {
-        params.append("fq", SQ);
-    }
-    if (isNN(TQ)) {
-        params.append("fq", TQ);
-    }
-    if (isNN(FQ)) {
-        params.append("fq", FQ);
+    for (let i=0; i < FQ.length; i++) {
+        params.append("fq", FQ[i]);
     }
     params.append("facet", "on");
     params.append("facet.method", "enum");

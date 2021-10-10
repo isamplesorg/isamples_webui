@@ -43,22 +43,30 @@ export class ISamplesSummary extends LitElement {
     static get properties() {
         return {
             queryStateId: {type: String},
+            name: {type: String},
             q: {type: String},
-            tq: {type: String},
-            sq: {type: String},
-            fq: {type: String},
-            _data: {type: Object, state: true},
+            fqs: {
+                type: Array,
+                hasChanged(newVal, oldVal) {
+                    console.log("isamples-summary.fqs.hasChanged")
+                    if (newVal === oldVal) {
+                        return false;
+                    }
+                    return false;
+                }
+            },
+            _data: {
+                type: Object,
+            },
         };
     }
-
 
     constructor() {
         super();
         this.queryStateId = "";
+        this.name = "summary";
         this.q = "*:*";
-        this.tq = "";
-        this.sq = "";
-        this.fq = "";
+        this.fqs = [];
         this._data = {
             sources: []
         };
@@ -67,62 +75,138 @@ export class ISamplesSummary extends LitElement {
 
     connectedCallback() {
         super.connectedCallback();
+        const _qele = document.getElementById(this.queryStateId);
+        if (_qele !== undefined) {
+            //get current query from query state manager
+            const filters = _qele.getFilters();
+            this.q = filters.q;
+            let fqs = [];
+            for (const [k,v] of Object.entries(filters.fqs)){
+                if (k !== this.name) {
+                    fqs.append(v);
+                }
+            }
+            this.fqs = fqs;
+
+            //subscribe to changes to query state
+            _qele.subscribe(this);
+        }
         this.loadSummary();
     }
 
     disconnectedCallback() {
+        const _qele = document.getElementById(this.queryStateId);
+        if (_qele !== undefined) {
+            _qele.unsubscribe(this);
+        }
         super.disconnectedCallback();
     }
 
+    /*
+    UNUSED
+     */
     getQueryState() {
+        console.log("isamples-summary.getQueryState");
         const _qele = document.getElementById(this.queryStateId);
         if (_qele === undefined) {
             return;
         }
-        this.q = _qele.q;
-        this.tq = _qele.tq;
-        this.sq = _qele.sq;
-        this.fq = _qele.fq;
+        const filters = _qele.getFilters();
+        this.q = filters.q;
+        let fqs = [];
+        for (const [k,v] of Object.entries(filters.fqs)){
+            if (k !== this.name) {
+                fqs.append(v);
+            }
+        }
+        this.fqs = fqs;
     }
 
+    /*
+    Loads the summary information from Solr using the current Q and FQ entries
+     */
     async loadSummary() {
-        this.getQueryState();
-        getSolrRecordSummary(this.q, this.sq, this.tq, this.fq, this._facets)
+        console.log("isamples-summary.loadSummary");
+        //this.getQueryState();
+        getSolrRecordSummary(this.q, this.fqs, this._facets)
             .then(data => {
                 this._data = data;
                 console.log(this._data)
             });
     }
 
+    /**
+     * Called by subscription manager to notify that Q or any FQ have changed.
+     *
+     * Changes to the FQ owned by this instance (keyed by name) are ignored
+     * since we are showing the summary for the subset identified by Q and
+     * any other filters.
+     *
+     * The data is loaded from reaction to change in this.q or this.fqs.
+     *
+     * @param data object containing q:String and fqs:Object
+     */
     queryChanged(data) {
-        console.log("Overview query changed: ", data);
+        console.log("isamples-summary.queryChanged = ", data);
         this.q = data.q;
-        this.sq = data.sq;
-        this.tq = data.tq;
-        this.fq = data.fq;
-        this.loadSummary();
+        let fqs = [];
+        for (const [k,v] of Object.entries(data.fqs)){
+            if (k !== this.name) {
+                fqs.append(v);
+            }
+        }
+        this.fqs = fqs;
     }
 
-    setFQ(fq) {
-        return function() {
-            console.log("dispatch = ", fq);
-            const _qele = document.getElementById(this.queryStateId);
-            if (_qele !== undefined) {
-                console.log("setFq = ", fq);
-                _qele.setFq(fq)
-                this.loadSummary();
+    /**
+     * Determine if a change should trigger a data load
+     *
+     * Overrides LitElement.updated
+     *
+     * @param changed Map of property changes
+     */
+    updated(changed) {
+        console.log("isamples-summary.updated:", changed);
+        let _notify = false;
+        changed.forEach((_change, key, map) => {
+            if (key === "q" && _change !== undefined) {
+                _notify = true;
             }
-            const event = new CustomEvent("fq_changed", {
+        });
+        if (_notify) {
+            this.loadSummary();
+        }
+    }
+
+    /**
+     *
+     * @param fq
+     * @returns {(function(): void)|*}
+     */
+    setFilter(fq) {
+        return function() {
+            console.log("isamples-summary.setFilter fq=", fq);
+
+            const state_manager = document.getElementById(this.queryStateId);
+            if (state_manager !== undefined) {
+                state_manager.setFilter(this.name, fq)
+            }
+            const event = new CustomEvent("query_changed", {
                 detail: {fq:fq},
                 bubbles: true,
                 composed: true
             });
             this.dispatchEvent(event);
+
+            //pubsub.publish("filter_changed", {name:this.name, value:fq})
         }
     }
 
     render() {
         let sources = [];
+        if (this._data === undefined) {
+            return html`Loading...`;
+        }
         this._data.sources.map((src) => sources.push(src));
         sources.sort();
 
@@ -143,9 +227,9 @@ export class ISamplesSummary extends LitElement {
                         let row = [html`<td style="width:18rem">${cat}</td>`];
                         for (let s=0; s < sources.length; s += 1) {
                             const src = sources[s];
-                            row.push(html`<td @click=${this.setFQ(data[src].fq)}>${data[src].v}</td>`);
+                            row.push(html`<td @click=${this.setFilter(data[src].fq)}>${data[src].v}</td>`);
                         }
-                        row.push(html`<td @click=${this.setFQ(data['Total'].fq)}>${data['Total'].v}</td>`);
+                        row.push(html`<td @click=${this.setFilter(data['Total'].fq)}>${data['Total'].v}</td>`);
                         fld.push(html`<tr>${row}</tr>`)
                     }
                 }
@@ -154,6 +238,7 @@ export class ISamplesSummary extends LitElement {
         }
 
         return html`
+            
             <table>
                 <thead>
                     <tr>
@@ -166,9 +251,9 @@ export class ISamplesSummary extends LitElement {
                     <tr>
                         <td style="width:18rem">Records</td>
                         ${sources.map((src) => html`
-                            <td @click=${this.setFQ(this._data.totals[src].fq)}>${this._data.totals[src].v}</td>
+                            <td @click=${this.setFilter(this._data.totals[src].fq)}>${this._data.totals[src].v}</td>
                         `)}
-                        <td @click=${this.setFQ('')}>${this._data.total_records}</td>
+                        <td @click=${this.setFilter('')}>${this._data.total_records}</td>
                     </tr>
                 </tbody>
             </table>
