@@ -110,6 +110,26 @@ function recordsOnLoad(tabulatorDivId) {
         resizableRows: true,
         footerElement:"<span class='records-footer'>Total records:<span id='record_count'></span></span>"
     });
+
+    /**
+     * Respond to query_state_changed events emitted by the query-section element.
+     * Ask the data_table to update the data with the query elements in the
+     * detail of the event.
+     */
+    try {
+        eventBus.on('query_state_changed', data => {
+            let params = {q: data.q, fq: []};
+            if (data.hasOwnProperty('filter')) {
+                for (const [k, v] of Object.entries(data.filter)) {
+                    params.fq.push(v);
+                }
+            }
+            data_table.setData(SERVICE_ENDPOINT + "/thing/select", params);
+        });
+    } catch (e) {
+        console.error(e);
+        console.info("eventBus is requried at window scope for component communications.")
+    }
 }
 
 //=================

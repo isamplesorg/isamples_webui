@@ -17,10 +17,12 @@ export class ISamplesSummary extends LitElement {
             font-family: var(--mono-font, monospace);
             font-size: 1.1em;
         }
+        .selected {
+            background-color: #cce6ff;
+        }
         table {
             min-width: 50rem;
             padding-top: 2rem;
-            border-spacing: 0;
         }
         tbody tr:last-child td {
             border-bottom: 1px solid grey;
@@ -37,6 +39,10 @@ export class ISamplesSummary extends LitElement {
             padding-left: 1rem;
             padding-right: 0;
         }
+        td.data:hover {
+            background-color: #e6f2ff;
+        }
+        
         `;
     }
 
@@ -48,7 +54,7 @@ export class ISamplesSummary extends LitElement {
             fqs: {
                 type: Array,
                 hasChanged(newVal, oldVal) {
-                    console.log("isamples-summary.fqs.hasChanged")
+                    //console.log("isamples-summary.fqs.hasChanged")
                     if (newVal === oldVal) {
                         return false;
                     }
@@ -67,18 +73,29 @@ export class ISamplesSummary extends LitElement {
         this.name = "summary";
         this.q = "*:*";
         this.fqs = [];
+        this._selected = '';
         this._data = {
             sources: []
         };
         this._facets = DEFAULT_FACETS;
+
+        // Subscribe to query_state_changed events
+        let _this = this;
+        this._queryStateChangedCallback =  function(data) {
+            _this.queryChanged(data);
+        }
+        eventBus.on('query_state_changed', this._queryStateChangedCallback);
     }
 
     connectedCallback() {
         super.connectedCallback();
-        const _qele = document.getElementById(this.queryStateId);
-        if (_qele !== undefined) {
-            //get current query from query state manager
-            const filters = _qele.getFilters();
+        const queryState = document.getElementById(this.queryStateId);
+        if (queryState !== undefined) {
+            // register this filter state provider with the query state manager
+            queryState.addFilterSource(this.name, '');
+
+            // get current query from query state manager, if available
+            const filters = queryState.getFilters();
             this.q = filters.q;
             let fqs = [];
             for (const [k,v] of Object.entries(filters.fqs)){
@@ -87,47 +104,22 @@ export class ISamplesSummary extends LitElement {
                 }
             }
             this.fqs = fqs;
-
-            //subscribe to changes to query state
-            _qele.subscribe(this);
         }
         this.loadSummary();
     }
 
     disconnectedCallback() {
-        const _qele = document.getElementById(this.queryStateId);
-        if (_qele !== undefined) {
-            _qele.unsubscribe(this);
-        }
+        // detach from the eventBus
+        eventBus.detach('query_state_changed', this._queryStateChangedCallback);
         super.disconnectedCallback();
     }
 
-    /*
-    UNUSED
-     */
-    getQueryState() {
-        console.log("isamples-summary.getQueryState");
-        const _qele = document.getElementById(this.queryStateId);
-        if (_qele === undefined) {
-            return;
-        }
-        const filters = _qele.getFilters();
-        this.q = filters.q;
-        let fqs = [];
-        for (const [k,v] of Object.entries(filters.fqs)){
-            if (k !== this.name) {
-                fqs.append(v);
-            }
-        }
-        this.fqs = fqs;
-    }
-
-    /*
-    Loads the summary information from Solr using the current Q and FQ entries
+    /**
+     * Load summary information from Solr using the current Q and FQ entries
+     *
+     * @returns {Promise<void>}
      */
     async loadSummary() {
-        console.log("isamples-summary.loadSummary");
-        //this.getQueryState();
         getSolrRecordSummary(this.q, this.fqs, this._facets)
             .then(data => {
                 this._data = data;
@@ -136,7 +128,7 @@ export class ISamplesSummary extends LitElement {
     }
 
     /**
-     * Called by subscription manager to notify that Q or any FQ have changed.
+     * Called by the eventBus to inform that Q or any FQ have changed.
      *
      * Changes to the FQ owned by this instance (keyed by name) are ignored
      * since we are showing the summary for the subset identified by Q and
@@ -147,15 +139,15 @@ export class ISamplesSummary extends LitElement {
      * @param data object containing q:String and fqs:Object
      */
     queryChanged(data) {
-        console.log("isamples-summary.queryChanged = ", data);
+        //console.log("isamples-summary.queryChanged = ", data);
         this.q = data.q;
-        let fqs = [];
-        for (const [k,v] of Object.entries(data.fqs)){
+        let filters = [];
+        for (const [k,v] of Object.entries(data.filter)){
             if (k !== this.name) {
-                fqs.append(v);
+                filters.append(v);
             }
         }
-        this.fqs = fqs;
+        this.fqs = filters;
     }
 
     /**
@@ -166,7 +158,7 @@ export class ISamplesSummary extends LitElement {
      * @param changed Map of property changes
      */
     updated(changed) {
-        console.log("isamples-summary.updated:", changed);
+        //console.log("isamples-summary.updated:", changed);
         let _notify = false;
         changed.forEach((_change, key, map) => {
             if (key === "q" && _change !== undefined) {
@@ -184,24 +176,29 @@ export class ISamplesSummary extends LitElement {
      * @returns {(function(): void)|*}
      */
     setFilter(fq) {
-        return function() {
-            console.log("isamples-summary.setFilter fq=", fq);
-
-            const state_manager = document.getElementById(this.queryStateId);
-            if (state_manager !== undefined) {
-                state_manager.setFilter(this.name, fq)
+        return function(e) {
+            console.log("isamples-summary.setFilter fq=", fq, e);
+            let elements = this.renderRoot.querySelectorAll(".selected");
+            for (let i=0; i < elements.length; i++) {
+                elements[i].classList.remove("selected");
             }
-            const event = new CustomEvent("query_changed", {
-                detail: {fq:fq},
-                bubbles: true,
-                composed: true
-            });
-            this.dispatchEvent(event);
-
-            //pubsub.publish("filter_changed", {name:this.name, value:fq})
+            e.target.classList.add("selected");
+            this._selected = fq;
+            eventBus.emit('filter_changed', null, {name:this.name, value:fq})
         }
     }
 
+    _getTd(data) {
+        return html`<td class="${data.c}" @click=${this.setFilter(data.fq)}>${data.v}</td>`;
+    }
+
+    /**
+     * Renders the summary data to a HTML template
+     *
+     * Overrides LitElelement.render
+     *
+     * @returns {*} html template
+     */
     render() {
         let sources = [];
         if (this._data === undefined) {
@@ -227,9 +224,11 @@ export class ISamplesSummary extends LitElement {
                         let row = [html`<td style="width:18rem">${cat}</td>`];
                         for (let s=0; s < sources.length; s += 1) {
                             const src = sources[s];
-                            row.push(html`<td @click=${this.setFilter(data[src].fq)}>${data[src].v}</td>`);
+                            //row.push(html`<td @click=${this.setFilter(data[src].fq)}>${data[src].v}</td>`);
+                            row.push(this._getTd(data[src]));
                         }
-                        row.push(html`<td @click=${this.setFilter(data['Total'].fq)}>${data['Total'].v}</td>`);
+                        //row.push(html`<td @click=${this.setFilter(data['Total'].fq)}>${data['Total'].v}</td>`);
+                        row.push(this._getTd(data['Total']));
                         fld.push(html`<tr>${row}</tr>`)
                     }
                 }
@@ -238,7 +237,6 @@ export class ISamplesSummary extends LitElement {
         }
 
         return html`
-            
             <table>
                 <thead>
                     <tr>
@@ -251,7 +249,7 @@ export class ISamplesSummary extends LitElement {
                     <tr>
                         <td style="width:18rem">Records</td>
                         ${sources.map((src) => html`
-                            <td @click=${this.setFilter(this._data.totals[src].fq)}>${this._data.totals[src].v}</td>
+                            ${this._getTd(this._data.totals[src])}
                         `)}
                         <td @click=${this.setFilter('')}>${this._data.total_records}</td>
                     </tr>

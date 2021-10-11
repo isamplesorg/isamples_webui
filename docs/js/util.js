@@ -104,7 +104,8 @@ export async function getSolrRecordSummary(Q, FQ=[], facets=DEFAULT_FACETS) {
         facet_info.sources.push(data.facet_counts.facet_fields[SOURCE][i]);
         facet_info.totals[data.facet_counts.facet_fields[SOURCE][i]] = {
             v:data.facet_counts.facet_fields[SOURCE][i + 1],
-            fq:SOURCE+":"+data.facet_counts.facet_fields[SOURCE][i]
+            fq:SOURCE+":"+data.facet_counts.facet_fields[SOURCE][i],
+            c: "data"
         };
     }
     for (const f in data.facet_counts.facet_fields) {
@@ -130,12 +131,14 @@ export async function getSolrRecordSummary(Q, FQ=[], facets=DEFAULT_FACETS) {
             entry[k] = {};
             entry[k][TOTAL] = {
                 v:data.facet_counts.facet_fields[f][i + 1],
-                fq:f + ":" + escapeLucene(k)
+                fq:f + ":" + escapeLucene(k),
+                c: "data"
             };
             for (const col in columns) {
                 entry[k][columns[col]] = {
                     v: getPivotValue(_pdata, columns[col], k),
-                    fq: SOURCE +":"+columns[col]+" AND " + f + ":" + escapeLucene(k)
+                    fq: SOURCE +":"+columns[col]+" AND " + f + ":" + escapeLucene(k),
+                    c: "data"
                 }
             }
         }
@@ -146,7 +149,8 @@ export async function getSolrRecordSummary(Q, FQ=[], facets=DEFAULT_FACETS) {
         for (const col in columns) {
             entry[TOTAL][columns[col]] = {
                 v:getPivotTotal(_pdata, columns[col]),
-                fq:SOURCE + ":" + escapeLucene(columns[col])
+                fq:SOURCE + ":" + escapeLucene(columns[col]),
+                c: "data"
             };
         }
         facet_info.facets[f] = entry;

@@ -70,6 +70,8 @@
         ]
     }
     </script>
+    <script src="https://unpkg.com/js-event-bus@1.1.1/src/index.js"></script>
+
     <link rel="stylesheet" href="https://unpkg.com/tabulator-tables@4.9.3/dist/css/tabulator.min.css">
     <!-- Githuub project link webcomponent -->
     <script type="module" src="https://unpkg.com/gh-corner-wc/gh-corner.js?module"></script>
@@ -82,6 +84,15 @@
          * @type {string} URL of service endpoint
          */
         var SERVICE_ENDPOINT = "https://mars.cyverse.org";
+
+        /**
+         * The eventBus is used for cross component communications.
+         *
+         * Query and filter state changes are notified through the eventBus.
+         *
+         * @type {EventBus}
+         */
+        const eventBus = new EventBus();
     </script>
     <script onerror="console.warn('No local configuration, using defaults')" src="local_config.js"></script>
 
@@ -103,6 +114,8 @@
         #records {
             height: 40vh;
         }
+
+
         .infoContainer {
             margin-top:1.0rem;
             display: flex;
@@ -169,66 +182,53 @@
 <body>
 <main>
     <gh-corner user="isamplesorg" repo=""></gh-corner>
+
     <section id="query-section">
         <isamples-state id="query-state"></isamples-state>
-        <div id="records"></div>
+        <details>
+            <summary>Summary</summary>
+            <isamples-summary id="summary" queryStateId="query-state"></isamples-summary>
+        </details>
     </section>
+
+    <section>
+        <div id="records">
+        </div>
+    </section>
+
     <details open>
         <summary>Selected Row Record</summary>
-    <section class="infoContainer">
-        <div class="infoChild" id="InfoLeft" >
-            <span class="label">Source Record</span>
-            <pre id="record_original">
+        <section class="infoContainer">
+            <div class="infoChild" id="InfoLeft" >
+                <span class="label">Source Record</span>
+                <pre id="record_original">
 
-                Select a row to view source record.
-            </pre>
-        </div>
-        <div class="infoChild" id="InfoRight">
-            <details>
-                <summary>iSamples Solr Record</summary>
-                <pre id="record_solr">
-
-                    Select a row to view solr record.
+                    Select a row to view source record.
                 </pre>
-            </details>
-            <details open>
-                <summary>iSamples Core Record</summary>
-                <pre id="record_xform">
+            </div>
+            <div class="infoChild" id="InfoRight">
+                <details>
+                    <summary>iSamples Solr Record</summary>
+                    <pre id="record_solr">
 
-                    Select a row to view transformed record.
-                </pre>
-            </details>
-        </div>
-    </section>
+                        Select a row to view solr record.
+                    </pre>
+                </details>
+                <details open>
+                    <summary>iSamples Core Record</summary>
+                    <pre id="record_xform">
+
+                        Select a row to view transformed record.
+                    </pre>
+                </details>
+            </div>
+        </section>
     </details>
 </main>
 <footer>
     <p>Placeholder</p>
 </footer>
 <script>
-    /**
-     * Respond to query_state_changed events emitted by the query-section element.
-     * Ask the data_table to update the data with the query elements in the
-     * detail of the event.
-     */
-    let _ele = document.getElementById("query-section");
-    _ele.addEventListener("query_state_changed", e => {
-        //#records is the selector for the div to which the Tabulator instance is attached
-        const tables = Tabulator.prototype.findTable("#records");
-        if (tables.length > 0) {
-            const data_table = tables[0];
-            console.log("Detail:", e.detail);
-            let params = { q: e.detail.q, fq:[] };
-            if (e.detail.hasOwnProperty('filter')) {
-                for (const [k,v] of Object.entries(e.detail.filter)) {
-                    params.fq.push(v);
-                }
-            }
-            console.log(`Update, params = ${params}`);
-            data_table.setData(SERVICE_ENDPOINT+"/thing/select", params);
-        }
-    });
-
     /**
      * Initialize the records view once the DOM has loaded.
      */

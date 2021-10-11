@@ -54,24 +54,24 @@ export class ISamplesState extends LitElement {
         super();
         this.q = "*:*";
         this._fqs = {};
-        this._subscribers = [];
-        this.addEventListener('query_changed', this._handleChanged);
-        //pubsub.subscribe('filter_changed', this._handleQueryChanged);
+        // Subscribe to filter_changed events
+        eventBus.on('filter_changed', this._handleQueryChanged)
     }
 
-    subscribe(target) {
-        if (this._subscribers.includes(target)) {
-            console.warn("isamples-state, already subscribed: ", target);
-            return
+    /**
+     * Adds a new filter source
+     *
+     * Filter sources control a single named filter. All named filters are
+     * bundled as FQ parameters wher making a request for data from Solr.
+     *
+     * @param name:String name of the filter
+     * @param initialValue:String initial value of the filter
+     */
+    addFilterSource(name, initialValue) {
+        if (this._fqs.hasOwnProperty(name)) {
+            console.warn(`Existing filter ${name} is being replaced`);
         }
-        this._subscribers.push(target);
-    }
-
-    unsubscribe(target) {
-        let index = this._subscribers.indexOf(target);
-        if (index > -1) {
-            this._subscribers.splice(index, 1);
-        }
+        this._fqs[name] = initialValue;
     }
 
     getFilters() {
@@ -85,21 +85,20 @@ export class ISamplesState extends LitElement {
      * Handles query change events sent from slots or other children
      * https://lit.dev/docs/components/events/#understanding-this-in-event-listeners
      *
-     * @param e event, detail contains key, value
+     * @param data, name and value of filter that changed
      * @private
      */
-    _handleQueryChanged = (e) => {
-        console.log("isamples-state._handleQueryChanged: ", e);
-        if (e.detail.hasOwnProperty("name")) {
-            if (e.detail.name === "q") {
-                this.q = e.detail.value;
-                this._notifyQueryChanged();
-            } else if (e.detail.name in this._fqs) {
-                this._fqs[e.detail.name] = e.detail.value
-                this._notifyQueryChanged();
-            } else {
-                console.warn(`"Received unexpected event detail name: ${e.detail.name}`)
-            }
+    _handleQueryChanged = (data) => {
+        console.log("isamples-state._handleQueryChanged: ", data);
+        if (data.name === "q") {
+            this.q = data.value;
+            this._notifyQueryChanged();
+        } else if (data.name in this._fqs) {
+            this._fqs[data.name] = data.value;
+            this._fqs = Object.assign({}, this._fqs);
+            this._notifyQueryChanged();
+        } else {
+            console.warn(`Received unexpected event detail name: ${data.name}`)
         }
     }
 
@@ -110,28 +109,13 @@ export class ISamplesState extends LitElement {
     }
 
     /**
-     * Calls queryChanged on all slotted elements and all subscribers
-     * that have that method.
+     * Emit notification to the eventBus that query state has changed
      */
     _notifyQueryChanged() {
         console.log("isamples-state._notifyQueryChanged");
-        const children = this._slottedChildren;
-        const data = {q:this.q, fqs:Object.assign({}, this._fqs)};
-        for (const k in children) {
-            const child = children[k];
-            if (typeof child.queryChanged === 'function') {
-                console.log("isamples-state._notifyQueryChanges.slot");
-                child.queryChanged(data);
-            }
-        }
-        for (const k in this._subscribers) {
-            const sub = this._subscribers[k];
-            if (typeof sub.queryChanged === 'function') {
-                console.log("isamples-state._notifyQueryChanges.sub");
-                sub.queryChanged(data);
-            }
-        }
+        eventBus.emit("query_state_changed", null, {q: this.q, filter: this._fqs});
     }
+
 
     setFilter(name, fq) {
         console.log(`isamples-state.setFilter fq = ${name} : ${fq}`);
@@ -147,6 +131,8 @@ export class ISamplesState extends LitElement {
      * The changed value contains the previous value(s). The properties
      * of this contain the new values when the method is called.
      *
+     * This is where other components are notified of a change
+     *
      * @param changed: previous value
      */
     updated(changed) {
@@ -158,6 +144,7 @@ export class ISamplesState extends LitElement {
             }
         });
         if (_notify) {
+            /*
             const event = new CustomEvent("query_state_changed", {
                 detail: {
                     q: this.q,
@@ -167,6 +154,7 @@ export class ISamplesState extends LitElement {
                 composed: true
             });
             this.dispatchEvent(event);
+             */
             this._notifyQueryChanged()
         }
     }
