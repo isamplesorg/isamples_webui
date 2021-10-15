@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iSamples Spatial</title>
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.86/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.86/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <style>
+        #cesiumContainer{
+            height: 80vh;
+        }
+    </style>
+</head>
+<body>
+    <p>Draft / alpha / experimental - iSamples data from 2021-10-15</p>
+    <div id="cesiumContainer" class="fullSize"></div>
+    <div id="toolbar">
+        <div id="pele"></div>
+    </div>
+    <div>
+        <p><span id="pquery"></span></p>
+        <pre id="records"></pre>
+    </div>
+    <!--<input id="hmload" type="button" value="Load HM" /> -->
+
+<script>
+
+function fetchRecords(fq) {
+    const Q = "*:*"
+    let _url = new URL("/thing/select", "https://mars.cyverse.org");
+    let params = _url.searchParams;
+    params.append("q", Q);
+    params.append("wt","json");
+    params.append("fl", "id,source,producedBy_samplingSite_location_ll,hasMaterialCategory,hasContextCategory,hasSpecimenCategory");
+    params.append("fq", fq.fq);
+    params.append("pt", fq.pt);
+    params.append("d", fq.d);
+    fetch(_url)
+        .then(response => response.json())
+        .then(data => {
+            const ele = document.getElementById("records");
+            let rows =[];
+            rows.push(`Matches: ${data.response.numFound}`);
+            for (const i in data.response.docs) {
+                const doc = data.response.docs[i];
+                let e = [doc.id, doc.source, doc.hasMaterialCategory];
+                e.push(doc.hasContextCategory);
+                e.push(doc.hasSpecimenCategory);
+                e.push(doc.producedBy_samplingSite_location_ll);
+                rows.push(e.join("|"));
+            }
+            ele.innerText = rows.join("\n");
+        })
+}
+
+
+Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwNzk3NjkyMy1iNGI1LTRkN2UtODRiMy04OTYwYWE0N2M3ZTkiLCJpZCI6Njk1MTcsImlhdCI6MTYzMzU0MTQ3N30.e70dpNzOCDRLDGxRguQCC-tRzGzA-23Xgno5lNgCeB4";
+
+let worldTerrain = Cesium.createWorldTerrain({
+  //requestWaterMask: true,
+  requestVertexNormals: true,
+});
+
+var scratchRectangle = new Cesium.Rectangle();
+
+// Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
+const viewer = new Cesium.Viewer('cesiumContainer', {
+    infoBox: false,
+    timeline:false,
+    animation:false,
+    //terrainProvider: worldTerrain
+  });
+// Add Cesium OSM Buildings, a global 3D buildings layer.
+const buildingTileset = viewer.scene.primitives.add(Cesium.createOsmBuildings());
+
+var tileset = viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
+    //url: 'tileset-public.moorea2.points.json',
+    url: Cesium.IonResource.fromAssetId(639739),
+}));
+
+console.log(tileset.properties);
+
+tileset.style = new Cesium.Cesium3DTileStyle({
+  color: {
+    conditions: [
+      ["${Classification} === 0", "color('purple')"],       // ground
+      ["${Classification} === 1", "color('brown')"], // low vegetation
+      ["${Classification} === 2", "color('cyan')"],       // medium vegetation
+      ["${Classification} === 3", "color('orange')"],   // high vegetation
+      ["true", "color('white')"]
+    ]
+  },
+  pointSize: 5
+});
+
+function visitMoorea() {
+    // Fly the camera to Moorea
+    viewer.camera.flyTo({
+      destination : Cesium.Cartesian3.fromDegrees(-149.7496, -17.415, 8000),
+      orientation : {
+        heading : Cesium.Math.toRadians(220.0),
+        pitch : Cesium.Math.toRadians(-45.0),
+      }
+    });
+}
+
+function visitUSA() {
+    // Fly the camera to Moorea
+    viewer.camera.flyTo({
+      destination : Cesium.Cartesian3.fromDegrees(-96.4, 38.7, 7419243),
+      orientation : {
+        heading : Cesium.Math.toRadians(0.0),
+        pitch : Cesium.Math.toRadians(-90.0),
+      }
+    });
+}
+
+
+    tileset.readyPromise.then(function() {
+          console.log('Loaded tileset');
+          var bounding = tileset._root._boundingVolume;
+          var center = bounding.boundingSphere.center;
+          var cart = Cesium.Ellipsoid.WGS84.cartesianToCartographic(center);
+          var dest = Cesium.Cartesian3.fromDegrees(
+                  cart.longitude * (180 / Math.PI),
+                  cart.latitude * (180 / Math.PI),
+                  bounding._boundingSphere.radius * 4); // was 2.2
+          console.log(dest);
+          viewer.camera.setView({ destination: dest });
+      });
+
+var toolbar = document.getElementById('toolbar');
+toolbar.innerHTML += "<div id='pele' />";
+
+viewer.clock.onTick.addEventListener(function() {
+    var rect = viewer.camera.computeViewRectangle(viewer.scene.globe.ellipsoid, scratchRectangle);
+    let pele = document.getElementById("pele");
+
+    pele.innerHTML = '<pre>' +
+        'West: ' + Cesium.Math.toDegrees(rect.west).toFixed(4) + '<br/>' +
+        'South: ' + Cesium.Math.toDegrees(rect.south).toFixed(4) + '<br/>' +
+        'East: ' + Cesium.Math.toDegrees(rect.east).toFixed(4) + '<br/>' +
+        'North: ' + Cesium.Math.toDegrees(rect.north).toFixed(4) + '</pre>';
+});
+
+
+viewer.screenSpaceEventHandler.setInputAction(click => {
+  var pickedFeature = viewer.scene.pick(click.position, 3, 3);
+  if (!Cesium.defined(pickedFeature)) {
+    return;
+  }
+  var posn = viewer.scene.pickPosition(click.position);
+  var xyz = Cesium.Cartographic.fromCartesian(posn);
+  var lat = Cesium.Math.toDegrees(xyz.latitude);
+  var lon = Cesium.Math.toDegrees(xyz.longitude);
+  console.log(`${lat}, ${lon}, ${xyz.height}`);
+
+  var cameraPosition = viewer.scene.camera.positionWC;
+  var ellipsoidPosition = viewer.scene.globe.ellipsoid.scaleToGeodeticSurface(cameraPosition);
+  var distance = Cesium.Cartesian3.magnitude(Cesium.Cartesian3.subtract(cameraPosition, ellipsoidPosition, new Cesium.Cartesian3()));
+
+
+
+  let qele = document.getElementById("pquery");
+  let d = (distance / 100000);
+  if (d < 0.1) {
+      d = 0.1;
+  }
+  let fq = {
+      fq:"{!geofilt sfield=producedBy_samplingSite_location_ll}",
+      pt:`${lat},${lon}`,
+      d:d
+  }
+  qele.innerText = `fq=${fq.fq}&pt=${fq.pt}&d=${fq.d} distance=${distance}`;
+  fetchRecords(fq);
+}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+function getData(rect) {
+  let min_lat = Cesium.Math.toDegrees(rect.south);
+  let min_lon = Cesium.Math.toDegrees(rect.west);
+  let max_lat = Cesium.Math.toDegrees(rect.north);
+  let max_lon = Cesium.Math.toDegrees(rect.east);
+  if (min_lat < -81.0) {
+    min_lat = -81.0;
+  }
+  if (max_lat > 81.0) {
+    max_lat = 81.0;
+  }
+  //let url = "https://mars.cyverse.org/things_geojson_heatmap?query=%2A%3A%2A";
+  let url = "http://localhost:8000/things_geojson_heatmap?query=%2A%3A%2A";
+
+  url = url + `&min_lat=${min_lat}&max_lat=${max_lat}&min_lon=${min_lon}&max_lon=${max_lon}`;
+  console.log(url);
+  return url;
+}
+
+function postProcessHeatmap(ds, count_max) {
+  console.log("post process");
+  console.log(ds.properties);
+  //let cscale = chroma.scale(["#0000ff","yellow", "red"]).domain([0,count_max]);
+  for (let i =0; i < ds.entities.values.length; i+=1) {
+    let e = ds.entities.values[i];
+    e.polygon.outline = false;
+    const height = 50000*Math.log10(e.properties.count+1);
+    e.polygon.extrudedHeight = height;
+    const color = Cesium.Color.fromHsl(0.6 - (height/count_max) * 0.5, 1.0, 0.5, 0.3);
+    e.polygon.material = color;
+    //console.log(e.extrudedHeight);
+  }
+}
+
+function doLoadHM() {
+    let rect = viewer.camera.computeViewRectangle(viewer.scene.globe.ellipsoid, scratchRectangle);
+    let url = getData(rect);
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+    let count_max = 50000*Math.log10(data.max_count+1);
+    let coll = viewer.dataSources.getByName("heatmap");
+    const options = {
+      //clampToGround: true
+    };
+    if (coll.length === 0) {
+      Cesium.GeoJsonDataSource.load(data, options)
+      .then(dataset => {
+        dataset.name = "heatmap";
+        viewer.dataSources.add(dataset).then(ds => {
+          postProcessHeatmap(ds, count_max);
+        });
+      });
+    } else {
+      coll[0].load(data, options).then(ds => {
+        ds.name = "heatmap";
+        postProcessHeatmap(ds, count_max);
+      });
+    }
+  });
+    /*
+    let coll = viewer.dataSources.getByName("heatmap");
+    const options = {
+        clampToGround: true
+    };
+    if (coll.length === 0) {
+        Cesium.GeoJsonDataSource.load(url, options)
+        .then(dataset => {
+            dataset.name = "heatmap";
+            viewer.dataSources.add(dataset);
+        });
+    } else {
+        coll[0].load(url, options).then(ds => {
+            ds.name = "heatmap";
+        });
+    }
+
+     */
+}
+
+//const bt = document.getElementById("hmload");
+//bt.onclick = doLoadHM;
+visitUSA();
+</script>
+<input type="button" value="Moorea" onclick="visitMoorea()"/>
+<input type="button" value="USA" onclick="visitUSA()"/>
+</body>
+</html>
