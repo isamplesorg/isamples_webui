@@ -104,7 +104,7 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
   });
 
 // Add Cesium OSM Buildings, a global 3D buildings layer.
-//const buildingTileset = viewer.scene.primitives.add(Cesium.createOsmBuildings());
+const buildingTileset = viewer.scene.primitives.add(Cesium.createOsmBuildings());
 
 var tileset = viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
     //url: 'tileset-public.moorea2.points.json',
