@@ -197,6 +197,17 @@
         .records-footer {
             float: left;
         }
+
+        .relpos {
+            position: relative;
+        }
+
+        .clippy {
+            position: absolute;
+            top: 3px;
+            right:15px;
+            max-width: 12px;
+        }
     </style>
 </head>
 <body>
@@ -217,28 +228,32 @@
     </section>
 
     <details open>
-        <summary>Selected Row Record</summary>
+        <summary>Selected Row Record <a target="_new" id="source_record_link">Source</a></summary>
         <section class="infoContainer">
             <div class="infoChild" id="InfoLeft">
                 <span class="label">Source Record</span>
-                <pre id="record_original">
+                <pre class="relpos"><img class="clippy" src="img/clippy.svg" id="source_record_copy" /><code id="record_original">
 
                     Select a row to view source record.
+
+                    </code>
                 </pre>
             </div>
             <div class="infoChild" id="InfoRight">
                 <details>
-                    <summary>iSamples Solr Record</summary>
-                    <pre id="record_solr">
+                    <summary>iSamples Solr Record <a target="_new" id="solr_record_link">Source</a></summary>
+                    <pre class="relpos"><img class="clippy" src="img/clippy.svg" id="solr_record_copy" /><code id="record_solr">
 
                         Select a row to view solr record.
+                        </code>
                     </pre>
                 </details>
                 <details open>
-                    <summary>iSamples Core Record</summary>
-                    <pre id="record_xform">
+                    <summary>iSamples Core Record <a target="_new" id="core_record_link">Source</a></summary>
+                    <pre class="relpos"><img class="clippy" src="img/clippy.svg" id="core_record_copy" /><code id="record_xform">
 
                         Select a row to view transformed record.
+                        </code>
                     </pre>
                 </details>
             </div>

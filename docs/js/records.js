@@ -128,7 +128,7 @@ function recordsOnLoad(tabulatorDivId) {
         });
     } catch (e) {
         console.error(e);
-        console.info("eventBus is requried at window scope for component communications.")
+        console.info("eventBus is required at window scope for component communications.")
     }
 }
 
@@ -152,6 +152,22 @@ function selectRow(_id) {
      */
 }
 
+function copyText(txt, eleid) {
+    return function() {
+        const cb = navigator.clipboard;
+        cb.writeText(txt).then(()=>{
+            const e = document.getElementById(eleid);
+            const originalbg = e.style.backgroundColor;
+            e.style.backgroundColor = "lime";
+            setTimeout(function(){
+                const e = document.getElementById(eleid);
+                e.style.backgroundColor = originalbg;
+            }, 1000);
+        });
+    }
+}
+
+
 //show specified identifier record
 async function showRawRecord(id) {
     const raw_url = new URL(`/thing/${encodeURIComponent(id)}`, SERVICE_ENDPOINT);
@@ -170,29 +186,41 @@ async function showRawRecord(id) {
         fetch(raw_url)
             .then(response => response.json())
             .then(doc => {
-                const e = document.getElementById("record_original");
+                let e = document.getElementById("record_original");
                 e.innerHTML = prettyPrintJson.toHtml(doc, FormatOptions = {
                     indent: 2,
                     linkUrls: false
                 });
+                e = document.getElementById("source_record_link")
+                e.href = raw_url;
+                e = document.getElementById("source_record_copy");
+                e.onclick = copyText(JSON.stringify(doc, null, 2), "source_record_copy");
             }),
         fetch(xform_url)
             .then(response => response.json())
             .then(doc => {
-                const e = document.getElementById("record_xform");
+                let e = document.getElementById("record_xform");
                 e.innerHTML = prettyPrintJson.toHtml(doc, FormatOptions = {
                     indent: 2,
                     linkUrls: false
                 });
+                e = document.getElementById("core_record_link")
+                e.href = xform_url;
+                e = document.getElementById("core_record_copy");
+                e.onclick = copyText(JSON.stringify(doc, null, 2), "core_record_copy");
             }),
         fetch(solr_url)
             .then(response => response.json())
             .then(doc => {
-                const e = document.getElementById("record_solr");
+                let e = document.getElementById("record_solr");
                 e.innerHTML = prettyPrintJson.toHtml(doc.response.docs[0], FormatOptions = {
                     indent: 2,
                     linkUrls: false
                 });
+                e = document.getElementById("solr_record_link")
+                e.href = solr_url;
+                e = document.getElementById("solr_record_copy");
+                e.onclick = copyText(JSON.stringify(doc, null, 2), "solr_record_copy");
             })
     ])
 }
