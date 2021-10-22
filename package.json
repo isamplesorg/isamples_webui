@@ -1,5 +1,11 @@
 {
   "devDependencies": {
     "@web/dev-server": "^0.1.25"
+  },
+  "dependencies": {
+    "gh-corner-wc": "^0.0.2",
+    "js-event-bus": "^1.1.1",
+    "lit": "^2.0.2",
+    "tabulator-tables": "^5.0.3"
   }
 }

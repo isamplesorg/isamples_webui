@@ -2,7 +2,7 @@
  * Webcomponent providing connection and query state for connecting to isamples service
  */
 
-import { LitElement, html, css } from "https://unpkg.com/lit@2.0.0/index.js?module";
+import { LitElement, html, css } from "lit";
 
 import { getSolrRecordSummary, DEFAULT_FACETS } from "./util.js";
 

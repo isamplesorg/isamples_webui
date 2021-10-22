@@ -1,3 +1,12 @@
+import {Tabulator} from 'tabulator-tables';
+
+/**
+ * TODO: The tabulator data loading mechanism has been completely
+ * rewritten in version 5.0. Need to update all the records loading stuff
+ * and the table configuration
+ *
+ *  http://tabulator.info/docs/5.0/upgrade
+ */
 
 // For escaping solr query terms
 const SOLR_RESERVED = [' ', '+', '-', '&', '!', '(', ')', '{', '}', '[', ']', '^', '"', '~', '*', '?', ':', '\\'];
@@ -6,7 +15,7 @@ const SOLR_VALUE_REGEXP = new RegExp("(\\" + SOLR_RESERVED.join("|\\") + ")", "g
 /**
  * Escape a lucene / solr query term
  */
-function escapeLucene(value) {
+export function escapeLucene(value) {
     return value.replace(SOLR_VALUE_REGEXP, "\\$1");
 }
 const DEFAULT_Q = "*:*";
@@ -26,7 +35,7 @@ var data_table = null;
 if (!library)
    var library = {};
 
-async function getSolrRecords(q, fq=[], start=0, num_rows=TABLE_ROWS, sorters=[]) {
+export async function getSolrRecords(q, fq=[], start=0, num_rows=TABLE_ROWS, sorters=[]) {
     var _url = new URL("/thing/select", SERVICE_ENDPOINT);
     let params = _url.searchParams;
     let _fields = [];
@@ -95,7 +104,7 @@ function _doSolrLoad(url, config, params){
     return getSolrRecords(_q, _fq, _start, params.size, params.sorters);
 }
 
-function recordsOnLoad(tabulatorDivId) {
+export function recordsOnLoad(tabulatorDivId) {
     // Initialize the data table
     data_table = new Tabulator(`#${tabulatorDivId}`, {
         pagination: "remote",
@@ -135,7 +144,7 @@ function recordsOnLoad(tabulatorDivId) {
 //=================
 
 //select row and show record information
-function rowClick(e, row) {
+export function rowClick(e, row) {
     let id = row._row.data.id;
     //var reportId = document.getElementById('currentID');
     //reportId.value = id;
@@ -143,7 +152,7 @@ function rowClick(e, row) {
     showRawRecord(id);
 }
 
-function selectRow(_id) {
+export function selectRow(_id) {
     console.log(_id);
     /*
     This is a bit complicated since we need to navigate to the identified row in the
@@ -153,7 +162,7 @@ function selectRow(_id) {
 }
 
 //show specified identifier record
-async function showRawRecord(id) {
+export async function showRawRecord(id) {
     const raw_url = new URL(`/thing/${encodeURIComponent(id)}`, SERVICE_ENDPOINT);
     raw_url.searchParams.append("format","original");
 

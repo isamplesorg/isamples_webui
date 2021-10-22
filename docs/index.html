@@ -86,11 +86,14 @@
             ]
         }
     </script>
-    <script src="https://unpkg.com/js-event-bus@1.1.1/src/index.js"></script>
+    <script type="module" src="js/main.js">
+    </script>
 
     <link rel="stylesheet" href="https://unpkg.com/tabulator-tables@4.9.3/dist/css/tabulator.min.css">
     <!-- Githuub project link webcomponent -->
-    <script type="module" src="https://unpkg.com/gh-corner-wc/gh-corner.js?module"></script>
+    <script type="module">
+        import 'gh-corner-wc/gh-corner.js';
+    </script>
     <script>
         /**
          * Define the service endpoint for accessing data.
@@ -99,16 +102,7 @@
          *
          * @type {string} URL of service endpoint
          */
-        var SERVICE_ENDPOINT = "https://mars.cyverse.org";
-
-        /**
-         * The eventBus is used for cross component communications.
-         *
-         * Query and filter state changes are notified through the eventBus.
-         *
-         * @type {EventBus}
-         */
-        const eventBus = new EventBus();
+        globalThis.SERVICE_ENDPOINT = "https://mars.cyverse.org";
     </script>
     <script onerror="console.warn('No local configuration, using defaults')" src="local_config.js"></script>
 
@@ -117,15 +111,11 @@
 
     <script type="module" src="js/isamples-summary.js"></script>
 
-    <!-- Table component-->
-    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@4.9.3/dist/js/tabulator.min.js"></script>
     <!-- js library pretty print json -->
     <link rel=stylesheet href=https://cdn.jsdelivr.net/npm/pretty-print-json@1.1/dist/pretty-print-json.css>
     <script src=https://cdn.jsdelivr.net/npm/pretty-print-json@1.1/dist/pretty-print-json.min.js></script>
     <link rel="stylesheet" href="css/common.css"/>
 
-    <!-- customization of the behavior of the record table -->
-    <script type="text/javascript" src="js/records.js"></script>
     <style>
         #records {
             height: 40vh;
@@ -204,7 +194,7 @@
     <gh-corner user="isamplesorg" repo=""></gh-corner>
 
     <section id="query-section">
-        <isamples-state id="query-state"></isamples-state>
+        <isamples-state id="query-state" eventBus=getEventBus()></isamples-state>
         <details>
             <summary>Summary</summary>
             <isamples-summary id="summary" queryStateId="query-state"></isamples-summary>
@@ -248,13 +238,5 @@
 <footer>
     <p>Placeholder</p>
 </footer>
-<script>
-    /**
-     * Initialize the records view once the DOM has loaded.
-     */
-    window.onload = function () {
-        recordsOnLoad('records');
-    }
-</script>
 </body>
 </html>
