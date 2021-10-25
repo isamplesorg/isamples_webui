@@ -157,11 +157,19 @@ function copyText(txt, eleid) {
         const cb = navigator.clipboard;
         cb.writeText(txt).then(()=>{
             const e = document.getElementById(eleid);
+            const em = e.querySelector("span:first-of-type")
+            const ei = e.querySelector("img:first-of-type")
+            ei.style.display = "none";
+            em.innerText = "Copied";
             const originalbg = e.style.backgroundColor;
-            e.style.backgroundColor = "lime";
+            //e.style.backgroundColor = "lime";
             setTimeout(function(){
                 const e = document.getElementById(eleid);
-                e.style.backgroundColor = originalbg;
+                const em = e.querySelector("span:first-of-type")
+                const ei = e.querySelector("img:first-of-type")
+                ei.style.display = "block";
+                //e.style.backgroundColor = originalbg;
+                em.innerText = "";
             }, 1000);
         });
     }

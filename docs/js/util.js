@@ -85,6 +85,7 @@ export async function getSolrRecordSummary(Q, FQ=[], facets=DEFAULT_FACETS) {
         params.append("facet.pivot", SOURCE + "," + facets[i]);
     }
     let response = await fetch(_url);
+    console.log(response.url);
     let data = await response.json();
     // container for later display in UI
     let facet_info = {

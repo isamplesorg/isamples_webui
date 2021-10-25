@@ -203,10 +203,10 @@
         }
 
         .clippy {
+            color: gray;
             position: absolute;
             top: 3px;
-            right:15px;
-            max-width: 12px;
+            right:3px;
         }
     </style>
 </head>
@@ -232,7 +232,7 @@
         <section class="infoContainer">
             <div class="infoChild" id="InfoLeft">
                 <span class="label">Source Record</span>
-                <pre class="relpos"><img class="clippy" src="img/clippy.svg" id="source_record_copy" /><code id="record_original">
+                <pre class="relpos"><span class="clippy" id="source_record_copy" ><span></span><img src="img/clippy.svg" width="12"/></span><code id="record_original">
 
                     Select a row to view source record.
 
@@ -242,7 +242,7 @@
             <div class="infoChild" id="InfoRight">
                 <details>
                     <summary>iSamples Solr Record <a target="_new" id="solr_record_link">Source</a></summary>
-                    <pre class="relpos"><img class="clippy" src="img/clippy.svg" id="solr_record_copy" /><code id="record_solr">
+                    <pre class="relpos"><span class="clippy" id="solr_record_copy"><span></span><img width="12" src="img/clippy.svg"/></span><code id="record_solr">
 
                         Select a row to view solr record.
                         </code>
@@ -250,7 +250,7 @@
                 </details>
                 <details open>
                     <summary>iSamples Core Record <a target="_new" id="core_record_link">Source</a></summary>
-                    <pre class="relpos"><img class="clippy" src="img/clippy.svg" id="core_record_copy" /><code id="record_xform">
+                    <pre class="relpos"><span class="clippy" id="core_record_copy"><span></span><img width="12" src="img/clippy.svg"/></span><code id="record_xform">
 
                         Select a row to view transformed record.
                         </code>
