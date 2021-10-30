@@ -1,4 +1,6 @@
-import {Tabulator} from 'tabulator-tables';
+import {TabulatorFull as Tabulator} from 'tabulator-tables';
+
+import { prettyPrintJson } from 'pretty-print-json';
 
 /**
  * TODO: The tabulator data loading mechanism has been completely
@@ -101,24 +103,26 @@ function _doSolrLoad(url, config, params){
     if (_bb !== undefined && _bb !== null && _bb !== "") {
         _fq.push(_bb);
     }
-    return getSolrRecords(_q, _fq, _start, params.size, params.sorters);
+    return getSolrRecords(_q, _fq, _start, params.size, params.sort);
 }
 
 export function recordsOnLoad(tabulatorDivId) {
     // Initialize the data table
     data_table = new Tabulator(`#${tabulatorDivId}`, {
-        pagination: "remote",
+        pagination: true,
+        paginationMode: "remote",
         paginationSize: TABLE_ROWS,
         ajaxURL: SERVICE_ENDPOINT+"/thing/select",
-        ajaxSorting:true,
+        sortMode: "remote",
         //ajaxProgressiveLoad: "scroll",
         ajaxRequestFunc: _doSolrLoad,
         columns: COLUMNS,
-        rowClick: rowClick,
         selectable:1,
         resizableRows: true,
         footerElement:"<span class='records-footer'>Total records:<span id='record_count'></span></span>"
     });
+
+    data_table.on("rowClick", rowClick);
 
     /**
      * Respond to query_state_changed events emitted by the query-section element.
@@ -137,7 +141,7 @@ export function recordsOnLoad(tabulatorDivId) {
         });
     } catch (e) {
         console.error(e);
-        console.info("eventBus is requried at window scope for component communications.")
+        console.info("eventBus is required at window scope for component communications.")
     }
 }
 
@@ -180,7 +184,7 @@ export async function showRawRecord(id) {
             .then(response => response.json())
             .then(doc => {
                 const e = document.getElementById("record_original");
-                e.innerHTML = prettyPrintJson.toHtml(doc, FormatOptions = {
+                e.innerHTML = prettyPrintJson.toHtml(doc, {
                     indent: 2,
                     linkUrls: false
                 });
@@ -189,7 +193,7 @@ export async function showRawRecord(id) {
             .then(response => response.json())
             .then(doc => {
                 const e = document.getElementById("record_xform");
-                e.innerHTML = prettyPrintJson.toHtml(doc, FormatOptions = {
+                e.innerHTML = prettyPrintJson.toHtml(doc, {
                     indent: 2,
                     linkUrls: false
                 });
@@ -198,7 +202,7 @@ export async function showRawRecord(id) {
             .then(response => response.json())
             .then(doc => {
                 const e = document.getElementById("record_solr");
-                e.innerHTML = prettyPrintJson.toHtml(doc.response.docs[0], FormatOptions = {
+                e.innerHTML = prettyPrintJson.toHtml(doc.response.docs[0], {
                     indent: 2,
                     linkUrls: false
                 });

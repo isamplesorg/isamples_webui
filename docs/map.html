@@ -23,6 +23,7 @@
 <div id="cesiumContainer" class="fullSize"></div>
 <div id="toolbar">
     <code><span class="coordinate" id="latitude"></span><span class="coordinate" id="longitude"></span></code>
+    <pre id="camera_posn"></pre>
     <div id="pele"></div>
 </div>
 <div>
@@ -36,6 +37,51 @@
      */
     function humanize(x, n) {
         return x.toFixed(n).replace(/\.?0*$/, '');
+    }
+
+
+    places = {
+        "moorea": {
+            latitude: -17.415,
+            longitude: -149.7496,
+            height: 8000,
+            heading: 220,
+            pitch: -45,
+        },
+        "gump": {
+            latitude: -17.48999,
+            longitude: -149.814307,
+            height: 552,
+            heading: 285.1,
+            pitch: -14.42,
+        },
+        "usa": {
+            latitude: 38.7,
+            longitude: -96.4,
+            height: 7419243,
+            heading: 0.0,
+            pitch: -90,
+        },
+        "sur": {
+            latitude: 36.36025,
+            longitude: -121.921338,
+            height: 762.8,
+            heading: 54.35,
+            pitch: -15.5289,
+        }
+    }
+
+
+    function visit(place) {
+        const p = places[place];
+        viewer.camera.flyTo({
+            destination: Cesium.Cartesian3.fromDegrees(p.longitude, p.latitude, p.height),
+            orientation: {
+                heading: Cesium.Math.toRadians(p.heading),
+                pitch: Cesium.Math.toRadians(p.pitch),
+            }
+        });
+
     }
 
     /**
@@ -126,27 +172,6 @@
         pointSize: 5
     });
 
-    function visitMoorea() {
-        // Fly the camera to Moorea
-        viewer.camera.flyTo({
-            destination: Cesium.Cartesian3.fromDegrees(-149.7496, -17.415, 8000),
-            orientation: {
-                heading: Cesium.Math.toRadians(220.0),
-                pitch: Cesium.Math.toRadians(-45.0),
-            }
-        });
-    }
-
-    function visitUSA() {
-        // Fly the camera to Moorea
-        viewer.camera.flyTo({
-            destination: Cesium.Cartesian3.fromDegrees(-96.4, 38.7, 7419243),
-            orientation: {
-                heading: Cesium.Math.toRadians(0.0),
-                pitch: Cesium.Math.toRadians(-90.0),
-            }
-        });
-    }
 
     /**
      *
@@ -226,6 +251,27 @@
             'South: ' + Cesium.Math.toDegrees(rect.south).toFixed(4) + '<br/>' +
             'East: ' + Cesium.Math.toDegrees(rect.east).toFixed(4) + '<br/>' +
             'North: ' + Cesium.Math.toDegrees(rect.north).toFixed(4) + '</pre>';
+
+        // Show the camera position.
+        /*
+                    destination: Cesium.Cartesian3.fromDegrees(-149.7496, -17.415, 8000),
+            orientation: {
+                heading: Cesium.Math.toRadians(220.0),
+                pitch: Cesium.Math.toRadians(-45.0),
+            }
+        */
+       const cameraposn = viewer.camera.positionCartographic;
+       const posn = {
+           longitude: Cesium.Math.toDegrees(cameraposn.longitude),
+           latitude: Cesium.Math.toDegrees(cameraposn.latitude),           
+           height: cameraposn.height,
+           //d: viewer.camera.directionWC,
+           heading: Cesium.Math.toDegrees(viewer.camera.heading),
+           pitch: Cesium.Math.toDegrees(viewer.camera.pitch),
+       };
+       pele = document.getElementById("camera_posn");
+       pele.innerText = JSON.stringify(posn, null, 2);
+
     });
 
     //
@@ -405,10 +451,12 @@
          */
     }
 
-    visitUSA();
+    visit("usa");
 </script>
 <!--<input id="hmload" type="button" onclick="doLoadHM()" value="Load HM" />-->
-<input type="button" value="Moorea" onclick="visitMoorea()"/>
-<input type="button" value="USA" onclick="visitUSA()"/>
+<input type="button" value="Moorea" onclick="visit('moorea')"/>
+<input type="button" value="Gump" onclick="visit('gump')"/>
+<input type="button" value="USA" onclick="visit('usa')"/>
+<input type="button" value="Big Sur" onclick="visit('sur')"/>
 </body>
 </html>

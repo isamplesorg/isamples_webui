@@ -94,6 +94,9 @@
     <script type="module">
         import 'gh-corner-wc/gh-corner.js';
     </script>
+    <script type="module">
+        import '@datadavev/oauth-autho/oauth-autho';
+    </script>
     <script>
         /**
          * Define the service endpoint for accessing data.
@@ -188,11 +191,15 @@
             float: left;
         }
     </style>
+    <script type="module">
+        import { GitHubIssues } from "./js/gh_issues";
+        window.githubIssues = new GitHubIssues("githubauth");
+    </script>
 </head>
 <body>
 <main>
     <gh-corner user="isamplesorg" repo=""></gh-corner>
-
+    <oauth-autho id="githubauth" authService="ws://localhost:8000/ws/"></oauth-autho>
     <section id="query-section">
         <isamples-state id="query-state" eventBus=getEventBus()></isamples-state>
         <details>
