@@ -3,10 +3,12 @@
  */
 
 import { LitElement, html, css } from "lit";
+window.CESIUM_BASE_URL = "/__wds-outside-root__/1/node_modules/cesium/Source";
 
-//import Cesium from 'cesium';
-import { Cesium } from "cesium";
-//import "cesium/Widgets/widgets.css";
+import {
+  CesiumWidget,
+} from "cesium";
+
 
 export class IsamplesSpatial extends LitElement {
     static get styles() {
@@ -16,9 +18,12 @@ export class IsamplesSpatial extends LitElement {
             padding-left: 1rem;
             padding-right: 1rem;
             padding-bottom: 1rem;
-            max-width: 90vw;
-            height: 90vh;
         }
+        .cesium-widget {
+            width: 100%;
+            height: 100%;
+        }
+        
         `;
     }
 
@@ -28,7 +33,6 @@ export class IsamplesSpatial extends LitElement {
 
     constructor() {
         super();
-        window.CESIUM_BASE_URL = 'https://localhost:8001/';
         this.widget = null;
     }
 
