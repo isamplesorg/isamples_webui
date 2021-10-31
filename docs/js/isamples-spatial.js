@@ -14,7 +14,7 @@ export class IsamplesSpatial extends LitElement {
     static get styles() {
         return css `
         :host {
-            display: block;
+            height: 80vh;
             padding-left: 1rem;
             padding-right: 1rem;
             padding-bottom: 1rem;
