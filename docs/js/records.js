@@ -2,12 +2,15 @@ import {TabulatorFull as Tabulator} from 'tabulator-tables';
 
 import { prettyPrintJson } from 'pretty-print-json';
 
+export class RecordsTable {
+// TODO: put everything into a class, and create an instance with the settings provided on creation.
+    constructor(settings) {
+
+    }
+}
+
 /**
- * TODO: The tabulator data loading mechanism has been completely
- * rewritten in version 5.0. Need to update all the records loading stuff
- * and the table configuration
- *
- *  http://tabulator.info/docs/5.0/upgrade
+ *  http://tabulator.info/docs/5.0/
  */
 
 // For escaping solr query terms
@@ -20,9 +23,11 @@ const SOLR_VALUE_REGEXP = new RegExp("(\\" + SOLR_RESERVED.join("|\\") + ")", "g
 export function escapeLucene(value) {
     return value.replace(SOLR_VALUE_REGEXP, "\\$1");
 }
-const DEFAULT_Q = "*:*";
-const TABLE_ROWS = 500;
-const COLUMNS = [
+const DEFAULT_Q = SETTINGS.defaultQuery || "*:*";
+const SERVICE_ENDPOINT = SETTINGS.serviceEndpoint;
+const TABLE_HEIGHT = SETTINGS.records.tableHeight || '100%';
+const TABLE_ROWS = SETTINGS.records.PageSize || 100;
+const COLUMNS = SETTINGS.records.columns || [
     {title:"ID", field:"id"},
     {title:"Source", field:"source"},
     {title:"Label", field:"label"},
@@ -52,7 +57,11 @@ export async function getSolrRecords(q, fq=[], start=0, num_rows=TABLE_ROWS, sor
     let response = await fetch(_url);
     let data = await response.json();
     const _ele = document.getElementById("record_count");
-    _ele.innerText = new Intl.NumberFormat().format(data.response.numFound);
+    try {
+        _ele.innerText = new Intl.NumberFormat().format(data.response.numFound);
+    } catch (e) {
+        console.warn(e);
+    }
     let last_page = Math.floor(data.response.numFound / num_rows);
     if (data.response.numFound % num_rows > 0) {
         last_page = last_page + 1;
@@ -103,22 +112,31 @@ function _doSolrLoad(url, config, params){
     if (_bb !== undefined && _bb !== null && _bb !== "") {
         _fq.push(_bb);
     }
-    return getSolrRecords(_q, _fq, _start, params.size, params.sort);
+    return new Promise(function(resolve, reject){
+        try {
+            resolve(getSolrRecords(_q, _fq, _start, params.size, params.sort))
+        } catch (e) {
+            reject(e);
+        }
+    })
 }
 
 export function recordsOnLoad(tabulatorDivId) {
     // Initialize the data table
     data_table = new Tabulator(`#${tabulatorDivId}`, {
+        height: TABLE_HEIGHT,
         pagination: true,
-        paginationMode: "remote",
+        paginationMode: 'remote',
         paginationSize: TABLE_ROWS,
+        paginationInitialPage: 1,
+        paginationSizeSelector:true,
+        //progressiveLoad:"scroll",
         ajaxURL: SERVICE_ENDPOINT+"/thing/select",
         sortMode: "remote",
-        //ajaxProgressiveLoad: "scroll",
         ajaxRequestFunc: _doSolrLoad,
         columns: COLUMNS,
         selectable:1,
-        resizableRows: true,
+        //resizableRows: true,
         footerElement:"<span class='records-footer'>Total records:<span id='record_count'></span></span>"
     });
 
