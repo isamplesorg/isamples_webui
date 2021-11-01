@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>iSamples Records</title>
+    <!-- schema.org JSON-LD description of this page -->
     <script type="application/ld+json">
         {
             "@context": "https://schema.org/",
@@ -86,45 +87,37 @@
             ]
         }
     </script>
+
+    <link rel="stylesheet" href="css/common.css" />
+    <link rel="stylesheet" href="css/records.css" />
+    <script type="module">
+        import {settings} from "./js/settings";
+        globalThis.SETTINGS = settings;
+    </script>
     <script type="module" src="js/main.js">
     </script>
 
-    <link rel="stylesheet" href="https://unpkg.com/tabulator-tables@4.9.3/dist/css/tabulator.min.css">
     <!-- Githuub project link webcomponent -->
     <script type="module">
         import 'gh-corner-wc/gh-corner.js';
     </script>
+
+    <!-- GitHub Authorization component -->
     <script type="module">
         import '@datadavev/oauth-autho/oauth-autho';
     </script>
-    <script>
-        /**
-         * Define the service endpoint for accessing data.
-         *
-         * Override if necessary (e.g. for local development) with a `local_config.js` file.
-         *
-         * @type {string} URL of service endpoint
-         */
-        globalThis.SERVICE_ENDPOINT = "https://mars.cyverse.org";
-    </script>
-    <script onerror="console.warn('No local configuration, using defaults')" src="local_config.js"></script>
 
     <!-- Webcomponent for manging overall query state -->
     <script type="module" src="js/isamples-state.js"></script>
 
+    <!-- The summary view, counts by various facet combinations -->
     <script type="module" src="js/isamples-summary.js"></script>
 
     <!-- js library pretty print json -->
     <link rel=stylesheet href=https://cdn.jsdelivr.net/npm/pretty-print-json@1.1/dist/pretty-print-json.css>
     <script src=https://cdn.jsdelivr.net/npm/pretty-print-json@1.1/dist/pretty-print-json.min.js></script>
-    <link rel="stylesheet" href="css/common.css"/>
 
     <style>
-        #records {
-            height: 40vh;
-        }
-
-
         .infoContainer {
             margin-top: 1.0rem;
             display: flex;
@@ -152,44 +145,6 @@
             font-family: var(--mono-font);
         }
 
-        .infoChild pre span {
-            font-size: inherit;
-        }
-
-        .tabulator {
-            font-family: var(--mono-font);
-            font-size: inherit;
-            vertical-align: auto;
-        }
-
-        .tabulator-row .tabulator-cell {
-            padding-top: 4px;
-            padding-bottom: 0;
-            padding-left: 4px;
-            padding-right: 4px;
-            vertical-align: center;
-        }
-
-        .tabulator-row.tabulator-row-even {
-            background: #ffffff;
-        }
-
-        .tabulator-row.tabulator-row-odd {
-            background: #ffffff;
-        }
-
-        .tabulator-row.tabulator-selected {
-            background-color: lightblue;
-        }
-
-        .tabulator-page {
-            color: #333333;
-            font-size: inherit;
-        }
-
-        .records-footer {
-            float: left;
-        }
     </style>
     <script type="module">
         import { GitHubIssues } from "./js/gh_issues";
@@ -213,34 +168,36 @@
         </div>
     </section>
 
-    <details open>
-        <summary>Selected Row Record</summary>
-        <section class="infoContainer">
-            <div class="infoChild" id="InfoLeft">
-                <span class="label">Source Record</span>
-                <pre id="record_original">
+    <section>
+        <details open>
+            <summary>Selected Row Record</summary>
+            <section class="infoContainer">
+                <div class="infoChild" id="InfoLeft">
+                    <span class="label">Source Record</span>
+                    <pre id="record_original">
 
-                    Select a row to view source record.
-                </pre>
-            </div>
-            <div class="infoChild" id="InfoRight">
-                <details>
-                    <summary>iSamples Solr Record</summary>
-                    <pre id="record_solr">
-
-                        Select a row to view solr record.
+                        Select a row to view source record.
                     </pre>
-                </details>
-                <details open>
-                    <summary>iSamples Core Record</summary>
-                    <pre id="record_xform">
+                </div>
+                <div class="infoChild" id="InfoRight">
+                    <details>
+                        <summary>iSamples Solr Record</summary>
+                        <pre id="record_solr">
 
-                        Select a row to view transformed record.
-                    </pre>
-                </details>
-            </div>
-        </section>
-    </details>
+                            Select a row to view solr record.
+                        </pre>
+                    </details>
+                    <details open>
+                        <summary>iSamples Core Record</summary>
+                        <pre id="record_xform">
+
+                            Select a row to view transformed record.
+                        </pre>
+                    </details>
+                </div>
+            </section>
+        </details>
+    </section>
 </main>
 <footer>
     <p>Placeholder</p>

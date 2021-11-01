@@ -3,10 +3,11 @@
  */
 
 import { LitElement, html, css } from "lit";
-window.CESIUM_BASE_URL = "/__wds-outside-root__/1/node_modules/cesium/Source";
-
+//window.CESIUM_BASE_URL = "/__wds-outside-root__/1/node_modules/cesium/Source";
+import '../../node_modules/cesium/Build/Cesium/Widgets/widgets.css'
+window.CESIUM_BASE_URL = "./";
 import {
-  CesiumWidget,
+  Viewer,
 } from "cesium";
 
 
@@ -33,15 +34,17 @@ export class IsamplesSpatial extends LitElement {
 
     constructor() {
         super();
-        this.widget = null;
+        this.viewer = null;
     }
 
     firstUpdated(_changedProperties) {
         super.firstUpdated(_changedProperties);
         const cesiumElement = this.renderRoot.getElementById("cesiumContainer");
-        this.widget = new CesiumWidget(cesiumElement);
+        this.widget = new Viewer(cesiumElement);
     }
 
+    //<link rel="stylesheet" href="/__wds-outside-root__/1/node_modules/cesium/Source/Widgets/shared.css" />
+    //<link rel="stylesheet" href="/__wds-outside-root__/1/node_modules/cesium/Source/Widgets/widgets.css" />
     render() {
         return html`
             <div id="cesiumContainer"></div>

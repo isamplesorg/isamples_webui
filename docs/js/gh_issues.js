@@ -2,7 +2,9 @@
  * Module for interacting with GH issues for records
  */
 
+//import { request } from "@octokit/request";
 import { request } from "https://cdn.skypack.dev/@octokit/request";
+
 
 export class GitHubIssues {
 
