@@ -1,6 +1,6 @@
 
 import { LitElement, html, css } from "lit";
-import {ISamplesState} from "./isamples-state";
+import { request } from "https://cdn.skypack.dev/@octokit/request";
 
 export class GitHubIssue extends LitElement {
 
@@ -21,29 +21,101 @@ export class GitHubIssue extends LitElement {
 
     static get properties() {
         return {
-            repo: { type: String },
+            authId: { type: String },
             orgname: { type: String },
+            repo: { type:String },
+            currentRecord: {type: String},
         }
     }
 
     constructor() {
         super();
-        this._token = null;
+        this.authId = authId;
         this.orgname = "isamplesorg";
         this.repo = "metadata";
+        this.user = "";
+        this.currentRecord = "";
     }
 
-    setToken(token) {
-        this._token = token;
+    getToken() {
+        const ele = document.getElementById(this.authId);
+        if (ele !== undefined) {
+            if (ele.authenticated) {
+                return ele.getToken();
+            }
+        }
+        return null;
     }
 
-    issueTitleForId(indentifier) {
-        return `Core-Record:${identifier}`;
+
+    /**
+     * https://docs.github.com/en/rest/reference/users
+     *
+     * @returns {Promise<*>}
+     */
+    async getUser() {
+        const token = this.getToken();
+        const user = await request('GET /user', {
+            headers: {
+                authorization: `token ${token}`
+            }
+        });
+        this.user = user.data.login;
+        return user.data;
     }
 
-    findIssue(identifier) {
+    issueTitleForId(identifier) {
+        return `${identifier}`;
+    }
+
+    async findIssue(identifier) {
+        const token = this.getToken();
+        if (token === null) {
+            console.error("Not authenticated!");
+            return
+        }
         const title = this.issueTitleForId(identifier);
-        let q = `${title} in:title type:issue`;
+        let q = `${title} in:title type:issue repo:${this.orgname}/${this.repo}`;
+        console.log(`Token: ${token}`);
+        request('GET /search/issues', {
+            headers: {
+                authorization: `token ${token}`
+            },
+            q: q
+        }).then(response => {
+            console.log(response);
+        }).catch(error => {
+            console.error(error);
+        })
+    }
+
+    /**
+     * https://docs.github.com/en/rest/reference/issues#create-an-issue
+     *
+     * @param identifier
+     * @param bodyText
+     * @param labels
+     * @returns {Promise<void>}
+     */
+    async createIssue(identifier, bodyText, labels) {
+        // empty label list if not defined
+        labels ??= [];
+        const token = this.getToken();
+        const userInfo = await this.getUser();
+        console.log(userInfo);
+        console.log(token);
+        const issue = await request('POST /repos/{owner}/{repo}/issues', {
+            headers: {
+                Authorization: `token ${token}`
+            },
+            owner: this.orgname,
+            repo: this.repo,
+            title: this.issueTitleForId(identifier),
+            body: bodyText,
+            milestone: null,
+            labels: labels,
+        });
+        return issue;
     }
 
     render() {

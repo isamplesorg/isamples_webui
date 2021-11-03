@@ -113,10 +113,6 @@
     <!-- The summary view, counts by various facet combinations -->
     <script type="module" src="js/isamples-summary.js"></script>
 
-    <!-- js library pretty print json -->
-    <link rel=stylesheet href=https://cdn.jsdelivr.net/npm/pretty-print-json@1.1/dist/pretty-print-json.css>
-    <script src=https://cdn.jsdelivr.net/npm/pretty-print-json@1.1/dist/pretty-print-json.min.js></script>
-
     <style>
         .infoContainer {
             margin-top: 1.0rem;
@@ -146,15 +142,19 @@
         }
 
     </style>
+
     <script type="module">
         import { GitHubIssues } from "./js/gh_issues";
+        import { Clippy } from "./js/wc-clippy";
+        import { JsonPanel } from "./js/json-panel";
+
         window.githubIssues = new GitHubIssues("githubauth");
     </script>
 </head>
 <body>
 <main>
     <gh-corner user="isamplesorg" repo=""></gh-corner>
-    <oauth-autho id="githubauth" authService="ws://localhost:8000/ws/"></oauth-autho>
+    <oauth-autho id="githubauth" authService="wss://mars.cyverse.org/ws/"></oauth-autho>
     <section id="query-section">
         <isamples-state id="query-state" eventBus=getEventBus()></isamples-state>
         <details>
@@ -174,25 +174,22 @@
             <section class="infoContainer">
                 <div class="infoChild" id="InfoLeft">
                     <span class="label">Source Record</span>
-                    <pre id="record_original">
-
-                        Select a row to view source record.
-                    </pre>
+                    <json-panel id="record_original">
+                        <wc-clippy sourceId="record_original"></wc-clippy>
+                    </json-panel>
                 </div>
                 <div class="infoChild" id="InfoRight">
                     <details>
                         <summary>iSamples Solr Record</summary>
-                        <pre id="record_solr">
-
-                            Select a row to view solr record.
-                        </pre>
+                        <json-panel id="record_solr">
+                            <wc-clippy sourceId="record_solr"></wc-clippy>
+                        </json-panel>
                     </details>
                     <details open>
                         <summary>iSamples Core Record</summary>
-                        <pre id="record_xform">
-
-                            Select a row to view transformed record.
-                        </pre>
+                        <json-panel id="record_xform">
+                            <wc-clippy sourceId="record_xform"></wc-clippy>
+                        </json-panel>
                     </details>
                 </div>
             </section>

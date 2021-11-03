@@ -202,28 +202,19 @@ export async function showRawRecord(id) {
             .then(response => response.json())
             .then(doc => {
                 const e = document.getElementById("record_original");
-                e.innerHTML = prettyPrintJson.toHtml(doc, {
-                    indent: 2,
-                    linkUrls: false
-                });
+                e.data = doc;
             }),
         fetch(xform_url)
             .then(response => response.json())
             .then(doc => {
                 const e = document.getElementById("record_xform");
-                e.innerHTML = prettyPrintJson.toHtml(doc, {
-                    indent: 2,
-                    linkUrls: false
-                });
+                e.data = doc;
             }),
         fetch(solr_url)
             .then(response => response.json())
             .then(doc => {
                 const e = document.getElementById("record_solr");
-                e.innerHTML = prettyPrintJson.toHtml(doc.response.docs[0], {
-                    indent: 2,
-                    linkUrls: false
-                });
+                e.data = doc.response.docs[0];
             })
     ])
 }

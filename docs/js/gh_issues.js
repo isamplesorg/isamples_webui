@@ -1,5 +1,7 @@
 /**
  * Module for interacting with GH issues for records
+ *
+ * https://octokit.github.io/rest.js/v18
  */
 
 //import { request } from "@octokit/request";
@@ -10,9 +12,9 @@ export class GitHubIssues {
 
     constructor( authId ) {
         this.authId = authId;
-        this._token = null;
         this.orgname = "isamplesorg";
         this.repo = "metadata";
+        this.user = "";
     }
 
     getToken() {
@@ -25,8 +27,24 @@ export class GitHubIssues {
         return null;
     }
 
+    /**
+     * https://docs.github.com/en/rest/reference/users
+     *
+     * @returns {Promise<*>}
+     */
+    async getUser() {
+        const token = this.getToken();
+        const user = await request('GET /user', {
+            headers: {
+                authorization: `token ${token}`
+            }
+        });
+        this.user = user.data.login;
+        return user.data;
+    }
+
     issueTitleForId(identifier) {
-        return `Core-Record:${identifier}`;
+        return `${identifier}`;
     }
 
     async findIssue(identifier) {
@@ -48,5 +66,34 @@ export class GitHubIssues {
         }).catch(error => {
             console.error(error);
         })
+    }
+
+    /**
+     * https://docs.github.com/en/rest/reference/issues#create-an-issue
+     *
+     * @param identifier
+     * @param bodyText
+     * @param labels
+     * @returns {Promise<void>}
+     */
+    async createIssue(identifier, bodyText, labels) {
+        // empty label list if not defined
+        labels ??= [];
+        const token = this.getToken();
+        const userInfo = await this.getUser();
+        console.log(userInfo);
+        console.log(token);
+        const issue = await request('POST /repos/{owner}/{repo}/issues', {
+            headers: {
+                Authorization: `token ${token}`
+            },
+            owner: this.orgname,
+            repo: this.repo,
+            title: this.issueTitleForId(identifier),
+            body: bodyText,
+            milestone: null,
+            labels: labels,
+        });
+        return issue;
     }
 }
