@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test for cross-origin oauth</title>
+    <script type="module" src="https://cdn.skypack.dev/@vanillawc/wc-markdown"></script>
+    <script type="module" src="../js/isamples-login.js"></script>
+    <script type="module">
+
+function getUserInfo(token) {
+    fetch("https://api.github.com/user", {
+        headers: {
+            "Authorization": `token ${token}`,
+            "Accept": "application/vnd.github.v3+json"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const ele = document.getElementById("_logger");
+        ele.innerText = JSON.stringify(data, null, 2)
+    }).catch(error => {
+        console.error(error);
+    })
+}
+
+window.addEventListener('credentials-changed', (event) => {
+    const isAuth = event.detail.authenticated;
+    if (isAuth) {
+        const _token = event.target.getToken();
+        getUserInfo(_token);
+    } else {
+        const ele = document.getElementById("_logger");
+        ele.innerText = "Logged out.";
+    }
+})
+
+    </script>
+</head>
+<body>
+<header>iSamples test - OAuth</header>
+<section>
+<wc-markdown>
+  <script type="wc-content">
+## Testing OAuth workflow with cross-origin participation
+
+Workflow:
+1. This window is open
+2. Clicking "Login" sends request to alt-server
+3. alt-server responds with login URL
+4. This window opens the login window
+5. Authentication proceeds from the login window
+6. On completion, the login window messages this window with the credentials
+7. This window tests the credentials by requesting user info from GitHub
+  </script>
+</wc-markdown>
+<isamples-login id="_auth" authService="https://mars.cyverse.org/login"></isamples-login>
+<pre id="_logger">
+</pre>
+</section>
+</body>
+</html>
