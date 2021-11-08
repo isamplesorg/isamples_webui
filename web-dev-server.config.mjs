@@ -1,7 +1,7 @@
 export default {
     open: true,
     nodeResolve: true,
-    watch: true,
+    watch: false,
     rootDir: 'docs',
     plugins: [
     ],
