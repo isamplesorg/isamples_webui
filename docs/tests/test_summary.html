@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test iSamples summary view</title>
+    <script type="module" src="https://cdn.skypack.dev/@vanillawc/wc-markdown"></script>
+    <script type="module">
+// Import the settings and scripts
+import {settings} from "../js/settings";
+import { EventBus } from "../js/eventbus";
+
+// Load the application settings
+globalThis.SETTINGS = settings;
+
+// Create an event bus to facilitate component communications
+globalThis.eventBus =  new EventBus();
+    </script>
+    <script type="module" src="../js/isamples-summary.js"></script>
+
+    <script type="module">
+const _summary_element = document.getElementById("summary");
+const _query_input = document.getElementById("query");
+
+_query_input.addEventListener("change", (e) => {
+    const prefix = "{!simple}"
+    let Q = e.target.value;
+    console.log(Q);
+    if (Q === "" | Q === "*") {
+        _summary_element.q = "*:*"
+        return;
+    }
+    _summary_element.q = `${prefix}Q`;
+})
+
+    </script>
+</head>
+<body>
+
+<section>
+    <wc-markdown>
+        <script type="wc-content">
+# Testing iSamples summary view
+
+Provides a view of record counts for source x categories.
+
+Setting the global query alters the set of records for which the counts are computed (use `*` or
+empty to find everything).
+        </script>
+    </wc-markdown>
+    Global Query: <input id="query" type="text" value="" size="70"/>
+    <isamples-summary id="summary"></isamples-summary>
+</section>
+
+</body>
+</html>

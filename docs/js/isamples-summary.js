@@ -4,7 +4,7 @@
 
 import { LitElement, html, css } from "lit";
 
-import { getSolrRecordSummary, DEFAULT_FACETS } from "./util.js";
+import { ISamplesSolr } from "./isamples-solr.js";
 
 export class ISamplesSummary extends LitElement {
 
@@ -77,20 +77,26 @@ export class ISamplesSummary extends LitElement {
         this._data = {
             sources: []
         };
-        this._facets = DEFAULT_FACETS;
+        this.solr = new ISamplesSolr();
+        //this._facets = DEFAULT_FACETS;
 
         // Subscribe to query_state_changed events
         let _this = this;
         this._queryStateChangedCallback =  function(data) {
             _this.queryChanged(data);
         }
-        eventBus.on('query_state_changed', this._queryStateChangedCallback);
+        try {
+            globalThis.eventBus.on('query_state_changed', this._queryStateChangedCallback);
+        } catch (e) {
+            console.warn(e);
+        }
+
     }
 
     connectedCallback() {
         super.connectedCallback();
         const queryState = document.getElementById(this.queryStateId);
-        if (queryState !== undefined) {
+        if (queryState !== null) {
             // register this filter state provider with the query state manager
             queryState.addFilterSource(this.name, '');
 
@@ -120,7 +126,7 @@ export class ISamplesSummary extends LitElement {
      * @returns {Promise<void>}
      */
     async loadSummary() {
-        getSolrRecordSummary(this.q, this.fqs, this._facets)
+        this.solr.getSolrRecordSummary(this.q, this.fqs)
             .then(data => {
                 this._data = data;
                 console.log(this._data)
@@ -184,7 +190,11 @@ export class ISamplesSummary extends LitElement {
             }
             e.target.classList.add("selected");
             this._selected = fq;
-            eventBus.emit('filter_changed', null, {name:this.name, value:fq})
+            try {
+                globalThis.eventBus.emit('filter_changed', null, {name: this.name, value: fq})
+            } catch (e) {
+                console.warn(e)
+            }
         }
     }
 
