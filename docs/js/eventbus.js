@@ -29,7 +29,7 @@ function EventBus() {
       });
     };
 
-    // valiodate that the number is a valid number for the number of executions
+    // validate that the number is a valid number for the number of executions
     this.validateNumber = function(n) {
       const _type = n.constructor.name;
 
