@@ -26,6 +26,7 @@ const htmlConfig = {
         'docs/index.html',
         'docs/map.html',
         'docs/map2.html',
+        'docs/tests/*.html'
     ],
 }
 
