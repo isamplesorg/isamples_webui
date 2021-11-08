@@ -102,17 +102,6 @@
         import 'gh-corner-wc/gh-corner.js';
     </script>
 
-    <!-- GitHub Authorization component -->
-    <script type="module">
-        import '@datadavev/oauth-autho/oauth-autho';
-    </script>
-
-    <!-- Webcomponent for manging overall query state -->
-    <script type="module" src="js/isamples-state.js"></script>
-
-    <!-- The summary view, counts by various facet combinations -->
-    <script type="module" src="js/isamples-summary.js"></script>
-
     <style>
         .infoContainer {
             margin-top: 1.0rem;
@@ -147,6 +136,13 @@
         import { GitHubIssues } from "./js/gh_issues";
         import { Clippy } from "./js/wc-clippy";
         import { JsonPanel } from "./js/json-panel";
+        import { ISamplesLogin } from "./js/isamples-login";
+
+        // Webcomponent for manging overall query state
+        import { ISamplesState } from "./js/isamples-state";
+
+        // The summary view, counts by various facet combinations
+        import { ISamplesSummary } from "./js/isamples-summary";
 
         window.githubIssues = new GitHubIssues("githubauth");
     </script>
@@ -154,7 +150,7 @@
 <body>
 <main>
     <gh-corner user="isamplesorg" repo=""></gh-corner>
-    <oauth-autho id="githubauth" authService="wss://mars.cyverse.org/ws/"></oauth-autho>
+    <isamples-login id="githubauth" authService="https://mars.cyverse.org/login"></isamples-login>
     <section id="query-section">
         <isamples-state id="query-state" eventBus=getEventBus()></isamples-state>
         <details>
