@@ -29,7 +29,8 @@ _query_input.addEventListener("change", (e) => {
         _summary_element.q = "*:*"
         return;
     }
-    _summary_element.q = `${prefix}${Q}`;
+    //_summary_element.q = `${prefix}${Q}`;
+    _summary_element.q = Q;
     console.log(_summary_element.q);
 })
 

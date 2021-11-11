@@ -19,6 +19,7 @@
     "cesium": "^1.86.1",
     "gh-corner-wc": "^0.0.2",
     "js-event-bus": "^1.1.1",
+    "jsonstream2": "^3.0.0",
     "lit": "^2.0.2",
     "pretty-print-json": "^1.1.1",
     "tabulator-tables": "^5.0.7"

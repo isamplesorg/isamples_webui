@@ -41,7 +41,11 @@ export class ISamplesSolr {
             "hasSpecimenCategory",
             "hasContextCategory",
         ]
+        // Default query field
         this._dqf = "searchText";
+
+        // Spatial point field
+        this.ptField = "producedBy_samplingSite_location_rpt"
     }
 
     /**
@@ -189,10 +193,46 @@ export class ISamplesSolr {
 
 
     /**
-     * Make a Q from a bounding box
-     * 
+     * Returns a Promise that resolves to a fetch response
+     * @param {*} Q 
+     * @param {*} FQ 
+     * @param {*} start 
+     * @param {*} rows 
+     * @param {*} fields 
+     * @returns Promise of fetch response
      */
-    getBBQ(bb) {
+    async getRecordsQuery(Q="*:*", FQ=[], start=0, rows=10, fields="*") {
+        let _url = new URL("/thing/select", this.service_endpoint);
+        let params = _url.searchParams;
+        params.append("q", Q);
+        for (let i=0; i< FQ.length; i++) {
+            params.append("fq", FQ[i]);
+        }
+        params.append("wt", "json");
+        params.append("fl", "id");
+        params.append("rows", 0);
+        return fetch(_url);
+    }
+
+
+    /**
+     * Number of records matching Q and FQs
+     * @param {*} Q 
+     * @param {*} FQ 
+     * @returns integer
+     */
+    async countRecordsQuery(Q="*:*", FQ=[]) {
+        try {
+            let response = await this.getRecordsQuery(Q, FQ, 0, 0, "id");
+            let data = await response.json();
+            return data.response.numFound;
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+
+    async getGeoJsonPointsQuery(Q="*:*", FQ=[], start=0, rows=1000, fields="id"){
         
     }
 
