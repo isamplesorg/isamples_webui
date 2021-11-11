@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Point Stream Test</title>
+    <!--
+    Handling streaming response from Mars / Solr
+    -->
+    <script src="../js/oboe-browser.js"></script>
+    <script type="module">
+
+let counter = 0;
+
+function setUI(msg) {
+    document.getElementById("output").innerText = `Values: ${msg}`;
+}
+
+const url = "http://localhost:8000/thing/stream?rows=100000";
+/* Not supported
+fetch(url).then( response => {
+    const reader = response.body.getReader();
+    oboe( reader )
+    .on('node', {
+        'docs.*': (doc) => {
+            console.log(doc);
+        }
+    })
+    .on('done', () => {
+        console.log("Done.")
+    })
+    .on('fail', () => {
+        console.log("Error")
+    })
+    // Proper streaming - is there a lib to support this?
+    reader.read().then(function processStream({done, value}) {
+        if (done) {
+            console.log("Stream complete.")
+            console.log(`Counter = ${counter}`);
+            return;
+        }
+        parser.parse(value);
+        return reader.read().then(processStream);
+    })
+});*/
+
+oboe( url )
+    .node('docs.*', (doc) => {
+        //console.log(doc);
+        if (doc.hasOwnProperty('x')) {
+            if (counter % 1000 === 0) {
+                setUI(counter);
+            }
+            counter += 1;
+        }
+        return oboe.drop;
+    })
+    .done( (finalJson) => {
+        console.log(finalJson);
+        setUI(`${counter}\nComplete.`);
+    })
+    .fail( (err) => {
+        console.error(err);
+    })
+
+</script>
+</head>
+<body>
+<pre id="output"></pre>
+</body>
+</html>
