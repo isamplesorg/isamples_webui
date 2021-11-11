@@ -84,9 +84,137 @@ function asDRectangle(rectangle) {
     return null;
 }
 
+/**
+ * Implements a DataSource for point stream from the /thing/stream API
+ * 
+ * Requires that "oboe" is globally available.
+ */
+export class PointStreamDatasource extends Cesium.CustomDataSource {
+
+    constructor(name) {
+        super(name);
+        this.removeListener = null;
+
+        // pins are used for labelling point clusters
+        const pinBuilder = new Cesium.PinBuilder();
+        this.pins = {
+        pin50:pinBuilder
+          .fromText("50+", Cesium.Color.RED, 48)
+          .toDataURL(),
+        pin40: pinBuilder
+          .fromText("40+", Cesium.Color.ORANGE, 48)
+          .toDataURL(),
+        pin30: pinBuilder
+          .fromText("30+", Cesium.Color.YELLOW, 48)
+          .toDataURL(),
+        pin20: pinBuilder
+          .fromText("20+", Cesium.Color.GREEN, 48)
+          .toDataURL(),
+        pin10: pinBuilder
+          .fromText("10+", Cesium.Color.BLUE, 48)
+          .toDataURL(),
+        }
+        var singleDigitPins = new Array(8);
+        for (var i = 0; i < singleDigitPins.length; ++i) {
+          singleDigitPins[i] = pinBuilder
+            .fromText("" + (i + 2), Cesium.Color.VIOLET, 48)
+            .toDataURL();
+        }
+        this.pins.sdp = singleDigitPins;        
+    }
+
+    /**
+     * Sets up the cluster styling for points
+     */
+    pointsClusterStyle() {
+        if (this.removeListener!==null) {
+            this.removeListener();
+            this.removeListener = null;
+        } else {
+            let _this = this;
+            this.removeListener = this.clustering.clusterEvent.addEventListener(
+                function (clusteredEntities, cluster) {
+                    cluster.label.show = false;
+                    cluster.billboard.show = true;
+                    cluster.billboard.id = cluster.label.id;
+                    cluster.billboard.verticalOrigin =
+                        Cesium.VerticalOrigin.BOTTOM;
+                    cluster.billboard.heightReference= Cesium.HeightReference.CLAMP_TO_GROUND;
+            
+                    if (clusteredEntities.length >= 50) {
+                        cluster.billboard.image = _this.pins.pin50;
+                    } else if (clusteredEntities.length >= 40) {
+                        cluster.billboard.image = _this.pins.pin40;
+                    } else if (clusteredEntities.length >= 30) {
+                        cluster.billboard.image = _this.pins.pin30;
+                    } else if (clusteredEntities.length >= 20) {
+                        cluster.billboard.image = _this.pins.pin20;
+                    } else if (clusteredEntities.length >= 10) {
+                        cluster.billboard.image = _this.pins.pin10;
+                    } else {
+                        cluster.billboard.image =
+                        _this.pins.sdp[clusteredEntities.length - 2];
+                    }
+                }
+            );
+        }
+        // force a re-cluster with the new styling
+        var pixelRange = this.clustering.pixelRange;
+        this.clustering.pixelRange = 0;
+        this.clustering.pixelRange = pixelRange;        
+    }
+
+    /**
+     * Load the data from the streaming data source.
+     * 
+     * @param {*} url providing a Solr streaming response with x, y, n values.
+     */
+    load(url) {
+        this.isLoading = true;
+        if (this.removeListener !== null) {
+            this.clustering.clusterEvent.removeEventListener(this.removeListener);
+            this.removeListener = null;
+        }
+        this.entities.removeAll()
+        this.clustering.enabled = true;
+        this.clustering.clusterPoints = true;
+        this.clustering.minimumClusterSize = 3;
+        this.clustering.pixelRange = 15;
+        const _color = Cesium.Color.GREEN.withAlpha(0.5);
+        oboe( url )
+        .node('docs.*', (doc) => {
+            // Handle the data records, e.g. response.docs[0].doc
+            if (doc.hasOwnProperty('x')) {
+                const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, 1);
+                this.entities.add({
+                    position: p0,
+                    point: {
+                        color: _color,
+                        pixelSize: 5,
+                        outlineColor: Cesium.Color.YELLOW,
+                        outlineWidth: 3,
+                        heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
+                    },
+                })                
+            }
+            // Drop the entity to reduce memory use
+            return oboe.drop;
+        })
+        .done( (finalJson) => {
+            this.isLoading = false;
+            this.pointsClusterStyle();
+            console.log("Point stream complete");
+        })
+        .fail( (err) => {
+            this.isLoading = false;
+            console.error(err);
+        })
+    }
+}
+
 
 /**
- *
+ * Wraps a Cesium view
  */
 export class ISamplesSpatial {
 
@@ -111,6 +239,7 @@ export class ISamplesSpatial {
             infoBox: false,
             timeline: false,
             animation: false,
+            sceneModePicker: false,
             terrainProvider: worldTerrain,
         });
         this.buildingTileset = this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
@@ -333,7 +462,14 @@ export class ISamplesSpatial {
               },
     
         });
-        //this.viewer.trackedEntity = e2;
         return e;
+    }
+
+    async addDataSource(dataSource) {
+        return await this.viewer.dataSources.add(dataSource);
+    }
+
+    removeDataSource(dataSource, destroy=false) {
+        return this.viewer.dataSources.remove(dataSource, destroy);
     }
 }

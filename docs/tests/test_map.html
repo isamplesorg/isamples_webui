@@ -30,6 +30,7 @@
             margin-bottom: 0;
         }
     </style>
+    <script src="../js/oboe-browser.js"></script>
     <script type="module">
 
     import { html, render } from "lit";
@@ -74,6 +75,7 @@
         //const Q = `producedBy_samplingSite_location_rpt:[${bb.min_lat},${bb.min_lon} TO ${bb.max_lat},${bb.max_lon}]`
         const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
         console.log(Q);
+        document.getElementById("q_bounds").innerText = Q;
         let _url = new URL("/thing/select", "https://mars.cyverse.org");
         let params = _url.searchParams;
         params.append("q", Q);
@@ -87,14 +89,16 @@
 
 
     // ==================
-    import {ISamplesSpatial, SpatialView} from "../js/isamples-spatial";
+    import {ISamplesSpatial, SpatialView, PointStreamDatasource} from "../js/isamples-spatial";
 
-    const moorea = new SpatialView(-149.814307,-17.48999,552,285.1,-14.42)
+    const moorea = new SpatialView(-149.8169236266867, -17.451466233002286, 2004.7347996772614, 201.84408760864753, -20.853642866175978);
+    const patagonia = new SpatialView(-69.60169132023925, -54.315990127766646, 1781.4560051617016, 173.54573250470798, -15.85292472305027);
 
     let bbox = null;
-    let viewer = new ISamplesSpatial("cesiumContainer");
+    export let viewer = new ISamplesSpatial("cesiumContainer");
     viewer.addPointsBySource(642092);
     viewer.visit(moorea);
+    let selPoints = await viewer.addDataSource( new PointStreamDatasource("BB Points") );
 
     function showCoordinates(lon, lat, height) {
         const e = document.getElementById("position");
@@ -104,6 +108,7 @@
     function clearBoundingBox() {
         viewer.removeEntity(bbox);
         document.getElementById("clear-bb").style.display = "none"
+        document.getElementById("q_bounds").innerText = "";
     }
 
     async function selectedBoxCallback(bb) {
@@ -111,6 +116,15 @@
         console.log(text);
         viewer.removeEntity(bbox);
         bbox = viewer.addRectangle(bb, text);
+
+        // Load the point stream
+        const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
+        let _url = new URL("/thing/stream", "http://localhost:8000");
+        let params = _url.searchParams;
+        params.append("q", Q);
+        params.append("rows", 10000);
+        selPoints.load(_url.toString());
+
         const btn = document.getElementById("clear-bb")
         btn.style.display = "block";
         btn.onclick = clearBoundingBox;
@@ -130,7 +144,15 @@
     viewer.trackMouseCoordinates(showCoordinates);
     viewer.enableTracking(selectedBoxCallback);
 
+    globalThis.viewer = viewer;
 
+    document.getElementById("visitMoorea").onclick = () => {
+        viewer.visit(moorea);
+    }
+    document.getElementById("visitPatagonia").onclick = () => {
+        viewer.visit(patagonia);
+    }
+    
     </script>
 </head>
 <body>
@@ -138,7 +160,10 @@
 <section>
 <div id="cesiumContainer">
 </div>
+<button id="visitMoorea">Visit Moorea</button><button id="visitPatagonia">Visit Patagonia</button>
 </section>
-<footer></footer>
+<footer>
+    <pre id="q_bounds" width="80em"></pre>
+</footer>
 </body>
 </html>
