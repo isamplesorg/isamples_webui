@@ -107,6 +107,7 @@
 
     function clearBoundingBox() {
         viewer.removeEntity(bbox);
+        selPoints.clear();
         document.getElementById("clear-bb").style.display = "none"
         document.getElementById("q_bounds").innerText = "";
     }

@@ -164,6 +164,14 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
         this.clustering.pixelRange = pixelRange;        
     }
 
+    clear() {
+        if (this.removeListener !== null) {
+            this.clustering.clusterEvent.removeEventListener(this.removeListener);
+            this.removeListener = null;
+        }
+        this.entities.removeAll()        
+    }
+
     /**
      * Load the data from the streaming data source.
      * 
@@ -171,11 +179,7 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
      */
     load(url) {
         this.isLoading = true;
-        if (this.removeListener !== null) {
-            this.clustering.clusterEvent.removeEventListener(this.removeListener);
-            this.removeListener = null;
-        }
-        this.entities.removeAll()
+        this.clear()
         this.clustering.enabled = true;
         this.clustering.clusterPoints = true;
         this.clustering.minimumClusterSize = 3;
