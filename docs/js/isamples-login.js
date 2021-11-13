@@ -1,11 +1,29 @@
 import { html, css, LitElement } from 'lit';
 
+/**
+ * Implements UI element to trigger an OAuth workflow.
+ * 
+ * Credentials are stored in the browser secure storage if
+ * available, and loaded from that location if present.
+ * 
+ * Emits an event "credentials-changed" when a login
+ * or logout is successful.
+ * 
+ * This component requires a server side action to handle
+ * the OAuth workflow. 
+ * 
+ * 1. This component opens a new window from the server authService
+ * 2. The user completes the OAuth workflow
+ * 3. The server updates the window with the login details
+ * 4. The window sends auth details in a message back to this window
+ * 
+ */
 export class ISamplesLogin extends LitElement {
   static get styles() {
     return css`
       :host {
         display: block;
-        padding: 25px;
+        padding: 0;
         color: var(--oauth-autho-text-color, #000);
       }
     `;
@@ -41,6 +59,11 @@ export class ISamplesLogin extends LitElement {
     super.disconnectedCallback();
   }
 
+  /**
+   * Load credentials from the Browser secure store.
+   * 
+   * Only works in a secure context (i.e. page loaded over https)
+   */
   loadCredentials() {
     navigator.credentials
       .get({ password: true, mediation: 'optional' })
@@ -53,10 +76,15 @@ export class ISamplesLogin extends LitElement {
       })
       // eslint-disable-next-line no-unused-vars
       .catch(err => {
-        // console.log(`Error reading credentials: ${err}`);
+        console.warn(`Error reading credentials: ${err}`);
       });
   }
 
+  /**
+   * Request to store credentials in the Browser secure storage location.
+   * 
+   * Only works in a secure context (i.e. page loaded over https)
+   */
   storeCredentials() {
     // eslint-disable-next-line no-undef
     const cred = new PasswordCredential({
@@ -71,10 +99,17 @@ export class ISamplesLogin extends LitElement {
       })
       // eslint-disable-next-line no-unused-vars
       .catch(err => {
-        // console.log(`Error storing creds: ${err}`);
+        console.warn(`Error storing creds: ${err}`);
       });
   }
 
+  /**
+   * Send a "credentials-changed" event.
+   * 
+   * The detail property contains a boolean indicating
+   * if the state is authenticated (i.e. login was successful)
+   * or not.
+   */
   notifyCredentialsChanged() {
     const e = new CustomEvent("credentials-changed", {
       detail: {authenticated: this.authenticated},
@@ -84,6 +119,11 @@ export class ISamplesLogin extends LitElement {
     this.dispatchEvent(e);
   }
 
+  /**
+   * Handles the required "auth-info" message response from the authentication window.
+   * 
+   * @param {*} event 
+   */
   _handleAuthenticationMessage = (event) => {
     if (event.data.name === "auth-info") {
       if (event.data.info.token !== undefined) {
@@ -95,10 +135,24 @@ export class ISamplesLogin extends LitElement {
     }
   }
 
+  /**
+   * Get the token.
+   * 
+   * @returns The authentication token that may be used by other services
+   */
   getToken() {
     return this._token;
   }
 
+  /**
+   * Initiates the login process by opening a new window at the authService location.
+   * 
+   * The opened window handles the authentication workflow and ultimately
+   * sends an "auth-info" message back to this window which is handled by
+   * this._handleAuthenticationMessage to get the crednetials.
+   * 
+   * @param {*} event 
+   */
   initiateLogin(event) {
     window.open(
       this.authService,
@@ -107,11 +161,18 @@ export class ISamplesLogin extends LitElement {
     );
   }
 
+  /**
+   * Logout by discarding the credentials.
+   * 
+   * A "credentials-changed" event is triggered.
+   */
   logout() {
     this._token = null;
     this.username = '';
-    this.authenticated = false;
-    this.notifyCredentialsChanged();
+    if (this.authenticated) {
+      this.authenticated = false;
+      this.notifyCredentialsChanged();  
+    }
   }
 
   render() {
