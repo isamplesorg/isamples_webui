@@ -15,17 +15,18 @@ export class Clippy extends LitElement {
     static get styles() {
         return css`
         :host {
-            color: gray;
-            float: right;
-            padding-right: 0.5rem;
-            padding-top: 0.5rem;
+            color: var(--clippy-color, gray);
+            float: var(--clippy-float, right);
+            padding-right: var(--clippy-padding-right, 0.5rem);
+            padding-top: var(--clippy-padding-top, 0.5rem);
+            padding-left: var(--clippy-padding-left, 0);
+            padding-bottom: var(--clippy-padding-bottom, 0);
         }
         #copyNote {
             visibility: hidden;
-        }
-        
+        }        
         #copyButton {
-            fill: gray;
+            fill: var(--clippy-button-fill, gray);
         }
         `
     }

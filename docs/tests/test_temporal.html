@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test temporal view</title>
+    <!--
+    Testing of the temporal range view for iSamples
+    -->
+    <script src="//cdn.plot.ly/plotly-2.3.1.min.js"></script>
+<script type="module">
+// Import the settings and scripts
+import {settings} from "../js/settings";
+import { Clippy } from "../js/wc-clippy";
+
+// Load the application settings
+globalThis.SETTINGS = settings;
+
+</script>
+
+<script type="module">
+import { TemporalBounds, DEFAULT_HISTOGRAM_BINS } from '../js/isamples-temporal.js';
+
+let temporal_bounds = new TemporalBounds();
+
+async function setTemporalBounds(start_date, end_date) {
+    temporal_bounds.setRange(start_date, end_date);
+    document.getElementById("t-query").innerText = temporal_bounds.asQuery();
+}
+
+async function getTemporalHistogram(
+        include_spatial=true,
+        num_bins = DEFAULT_HISTOGRAM_BINS,
+        service = "http://localhost:8000/thing/select") {
+    //const queries = this.getQueries(include_spatial, false);
+    const queries = {
+        q:"*:*",
+        fq: [],
+    }
+    return temporal_bounds.getHistogram(queries.q, queries.fq, num_bins, service);
+}
+
+async function refreshDateHistogram(ele_id) {
+    let ele = document.getElementById(ele_id);
+    let data = await getTemporalHistogram();
+    data["type"] = "bar";
+    console.log(data);
+    const layout = {
+        title: "produced_by time",
+        showLegend: false,
+        yaxis: {
+            type:'log',
+            autorange: true
+        }
+    }
+    Plotly.newPlot(ele_id, [data], layout, {scrollZoom: true});
+    ele.on('plotly_relayout', onDateRangeZoom);
+}
+
+async function onDateRangeZoom(ev) {
+    console.log(ev);
+    if (ev["xaxis.range[0]"]) {
+        const d0 = new Date(Date.parse(ev["xaxis.range[0]"]));
+        const d1 = new Date(Date.parse(ev["xaxis.range[1]"]));
+        setTemporalBounds(d0.toISOString(), d1.toISOString())
+            .then(refreshDateHistogram("temporal-view"));
+    }
+}
+
+
+setTemporalBounds("1800-01-01T00:00:00Z","2100-01-01T00:00:00Z")
+            .then(refreshDateHistogram("temporal-view"))
+
+    </script>
+</head>
+<body>
+    <header></header>
+    <section>
+        <p>Test for temporal view of record.</p>
+        <div id="temporal-view"></div>
+        <p>Corresponding temporal query:</p>
+        <div>
+            <wc-clippy sourceId="t-query"></wc-clippy>
+            <pre id="t-query"></pre>
+        </div>
+    </section>
+    <footer></footer>
+</body>
+</html>
