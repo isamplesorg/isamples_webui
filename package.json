@@ -5,6 +5,10 @@
     "@web/dev-server-rollup": "^0.3.11",
     "@web/rollup-plugin-copy": "^0.3.0",
     "@web/rollup-plugin-html": "^1.10.1",
+    "copyfiles": "^2.4.1",
+    "esbuild": "^0.13.14",
+    "npm-run-all": "^4.1.5",
+    "onchange": "^7.1.0",
     "rollup": "^2.58.3",
     "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-minify-html-literals": "^1.2.6",
@@ -16,15 +20,21 @@
   "dependencies": {
     "@datadavev/oauth-autho": "^0.0.1",
     "@octokit/request": "^5.6.2",
-    "cesium": "^1.86.1",
-    "gh-corner-wc": "^0.0.2",
-    "js-event-bus": "^1.1.1",
-    "jsonstream2": "^3.0.0",
+    "gh-corner-wc": "github:datadavev/gh-corner",
     "lit": "^2.0.2",
     "pretty-print-json": "^1.1.1",
     "tabulator-tables": "^5.0.7"
   },
   "scripts": {
-    "start": "web-dev-server"
+    "serve": "browser-sync start -c bs-config.js",
+    "build:css": "copyfiles -u 1 './src/css/*.css' dist",
+    "build:html": "copyfiles -u 1 './src/**/*.html' dist",
+    "build:js": "node esbuilder.js",
+    "build": "run-s build:*",
+    "watch:css": "onchange \"src/css\" -- run-s build:css",
+    "watch:html": "onchange \"src/**/*.html\" -- run-s build:html",
+    "watch:js": "onchange \"src/js\" -- run-s build:js",
+    "watch": "run-p serve watch:*",
+    "clean": "rm -rf dist/*"
   }
 }
