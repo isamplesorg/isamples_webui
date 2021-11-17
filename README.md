@@ -25,5 +25,5 @@ npm run serve
 
 Watch sources, build on change, and refresh view:
 ```
-npm watch
+npm run watch
 ```
