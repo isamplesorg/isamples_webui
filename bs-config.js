@@ -30,10 +30,10 @@ module.exports = {
         "ignoreInitial": true
     },
     "server": {
-        "baseDir": "dist",
+        "baseDir": "docs",
         "directory": true,
         "routes" :{
-            "/isamples_webui": "dist"
+            "/isamples_webui": "docs"
         }
     },
     "proxy": false,
