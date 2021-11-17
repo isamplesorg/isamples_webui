@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>iSamples Records</title>
+    <!-- schema.org JSON-LD description of this page -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org/",
+            "@type": "WebPage",
+            "@id": "index.html",
+            "creator": {
+                "@id": "#isamples-project"
+            },
+            "contributor": {
+                "@type": "Person",
+                "@id": "https://orcid.org/0000-0002-6513-4996",
+                "name": "Dave Vieglais"
+            },
+            "keywords": [
+                "iSamples",
+                "physical-samples",
+                "NSF-Project"
+            ],
+            "description": "Web interface for iSamples Central or Box",
+            "url": "https://isamplesorg.github.io/isamples_webui/",
+            "archivedAt": "https://github.com/isamplesorg/isamples_webui",
+            "dateCreated": "2021-10-08",
+            "dateModified": "2021-10-08",
+            "isPartOf": "https://github.com/isamplesorg"
+        }
+    </script>
+    <script type="application/ld+json" id="isamples-project">
+        {
+            "@context": "https://schema.org/",
+            "@graph": [
+                {
+                    "@type": "ResearchProject",
+                    "@id": "#isamples-project",
+                    "name": "Collaborative Research: Frameworks: Internet of Samples: Toward an Interdisciplinary Cyberinfrastructure for Material Samples",
+                    "funder": {
+                        "@id": "nsf"
+                    },
+                    "sponsor": {
+                        "@id": "nsf"
+                    }
+                },
+                {
+                    "@type": "MonetaryGrant",
+                    "url": "https://nsf.gov/awardsearch/showAward?AWD_ID=2004839",
+                    "fundedItem": {
+                        "@id": "#isamples-project"
+                    }
+                },
+                {
+                    "@type": "MonetaryGrant",
+                    "url": "https://nsf.gov/awardsearch/showAward?AWD_ID=2004562",
+                    "fundedItem": {
+                        "@id": "#isamples-project"
+                    }
+                },
+                {
+                    "@type": "MonetaryGrant",
+                    "url": "https://nsf.gov/awardsearch/showAward?AWD_ID=2004642",
+                    "fundedItem": {
+                        "@id": "#isamples-project"
+                    }
+                },
+                {
+                    "@type": "MonetaryGrant",
+                    "url": "https://nsf.gov/awardsearch/showAward?AWD_ID=2004815",
+                    "fundedItem": {
+                        "@id": "#isamples-project"
+                    }
+                },
+                {
+                    "@type": "Organization",
+                    "@id": "nsf",
+                    "name": "National Sicence Foundation",
+                    "url": "https://nsf.gov/",
+                    "identifier": [
+                        "https://ror.org/021nxhr62",
+                        "https://grid.ac/institutes/grid.431093.c",
+                        "https://www.wikidata.org/wiki/Q304878"
+                    ]
+                }
+            ]
+        }
+    </script>
+
+    <link rel="stylesheet" href="css/common.css" />
+    <link rel="stylesheet" href="css/records.css" />
+    <script type="module">
+        import {settings} from "./js/settings.js";
+        globalThis.SETTINGS = settings;
+    </script>
+    <script type="module" src="js/main.js">
+    </script>
+
+    <!-- Github project link webcomponent -->
+    <script type="module" >
+    </script>
+
+    <style>
+        .infoContainer {
+            margin-top: 1.0rem;
+            display: flex;
+            flex-direction: row;
+            height: calc(100% - 25px);
+            height: -moz-calc(100% - 25px);
+            height: -webkit-calc(100% - 25px);
+            box-sizing: border-box;
+        }
+
+        .infoChild {
+            width: 50%;
+            background-color: white;
+        }
+
+        div.infoChild pre {
+            padding-top: 0;
+            padding-left: 0;
+            padding-bottom: 0;
+            padding-right: 0;
+            margin-top: 0;
+            margin-right: 0.5rem;
+            white-space: pre-wrap;
+            border: 1px dotted grey;
+            font-family: var(--mono-font);
+        }
+
+    </style>
+
+    <script type="module">
+        import { GitHubIssues } from "./js/gh_issues.js";
+        import { Clippy } from "./js/wc-clippy.js";
+        import { JsonPanel } from "./js/json-panel.js";
+        import { ISamplesLogin } from "./js/isamples-login.js";
+
+        // Webcomponent for manging overall query state
+        import { ISamplesState } from "./js/isamples-state.js";
+
+        // The summary view, counts by various facet combinations
+        import { ISamplesSummary } from "./js/isamples-summary.js";
+
+        window.githubIssues = new GitHubIssues("githubauth");
+    </script>
+</head>
+<body>
+<main>
+    <gh-corner user="isamplesorg" repo=""></gh-corner>
+    <isamples-login id="githubauth" authService="https://mars.cyverse.org/login"></isamples-login>
+    <section id="query-section">
+        <isamples-state id="query-state" eventBus="getEventBus()"></isamples-state>
+        <details>
+            <summary>Summary</summary>
+            <isamples-summary id="summary" queryStateId="query-state"></isamples-summary>
+        </details>
+    </section>
+
+    <section>
+        <div id="records">
+        </div>
+    </section>
+
+    <section>
+        <details open>
+            <summary>Selected Row Record</summary>
+            <section class="infoContainer">
+                <div class="infoChild" id="InfoLeft">
+                    <span class="label">Source Record</span>
+                    <json-panel id="record_original">
+                        <wc-clippy sourceId="record_original"></wc-clippy>
+                    </json-panel>
+                </div>
+                <div class="infoChild" id="InfoRight">
+                    <details>
+                        <summary>iSamples Solr Record</summary>
+                        <json-panel id="record_solr">
+                            <wc-clippy sourceId="record_solr"></wc-clippy>
+                        </json-panel>
+                    </details>
+                    <details open>
+                        <summary>iSamples Core Record</summary>
+                        <json-panel id="record_xform">
+                            <wc-clippy sourceId="record_xform"></wc-clippy>
+                        </json-panel>
+                    </details>
+                </div>
+            </section>
+        </details>
+    </section>
+</main>
+<footer>
+    <p>Placeholder</p>
+</footer>
+</body>
+</html>

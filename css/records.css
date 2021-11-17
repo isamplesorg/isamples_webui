@@ -1,0 +1,13 @@
+/**
+ TODO: Replace this with css from node_modules
+ */
+@import "https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css";
+
+.tabulator {
+    font-family: var(--mono-font, monospace);
+    font-size: inherit;
+    vertical-align: auto;
+}
+.records-footer {
+    float: left;
+}
