@@ -3,7 +3,7 @@ import {
   r,
   s
 } from "./chunk-B4DODV5L.js";
-import "./chunk-CWOSGNMY.js";
+import "./chunk-XVZR6UTJ.js";
 
 // src/js/json-panel.js
 import { JsonPointer } from "https://unpkg.com/jsonpointerx@1.1.4/module/index.js?module";

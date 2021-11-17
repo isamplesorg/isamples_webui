@@ -1,4 +1,4 @@
-import "./chunk-CWOSGNMY.js";
+import "./chunk-XVZR6UTJ.js";
 
 // src/js/util.js
 var SERVICE_ENDPOINT = SETTINGS.serviceEndpoint;

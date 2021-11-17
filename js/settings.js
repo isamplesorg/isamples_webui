@@ -1,4 +1,4 @@
-import "./chunk-CWOSGNMY.js";
+import "./chunk-XVZR6UTJ.js";
 
 // src/js/settings.js
 var settings = {

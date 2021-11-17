@@ -3,7 +3,7 @@ import {
   r,
   s
 } from "./chunk-B4DODV5L.js";
-import "./chunk-CWOSGNMY.js";
+import "./chunk-XVZR6UTJ.js";
 
 // src/js/wc-clippy.js
 var Clippy = class extends s {

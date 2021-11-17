@@ -1,4 +1,4 @@
-import "./chunk-CWOSGNMY.js";
+import "./chunk-XVZR6UTJ.js";
 
 // src/js/gh_issues.js
 import { request } from "https://cdn.skypack.dev/@octokit/request";

@@ -1,6 +1,6 @@
 import {
   __commonJS
-} from "./chunk-CWOSGNMY.js";
+} from "./chunk-XVZR6UTJ.js";
 
 // src/js/oboe-browser.js
 var require_oboe_browser = __commonJS({

@@ -6,7 +6,7 @@ import {
   r,
   s
 } from "./chunk-B4DODV5L.js";
-import "./chunk-CWOSGNMY.js";
+import "./chunk-XVZR6UTJ.js";
 
 // node_modules/gh-corner-wc/src/GhCorner.js
 var GhCorner = class extends s {
