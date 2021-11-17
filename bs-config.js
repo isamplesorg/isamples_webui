@@ -17,9 +17,9 @@ module.exports = {
         "port": 2001
     },
     "files": [
-        "dist/*.html",
-        "dist/*.js",
-        "dist/assets/*.css"
+        "docs/*.html",
+        "docs/*.js",
+        "docs/assets/*.css"
     ],
     "watchEvents": [
     ],

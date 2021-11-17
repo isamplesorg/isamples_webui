@@ -27,8 +27,8 @@
   },
   "scripts": {
     "serve": "browser-sync start -c bs-config.js",
-    "build:css": "copyfiles -u 1 './src/css/*.css' dist",
-    "build:html": "copyfiles -u 1 './src/**/*.html' dist",
+    "build:css": "copyfiles -u 1 './src/css/*.css' docs",
+    "build:html": "copyfiles -u 1 './src/**/*.html' docs",
     "build:js": "node esbuilder.js",
     "build": "run-s build:*",
     "watch:css": "onchange \"src/css\" -- run-s build:css",

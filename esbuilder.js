@@ -18,7 +18,7 @@ require('esbuild').build({
         'src/js/isamples-temporal.js',
     ],
     bundle: true,
-    outdir: "dist/js",
+    outdir: "docs/js",
     splitting: true,
     format:"esm",
 
