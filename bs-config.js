@@ -17,9 +17,9 @@ module.exports = {
         "port": 2001
     },
     "files": [
-        "docs/*.html",
-        "docs/*.js",
-        "docs/assets/*.css"
+        "dist/*.html",
+        "dist/*.js",
+        "dist/assets/*.css"
     ],
     "watchEvents": [
     ],
@@ -30,10 +30,10 @@ module.exports = {
         "ignoreInitial": true
     },
     "server": {
-        "baseDir": "docs",
+        "baseDir": "dist",
         "directory": true,
         "routes" :{
-            "/isamples_webui": "docs"
+            "/isamples_webui": "dist"
         }
     },
     "proxy": false,

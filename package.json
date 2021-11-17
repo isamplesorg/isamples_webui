@@ -27,14 +27,14 @@
   },
   "scripts": {
     "serve": "browser-sync start -c bs-config.js",
-    "build:css": "copyfiles -u 1 './src/css/*.css' docs",
-    "build:html": "copyfiles -u 1 './src/**/*.html' docs",
+    "build:css": "copyfiles -u 1 './src/css/*.css' dist",
+    "build:html": "copyfiles -u 1 './src/**/*.html' dist",
     "build:js": "node esbuilder.js",
     "build": "run-s build:*",
     "watch:css": "onchange \"src/css\" -- run-s build:css",
     "watch:html": "onchange \"src/**/*.html\" -- run-s build:html",
     "watch:js": "onchange \"src/js\" -- run-s build:js",
     "watch": "run-p serve watch:*",
-    "clean": "rm -rf docs/*"
+    "clean": "rm -rf dist/*"
   }
 }

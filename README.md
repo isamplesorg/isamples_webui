@@ -16,7 +16,7 @@ Build:
 ```
 npm run build
 ```
-Results are in the `docs` folder.
+Results are in the `dist` folder.
 
 Run local server:
 ```
