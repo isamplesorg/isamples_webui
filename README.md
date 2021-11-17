@@ -7,13 +7,23 @@ Web interface to iSB and iSC APIs
 
 Generally following guidelines under https://modern-web.dev/
 
-Run a development server:
+Setup:
 ```
-npm start
+npm install
 ```
 
-Building to `dist` following config guidelines in https://lit.dev/docs/tools/production/:
-
+Build:
 ```
-rollup -c
+npm run build
+```
+Results are in the `dist` folder.
+
+Run local server:
+```
+npm run serve
+```
+
+Watch sources, build on change, and refresh view:
+```
+npm watch
 ```
