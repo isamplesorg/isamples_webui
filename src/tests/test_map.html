@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Testing Cesium view</title>
-    <script src="https://cesium.com/downloads/cesiumjs/releases/1.87/Build/Cesium/Cesium.js"></script>
-    <link href="https://cesium.com/downloads/cesiumjs/releases/1.87/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <link href="../js/Widgets/widgets.css" rel="stylesheet">
     <style>
         #cesiumContainer {
             width: 100%;
@@ -30,6 +29,9 @@
             margin-bottom: 0;
         }
     </style>
+    <script type="module">
+        globalThis.CESIUM_BASE_URL = "/js/";
+    </script>
     <script type="module">
 
     import {ISamplesSpatial, SpatialView, PointStreamDatasource} from "../js/isamples-spatial.js";

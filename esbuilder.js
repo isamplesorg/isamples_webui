@@ -1,8 +1,17 @@
 /**
  * Implements the npm run build operation
+ * 
+ * Notes for cesium:
+ * Building baulks on url, https, http, and zlib which are node modules.
+ * There are browserified options for them which maybe could
+ * work with esbuild's define and inject options.
  */
-require('esbuild').build({
+ const { build } = require("esbuild")
+ const { nodeBuiltIns } = require("esbuild-node-builtins")
+
+build({
     logLevel: "info",
+    plugins: [nodeBuiltIns()],
     entryPoints: [
         'src/js/oboe-browser.js',
         'src/js/settings.js',
@@ -21,5 +30,5 @@ require('esbuild').build({
     outdir: "dist/js",
     splitting: true,
     format:"esm",
-
+    platform: "browser",
 }).catch(() => process.exit(1))

@@ -1,10 +1,10 @@
 /**
  * Cesium widget wrapped with some methods for ISamples
  *
- * <script src="https://cesium.com/downloads/cesiumjs/releases/1.87/Build/Cesium/Cesium.js"></script>
- * <link href="https://cesium.com/downloads/cesiumjs/releases/1.87/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+ * The page needs to include some css, like:
+ *     <link href="../js/Widgets/widgets.css" rel="stylesheet">
  */
-
+import * as Cesium from 'cesium';
 import { html, render } from "lit";
 import oboe from "../js/oboe-browser.js";
 
