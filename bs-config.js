@@ -18,8 +18,8 @@ module.exports = {
     },
     "files": [
         "docs/*.html",
-        "docs/js/*.js",
-        "docs/css/*.css"
+        "docs/*.js",
+        "docs/assets/*.css"
     ],
     "watchEvents": [
     ],

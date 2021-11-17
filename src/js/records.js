@@ -1,3 +1,17 @@
+import {TabulatorFull as Tabulator} from 'tabulator-tables';
+
+import { prettyPrintJson } from 'pretty-print-json';
+
+export class RecordsTable {
+// TODO: put everything into a class, and create an instance with the settings provided on creation.
+    constructor(settings) {
+
+    }
+}
+
+/**
+ *  http://tabulator.info/docs/5.0/
+ */
 
 // For escaping solr query terms
 const SOLR_RESERVED = [' ', '+', '-', '&', '!', '(', ')', '{', '}', '[', ']', '^', '"', '~', '*', '?', ':', '\\'];
@@ -6,12 +20,14 @@ const SOLR_VALUE_REGEXP = new RegExp("(\\" + SOLR_RESERVED.join("|\\") + ")", "g
 /**
  * Escape a lucene / solr query term
  */
-function escapeLucene(value) {
+export function escapeLucene(value) {
     return value.replace(SOLR_VALUE_REGEXP, "\\$1");
 }
-const DEFAULT_Q = "*:*";
-const TABLE_ROWS = 500;
-const COLUMNS = [
+const DEFAULT_Q = SETTINGS.defaultQuery || "*:*";
+const SERVICE_ENDPOINT = SETTINGS.serviceEndpoint;
+const TABLE_HEIGHT = SETTINGS.records.tableHeight || '100%';
+const TABLE_ROWS = SETTINGS.records.PageSize || 100;
+const COLUMNS = SETTINGS.records.columns || [
     {title:"ID", field:"id"},
     {title:"Source", field:"source"},
     {title:"Label", field:"label"},
@@ -26,7 +42,7 @@ var data_table = null;
 if (!library)
    var library = {};
 
-async function getSolrRecords(q, fq=[], start=0, num_rows=TABLE_ROWS, sorters=[]) {
+export async function getSolrRecords(q, fq=[], start=0, num_rows=TABLE_ROWS, sorters=[]) {
     var _url = new URL("/thing/select", SERVICE_ENDPOINT);
     let params = _url.searchParams;
     let _fields = [];
@@ -41,7 +57,11 @@ async function getSolrRecords(q, fq=[], start=0, num_rows=TABLE_ROWS, sorters=[]
     let response = await fetch(_url);
     let data = await response.json();
     const _ele = document.getElementById("record_count");
-    _ele.innerText = new Intl.NumberFormat().format(data.response.numFound);
+    try {
+        _ele.innerText = new Intl.NumberFormat().format(data.response.numFound);
+    } catch (e) {
+        console.warn(e);
+    }
     let last_page = Math.floor(data.response.numFound / num_rows);
     if (data.response.numFound % num_rows > 0) {
         last_page = last_page + 1;
@@ -92,24 +112,35 @@ function _doSolrLoad(url, config, params){
     if (_bb !== undefined && _bb !== null && _bb !== "") {
         _fq.push(_bb);
     }
-    return getSolrRecords(_q, _fq, _start, params.size, params.sorters);
+    return new Promise(function(resolve, reject){
+        try {
+            resolve(getSolrRecords(_q, _fq, _start, params.size, params.sort))
+        } catch (e) {
+            reject(e);
+        }
+    })
 }
 
-function recordsOnLoad(tabulatorDivId) {
+export function recordsOnLoad(tabulatorDivId) {
     // Initialize the data table
     data_table = new Tabulator(`#${tabulatorDivId}`, {
-        pagination: "remote",
+        height: TABLE_HEIGHT,
+        pagination: true,
+        paginationMode: 'remote',
         paginationSize: TABLE_ROWS,
+        paginationInitialPage: 1,
+        paginationSizeSelector:true,
+        //progressiveLoad:"scroll",
         ajaxURL: SERVICE_ENDPOINT+"/thing/select",
-        ajaxSorting:true,
-        //ajaxProgressiveLoad: "scroll",
+        sortMode: "remote",
         ajaxRequestFunc: _doSolrLoad,
         columns: COLUMNS,
-        rowClick: rowClick,
         selectable:1,
-        resizableRows: true,
+        //resizableRows: true,
         footerElement:"<span class='records-footer'>Total records:<span id='record_count'></span></span>"
     });
+
+    data_table.on("rowClick", rowClick);
 
     /**
      * Respond to query_state_changed events emitted by the query-section element.
@@ -135,7 +166,7 @@ function recordsOnLoad(tabulatorDivId) {
 //=================
 
 //select row and show record information
-function rowClick(e, row) {
+export function rowClick(e, row) {
     let id = row._row.data.id;
     //var reportId = document.getElementById('currentID');
     //reportId.value = id;
@@ -143,7 +174,7 @@ function rowClick(e, row) {
     showRawRecord(id);
 }
 
-function selectRow(_id) {
+export function selectRow(_id) {
     console.log(_id);
     /*
     This is a bit complicated since we need to navigate to the identified row in the
@@ -177,7 +208,7 @@ function copyText(txt, eleid) {
 
 
 //show specified identifier record
-async function showRawRecord(id) {
+export async function showRawRecord(id) {
     const raw_url = new URL(`/thing/${encodeURIComponent(id)}`, SERVICE_ENDPOINT);
     raw_url.searchParams.append("format","original");
 
@@ -194,41 +225,20 @@ async function showRawRecord(id) {
         fetch(raw_url)
             .then(response => response.json())
             .then(doc => {
-                let e = document.getElementById("record_original");
-                e.innerHTML = prettyPrintJson.toHtml(doc, FormatOptions = {
-                    indent: 2,
-                    linkUrls: false
-                });
-                e = document.getElementById("source_record_link")
-                e.href = raw_url;
-                e = document.getElementById("source_record_copy");
-                e.onclick = copyText(JSON.stringify(doc, null, 2), "source_record_copy");
+                const e = document.getElementById("record_original");
+                e.data = doc;
             }),
         fetch(xform_url)
             .then(response => response.json())
             .then(doc => {
-                let e = document.getElementById("record_xform");
-                e.innerHTML = prettyPrintJson.toHtml(doc, FormatOptions = {
-                    indent: 2,
-                    linkUrls: false
-                });
-                e = document.getElementById("core_record_link")
-                e.href = xform_url;
-                e = document.getElementById("core_record_copy");
-                e.onclick = copyText(JSON.stringify(doc, null, 2), "core_record_copy");
+                const e = document.getElementById("record_xform");
+                e.data = doc;
             }),
         fetch(solr_url)
             .then(response => response.json())
             .then(doc => {
-                let e = document.getElementById("record_solr");
-                e.innerHTML = prettyPrintJson.toHtml(doc.response.docs[0], FormatOptions = {
-                    indent: 2,
-                    linkUrls: false
-                });
-                e = document.getElementById("solr_record_link")
-                e.href = solr_url;
-                e = document.getElementById("solr_record_copy");
-                e.onclick = copyText(JSON.stringify(doc, null, 2), "solr_record_copy");
+                const e = document.getElementById("record_solr");
+                e.data = doc.response.docs[0];
             })
     ])
 }

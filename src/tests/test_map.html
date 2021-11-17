@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Testing Cesium view</title>
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.87/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.87/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <style>
+        #cesiumContainer {
+            width: 100%;
+            height: 90vh;
+        }
+      
+        .spatial-hud {
+            display: block;
+            position: absolute;
+            z-index: 1;
+            top: 0.5rem;
+            left: 0.5rem;
+            min-width: 20rem;
+            color: white;
+            background-color: #333333aa;
+            margin-top: 0;
+            margin-bottom: 0;
+            font-family: monospace;
+            font-size: 0.7rem;
+        }
+        .spatial-hud>p {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+    </style>
+    <script type="module">
+
+    import {ISamplesSpatial, SpatialView, PointStreamDatasource} from "../js/isamples-spatial.js";
+
+    /**
+     * Format float x with n decimal places
+     */
+    function humanize(x, n) {
+        return x.toFixed(n);
+        //return x.toFixed(n).replace(/\.?0*$/, '');
+    }
+
+    function fetchRecords(fq) {
+        const Q = "*:*"
+        let _url = new URL("/thing/select", "https://mars.cyverse.org");
+        let params = _url.searchParams;
+        params.append("q", Q);
+        params.append("wt", "json");
+        params.append("fl", "id,source,producedBy_samplingSite_location_ll,hasMaterialCategory,hasContextCategory,hasSpecimenCategory");
+        params.append("fq", fq.fq);
+        params.append("pt", fq.pt);
+        params.append("d", fq.d);
+        fetch(_url)
+            .then(response => response.json())
+            .then(data => {
+                const ele = document.getElementById("records");
+                let rows = [];
+                rows.push(`Matches: ${data.response.numFound}`);
+                for (const i in data.response.docs) {
+                    const doc = data.response.docs[i];
+                    let e = [doc.id, doc.source, doc.hasMaterialCategory];
+                    e.push(doc.hasContextCategory);
+                    e.push(doc.hasSpecimenCategory);
+                    e.push(doc.producedBy_samplingSite_location_ll);
+                    rows.push(e.join("|"));
+                }
+                ele.innerText = rows.join("\n");
+            })
+    }
+
+    async function countRecordsInBB(bb) {
+        //const Q = `producedBy_samplingSite_location_rpt:[${bb.min_lat},${bb.min_lon} TO ${bb.max_lat},${bb.max_lon}]`
+        const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
+        console.log(Q);
+        document.getElementById("q_bounds").innerText = Q;
+        let _url = new URL("/thing/select", "https://mars.cyverse.org");
+        let params = _url.searchParams;
+        params.append("q", Q);
+        params.append("wt", "json");
+        params.append("fl", "id");
+        params.append("rows", 0);
+        let response = await fetch(_url);
+        let data = await response.json();
+        return data.response.numFound;
+    }
+
+
+    // ==================
+
+    const moorea = new SpatialView(-149.8169236266867, -17.451466233002286, 2004.7347996772614, 201.84408760864753, -20.853642866175978);
+    const patagonia = new SpatialView(-69.60169132023925, -54.315990127766646, 1781.4560051617016, 173.54573250470798, -15.85292472305027);
+
+    let bbox = null;
+    export let viewer = new ISamplesSpatial("cesiumContainer");
+    viewer.addPointsBySource(642092);
+    viewer.visit(moorea);
+    let selPoints = await viewer.addDataSource( new PointStreamDatasource("BB Points") );
+
+    function showCoordinates(lon, lat, height) {
+        const e = document.getElementById("position");
+        e.innerText = `${humanize(lat,4)}, ${humanize(lon,4)}, ${humanize(height,1)}`;
+    }
+
+    function clearBoundingBox() {
+        viewer.removeEntity(bbox);
+        selPoints.clear();
+        document.getElementById("clear-bb").style.display = "none"
+        document.getElementById("q_bounds").innerText = "";
+    }
+
+    async function selectedBoxCallback(bb) {
+        let text = `Record count: ${await countRecordsInBB(bb)}`;
+        console.log(text);
+        viewer.removeEntity(bbox);
+        bbox = viewer.addRectangle(bb, text);
+
+        // Load the point stream
+        const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
+        let _url = new URL("/thing/stream", "http://localhost:8000");
+        let params = _url.searchParams;
+        params.append("q", Q);
+        params.append("rows", 10000);
+        selPoints.load(_url.toString());
+
+        const btn = document.getElementById("clear-bb")
+        btn.style.display = "block";
+        btn.onclick = clearBoundingBox;
+
+    }
+
+    /*
+    function addHud() {
+        let hud = html`<div class="spatial-hud">
+            <p><code id='position'>0, 0, 0</code></p>
+            <p><button id='clear-bb' style='display:none'>Clear BB</button></p>
+        </div>`;
+        const v = document.querySelector("div.cesium-viewer");
+        render(hud, v); 
+    }
+    */
+
+    viewer.addHud();
+    viewer.trackMouseCoordinates(showCoordinates);
+    viewer.enableTracking(selectedBoxCallback);
+
+    globalThis.viewer = viewer;
+
+    document.getElementById("visitMoorea").onclick = () => {
+        viewer.visit(moorea);
+    }
+    document.getElementById("visitPatagonia").onclick = () => {
+        viewer.visit(patagonia);
+    }
+    
+    </script>
+</head>
+<body>
+<header></header>
+<section>
+<div id="cesiumContainer">
+</div>
+<button id="visitMoorea">Visit Moorea</button><button id="visitPatagonia">Visit Patagonia</button>
+</section>
+<footer>
+    <pre id="q_bounds" width="80em"></pre>
+</footer>
+</body>
+</html>

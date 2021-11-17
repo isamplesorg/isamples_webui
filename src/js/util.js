@@ -1,4 +1,6 @@
 
+const SERVICE_ENDPOINT = SETTINGS.serviceEndpoint;
+
 // Missing number value
 export const MISSING_VALUE = "-9999";
 

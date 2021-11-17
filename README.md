@@ -5,14 +5,32 @@ Web interface to iSB and iSC APIs
 
 ## Development
 
-A development server can be started with [`browser-sync`](https://browsersync.io/):
+Generally following guidelines under https://modern-web.dev/
 
+Setup:
 ```
-browser-sync start -s docs --https
+npm install
 ```
 
-To install `browser-sync`:
+Build:
+```
+npm run build
+```
+Results are in the `docs` folder.
 
+Run local server:
 ```
-npm install -g browser-sync
+npm run serve
 ```
+
+Watch sources, build on change, and refresh view:
+```
+npm run watch
+```
+
+Certificates are needed for some interactions (e.g. authentication). The development server
+configuration for https is in `bs-config.js` in the `https` section. 
+
+[Minica](https://github.com/jsha/minica) provides a convenient CA for local development
+purposes. My setup keeps the CA in `~/.local/etc/ca`.
+

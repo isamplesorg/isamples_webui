@@ -83,3 +83,17 @@ a.json-link         { color: purple; transition: all 400ms; }
 a.json-link:visited { color: slategray; }
 a.json-link:hover   { color: blueviolet; }
 a.json-link:active  { color: slategray; }
+
+/**
+Clippy
+ */
+.relpos {
+    position: relative;
+}
+
+.clippy {
+    color: gray;
+    position: absolute;
+    top: 3px;
+    right:3px;
+}

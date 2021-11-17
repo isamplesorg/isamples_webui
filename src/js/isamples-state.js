@@ -2,7 +2,7 @@
  * Webcomponent providing connection and query state for connecting to isamples service
  */
 
-import { LitElement, html, css } from "https://unpkg.com/lit@2.0.0/index.js?module";
+import { LitElement, html, css } from "lit";
 
 export class ISamplesState extends LitElement {
 
@@ -23,7 +23,13 @@ export class ISamplesState extends LitElement {
 
     static get properties() {
         return {
+            // The main query. This will typically represent a query
+            // that has been entered by the user in a search box
             q: {type: String},
+
+            // Dictionary of filter queries
+            // These typically represent the state of additional constraints
+            // such as spatial range, temporal range, selected facets
             _fqs: {
                 state: true,
                 type: Object,
@@ -55,7 +61,11 @@ export class ISamplesState extends LitElement {
         this.q = "*:*";
         this._fqs = {};
         // Subscribe to filter_changed events
-        eventBus.on('filter_changed', this._handleQueryChanged)
+        if (globalThis.eventBus !== undefined) {
+            globalThis.eventBus.on('filter_changed', this._handleQueryChanged)
+        } else {
+            console.warn("isamples-state: No globalThis.eventBus instance available.")
+        }
     }
 
     /**
