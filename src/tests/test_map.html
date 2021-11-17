@@ -30,10 +30,9 @@
             margin-bottom: 0;
         }
     </style>
-    <script src="../js/oboe-browser.js"></script>
     <script type="module">
 
-    import { html, render } from "lit";
+    import {ISamplesSpatial, SpatialView, PointStreamDatasource} from "../js/isamples-spatial.js";
 
     /**
      * Format float x with n decimal places
@@ -89,7 +88,6 @@
 
 
     // ==================
-    import {ISamplesSpatial, SpatialView, PointStreamDatasource} from "../js/isamples-spatial";
 
     const moorea = new SpatialView(-149.8169236266867, -17.451466233002286, 2004.7347996772614, 201.84408760864753, -20.853642866175978);
     const patagonia = new SpatialView(-69.60169132023925, -54.315990127766646, 1781.4560051617016, 173.54573250470798, -15.85292472305027);
@@ -132,6 +130,7 @@
 
     }
 
+    /*
     function addHud() {
         let hud = html`<div class="spatial-hud">
             <p><code id='position'>0, 0, 0</code></p>
@@ -140,8 +139,9 @@
         const v = document.querySelector("div.cesium-viewer");
         render(hud, v); 
     }
+    */
 
-    addHud();
+    viewer.addHud();
     viewer.trackMouseCoordinates(showCoordinates);
     viewer.enableTracking(selectedBoxCallback);
 

@@ -23,7 +23,13 @@ export class ISamplesState extends LitElement {
 
     static get properties() {
         return {
+            // The main query. This will typically represent a query
+            // that has been entered by the user in a search box
             q: {type: String},
+
+            // Dictionary of filter queries
+            // These typically represent the state of additional constraints
+            // such as spatial range, temporal range, selected facets
             _fqs: {
                 state: true,
                 type: Object,

@@ -35,6 +35,7 @@ export class ISamplesLogin extends LitElement {
       error: { type: String },
       username: { type: String },
       authenticated: { type: Boolean },
+      persist: { type:Boolean },
     };
   }
 
@@ -46,11 +47,14 @@ export class ISamplesLogin extends LitElement {
     this.authService = '';
     this._clientid = null;
     this._token = null;
+    this.persist = false;
   }
 
   connectedCallback() {
     super.connectedCallback();
-    this.loadCredentials();
+    if (this.persist) {
+      this.loadCredentials();
+    }
     window.addEventListener('message', this._handleAuthenticationMessage)
   }
 
@@ -94,8 +98,8 @@ export class ISamplesLogin extends LitElement {
     navigator.credentials
       .store(cred)
       .then(() => {
-        // console.log(`CREDS = ${cred.id}`);
-        // console.log(`CREDS = ${cred.password}`);
+        console.log(`CREDS = ${cred.id}`);
+        console.log(`CREDS = ${cred.password}`);
       })
       // eslint-disable-next-line no-unused-vars
       .catch(err => {
@@ -130,6 +134,9 @@ export class ISamplesLogin extends LitElement {
         this._token = event.data.info.token;
         this.username = event.data.info.login;
         this.authenticated = true;
+        if (this.persist) {
+          this.storeCredentials();
+        }
         this.notifyCredentialsChanged();
       }
     }

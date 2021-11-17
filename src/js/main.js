@@ -2,6 +2,8 @@
  * Main script for UI
  *
  */
+ import 'gh-corner-wc';
+
 import { EventBus } from './eventbus.js';
 import { recordsOnLoad } from './records.js';
 

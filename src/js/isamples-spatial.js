@@ -5,6 +5,9 @@
  * <link href="https://cesium.com/downloads/cesiumjs/releases/1.87/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
  */
 
+import { html, render } from "lit";
+import oboe from "../js/oboe-browser.js";
+
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwNzk3NjkyMy1iNGI1LTRkN2UtODRiMy04OTYwYWE0N2M3ZTkiLCJpZCI6Njk1MTcsImlhdCI6MTYzMzU0MTQ3N30.e70dpNzOCDRLDGxRguQCC-tRzGzA-23Xgno5lNgCeB4';
 
 /**
@@ -475,5 +478,14 @@ export class ISamplesSpatial {
 
     removeDataSource(dataSource, destroy=false) {
         return this.viewer.dataSources.remove(dataSource, destroy);
+    }
+
+    addHud() {
+        let hud = html`<div class="spatial-hud">
+            <p><code id='position'>0, 0, 0</code></p>
+            <p><button id='clear-bb' style='display:none'>Clear BB</button></p>
+        </div>`;
+        const v = document.querySelector("div.cesium-viewer");
+        render(hud, v); 
     }
 }
