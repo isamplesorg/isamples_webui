@@ -43,7 +43,7 @@ export class ISamplesState extends LitElement {
                         return true;
                     }
                     for (const [k,v] of Object.entries(newVal)) {
-                        if (! k in oldVal) {
+                        if (!(k in oldVal)) {
                             return true;
                         }
                         if (oldVal[k] !== v) {
