@@ -154,17 +154,6 @@ export class ISamplesState extends LitElement {
             }
         });
         if (_notify) {
-            /*
-            const event = new CustomEvent("query_state_changed", {
-                detail: {
-                    q: this.q,
-                    filter: this._fqs
-                },
-                bubbles: true,
-                composed: true
-            });
-            this.dispatchEvent(event);
-             */
             this._notifyQueryChanged()
         }
     }
