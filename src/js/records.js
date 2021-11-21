@@ -28,16 +28,26 @@ const SERVICE_ENDPOINT = SETTINGS.serviceEndpoint;
 const TABLE_HEIGHT = SETTINGS.records.tableHeight || '100%';
 const TABLE_ROWS = SETTINGS.records.PageSize || 100;
 const COLUMNS = SETTINGS.records.columns || [
-    {title:"ID", field:"id"},
-    {title:"Source", field:"source"},
-    {title:"Label", field:"label"},
-    {title:"hasContext...", field:"hasContextCategory"},
-    {title:"hasMaterial...", field:"hasMaterialCategory"},
-    {title:"hasSpecimen...", field:"hasSpecimenCategory"},
-    {title:"Produced", field:"producedBy_resultTime"},
-    {title:"Keywords", field:"keywords"}
+    {title:"ID", field:"id", clipboard:true},
+    {title:"Source", field:"source", clipboard:false},
+    {title:"Label", field:"label", clipboard:false},
+    {title:"hasContext...", field:"hasContextCategory", clipboard:false},
+    {title:"hasMaterial...", field:"hasMaterialCategory", clipboard:false},
+    {title:"hasSpecimen...", field:"hasSpecimenCategory", clipboard:false},
+    {title:"Produced", field:"producedBy_resultTime", clipboard:false},
+    {title:"Keywords", field:"keywords", clipboard:false}
 ]
-var data_table = null;
+let data_table = null;
+let record_select_callback = null;
+
+for (let i=0; i<COLUMNS.length; i+=1) {
+    if (COLUMNS[i].field === "id") {
+        COLUMNS[i].clipboard=true;
+    } else {
+        COLUMNS[i].clipboard=false;
+    }
+}
+
 
 if (!library)
    var library = {};
@@ -137,7 +147,12 @@ export function recordsOnLoad(tabulatorDivId) {
         columns: COLUMNS,
         selectable:1,
         //resizableRows: true,
-        footerElement:"<span class='records-footer'>Total records:<span id='record_count'></span></span>"
+        footerElement:"<span class='records-footer'>Total records:<span id='record_count'></span></span>",
+        clipboard:true,
+        clipboardCopyRowRange: "selected",
+        clipboardCopyConfig: {
+            columnHeaders: false,            
+        },
     });
 
     data_table.on("rowClick", rowClick);
@@ -171,7 +186,13 @@ export function rowClick(e, row) {
     //var reportId = document.getElementById('currentID');
     //reportId.value = id;
     //reportId.innerHTML = id;
-    showRawRecord(id);
+    if (globalThis.eventBus !== undefined) {
+        globalThis.eventBus.emit('record_selected', null, {name: "record", value: id})
+    }
+    if (record_select_callback !== null) {
+        record_select_callback(id);
+    }
+    //showRawRecord(id);
 }
 
 export function selectRow(_id) {
@@ -227,18 +248,33 @@ export async function showRawRecord(id) {
             .then(doc => {
                 const e = document.getElementById("record_original");
                 e.data = doc;
+            }).catch((e) => {
+                console.warn(e);
             }),
         fetch(xform_url)
             .then(response => response.json())
             .then(doc => {
                 const e = document.getElementById("record_xform");
                 e.data = doc;
+            }).catch((e) => {
+                console.warn(e);
             }),
         fetch(solr_url)
             .then(response => response.json())
             .then(doc => {
                 const e = document.getElementById("record_solr");
                 e.data = doc.response.docs[0];
+            }).catch((e) => {
+                console.warn(e);
             })
     ])
+}
+
+export function setSelectedRecordCallback(fn) {
+    record_select_callback = fn;
+}
+
+
+if (record_select_callback === null) {
+    //setSelectedRecordCallback(showRawRecord);
 }

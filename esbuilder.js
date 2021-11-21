@@ -13,7 +13,7 @@ build({
     logLevel: "info",
     plugins: [nodeBuiltIns()],
     entryPoints: [
-        'src/js/oboe-browser.js',
+        'src/js/isamples-api.js',
         'src/js/settings.js',
         'src/js/eventbus.js',
         'src/js/main.js',
@@ -22,6 +22,7 @@ build({
         'src/js/gh_issues.js',
         'src/js/json-panel.js',
         'src/js/isamples-state.js',
+        'src/js/isamples-record.js',
         'src/js/isamples-summary.js',
         'src/js/isamples-spatial.js',
         'src/js/isamples-temporal.js',

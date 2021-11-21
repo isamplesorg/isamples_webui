@@ -6,9 +6,17 @@
  */
 import * as Cesium from 'cesium';
 import { html, render } from "lit";
-import oboe from "../js/oboe-browser.js";
+import oboe from "./oboe-browser.js";
 
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwNzk3NjkyMy1iNGI1LTRkN2UtODRiMy04OTYwYWE0N2M3ZTkiLCJpZCI6Njk1MTcsImlhdCI6MTYzMzU0MTQ3N30.e70dpNzOCDRLDGxRguQCC-tRzGzA-23Xgno5lNgCeB4';
+
+
+//export function recordSelectCallback(id) {
+//    console.log(`RECORD CALLBACk: ${id}`);
+//}
+//setSelectedRecordCallback(recordSelectCallback);
+
+
 
 /**
  * Describes a camera viewpoint for Cesium.
@@ -82,7 +90,7 @@ function asDRectangle(rectangle) {
     try {
         return new DRectangle(rectangle.west, rectangle.south, rectangle.east, rectangle.north);
     } catch(e) {
-        console.warn("Unable to cast to DRectangle");
+        //console.warn("Unable to cast to DRectangle");
     }
     return null;
 }
@@ -261,6 +269,10 @@ export class ISamplesSpatial {
         this.selectedBox = null;
     }
 
+    get canvas() {
+        return this.viewer.canvas;
+    }
+
     /**
      * Fly to the provided SpatialView
      *
@@ -427,7 +439,8 @@ export class ISamplesSpatial {
                     ["true", "color('white')"]
                 ]
             },
-            pointSize: 5
+            pointSize: 5,
+            zIndex: 100,
         });
     }
 
@@ -480,12 +493,24 @@ export class ISamplesSpatial {
         return this.viewer.dataSources.remove(dataSource, destroy);
     }
 
-    addHud() {
+    addHud(canvas_id) {
         let hud = html`<div class="spatial-hud">
             <p><code id='position'>0, 0, 0</code></p>
             <p><button id='clear-bb' style='display:none'>Clear BB</button></p>
+            <div id="selected-record"></div>
         </div>`;
         const v = document.querySelector("div.cesium-viewer");
         render(hud, v); 
+        const cc = this.canvas;
+        const c = document.getElementById(canvas_id);
+        c.height = cc.height;
+        c.width = cc.width;
+        c.style.left = cc.style.left;
+        c.style.top = cc.style.top;        
+    }
+
+    getScreenPosition(longitude, latitude) {
+        let position = Cesium.Cartesian3.fromDegrees(longitude, latitude);
+        return Cesium.SceneTransforms.wgs84ToWindowCoordinates(this.viewer.scene, position);
     }
 }

@@ -25,7 +25,7 @@
 */
 
 (function ($) {
-    if (window.consolePanel) {
+    if (globalThis.consolePanel) {
         return;
     }
 
@@ -1453,5 +1453,5 @@
         return ConsolePanel;
     }());
 
-    window.consolePanel = new ConsolePanel();
+    globalThis.consolePanel = new ConsolePanel();
 }(window.jQuery));
