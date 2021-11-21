@@ -83,47 +83,47 @@ function template(strings, ...keys) {
 export const CONCEPTS = {
     "pid":{
         "label": "PID",
-        "description": ""
+        "description": "Persistent Identifier"
     },
     "source":{
         "label":"Source",
-        "description":"",
+        "description":"Record source collection",
     },
     "label": {
         "label":"Label",
-        "description": "",
+        "description": "Label",
     },
     "description": {
         "label":"Description",
-        "description": "",
+        "description": "Description",
     },
     "captureTime": {
         "label":"When",
-        "description": "",
+        "description": "Time of the event that led to the capture of the sample described by this record.",
     },
     "placeName": {
         "label":"Location",
-        "description": "",
+        "description": "Name of the place where sample was taken from",
     },
     "contextCategory": {
         "label":"Context",
-        "description": "",
+        "description": "The context of the sample",
     },
     "materialCategory": {
         "label":"Material",
-        "description": "",
+        "description": "The material category assigned to the samepl",
     },
     "specimenCategory": {
         "label":"Specimen",
-        "description": "",
+        "description": "The type of specimen represented by the sample",
     },
     "keywords": {
         "label":"Keywords",
-        "description": "",
+        "description": "Keywords associated with the sample",
     },
     "xyz": {
         "label":"Coordinate",
-        "description": "",
+        "description": "WGS84 degrees longitude and latitude, and optionally elevation in meters",
     },
 };
 
@@ -290,7 +290,7 @@ export class ISamplesRecord extends LitElement {
             return html`<div>
             <dl>
                 ${this.conceptList.map((concept) => 
-                    html`<dt>${CONCEPTS[concept].label}</dt><dd>${this.rat(concept)}</dd>`
+                    html`<dt title="${CONCEPTS[concept].description}">${CONCEPTS[concept].label}</dt><dd>${this.rat(concept)}</dd>`
                 )}
             </dl>
             </div>`;
