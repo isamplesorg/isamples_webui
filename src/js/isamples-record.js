@@ -102,7 +102,7 @@ export const CONCEPTS = {
         "description": "Time of the event that led to the capture of the sample described by this record.",
     },
     "placeName": {
-        "label":"Location",
+        "label":"Where",
         "description": "Name of the place where sample was taken from",
     },
     "contextCategory": {
@@ -125,6 +125,10 @@ export const CONCEPTS = {
         "label":"Coordinate",
         "description": "WGS84 degrees longitude and latitude, and optionally elevation in meters",
     },
+    "producedBy": {
+        "label": "Who",
+        "description": "Person(s) responsible for capturing the sample"
+    }
 };
 
 export class ISamplesRecord extends LitElement {
@@ -133,8 +137,8 @@ export class ISamplesRecord extends LitElement {
         return css`
         :host {
             display: block;
-            border: 1px dotted red;
-            padding: 1em;
+            border: var(--record-border, 1px dotted gray);
+            padding: var(--record-padding, 1em);
             font-family: var(--record-font-family, inherit);
             font-size: var(--record-font-size, 1rem);
             color: var(--record-color, black);
@@ -174,6 +178,7 @@ export class ISamplesRecord extends LitElement {
             "source",
             "label",
             "description",
+            "producedBy",
             "captureTime",
             "placeName",
             "contextCategory",
@@ -197,6 +202,7 @@ export class ISamplesRecord extends LitElement {
                 "pid": {p:"$.sampleidentifier", f:this.resolver}, 
                 "label": {p:"$.label"},
                 "description": {p:"$.description"},
+                "producedBy": {p:"$.producedBy.responsibility", f:listFormatter},
                 "resultTime": {p:"$.producedBy.resultTime"},
                 "placeName": {p:"$.producedBy.samplingSite.placeName", f:listFormatter},
                 "contextCategory": {p:"$.hasContextCategory", f:listFormatter},
@@ -214,6 +220,7 @@ export class ISamplesRecord extends LitElement {
                 "label": {p:"$.label",},
                 "source":{p:"$.source", },
                 "description": {p:"$.description", },
+                "producedBy": {p:"$.producedBy_responsibility", f:listFormatter},
                 "resultTime": {p:"$.producedBy_resultTime", },
                 "placeName": {p:"$.producedBy_samplingSite_placeName", f:listFormatter},
                 "contextCategory": {p:"$.hasContextCategory", f:listFormatter},
@@ -290,7 +297,8 @@ export class ISamplesRecord extends LitElement {
             return html`<div>
             <dl>
                 ${this.conceptList.map((concept) => 
-                    html`<dt title="${CONCEPTS[concept].description}">${CONCEPTS[concept].label}</dt><dd>${this.rat(concept)}</dd>`
+                    html`<dt title="${CONCEPTS[concept].description}">${CONCEPTS[concept].label}</dt>
+                    <dd>${this.rat(concept)}</dd>`
                 )}
             </dl>
             </div>`;
