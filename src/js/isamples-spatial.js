@@ -331,10 +331,10 @@ export class ISamplesSpatial {
     enableTracking(selectBoxCallback) {
         this.handler.setInputAction((click) => {
             this.startTracking(click)
-        },  Cesium.ScreenSpaceEventType.RIGHT_CLICK);
+        }, Cesium.ScreenSpaceEventType.LEFT_DOWN, Cesium.KeyboardEventModifier.ALT);
         this.handler.setInputAction((movement) => {
             this._trackMovement(movement)
-        }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+        }, Cesium.ScreenSpaceEventType.MOUSE_MOVE, Cesium.KeyboardEventModifier.ALT);
         if (selectBoxCallback !== undefined) {
             this.selectBoxCallback = selectBoxCallback;
         }
