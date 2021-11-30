@@ -493,6 +493,7 @@ export class ISamplesSpatial {
         return this.viewer.dataSources.remove(dataSource, destroy);
     }
 
+    //TODO: This should be a separate class for managing the HUD
     addHud(canvas_id) {
         let hud = html`<div class="spatial-hud">
             <p><code id='position'>0, 0, 0</code></p>

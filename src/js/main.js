@@ -5,7 +5,7 @@
  import 'gh-corner-wc';
 
 import { EventBus } from './eventbus.js';
-import { recordsOnLoad } from './records.js';
+//import { recordsOnLoad } from './records.js';
 
 if (globalThis.SETTINGS === undefined) {
     console.warning("Using default settings");
@@ -47,5 +47,5 @@ globalThis.eventBus =  new EventBus();
  * Initialize the records view once the DOM has loaded.
  */
 window.onload = function () {
-    recordsOnLoad('records');
+    //recordsOnLoad('records');
 }

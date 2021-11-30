@@ -13,13 +13,14 @@
     </style>
     <script type="module">
 import {ISamplesAPI} from '../js/isamples-api.js';
+globalThis["iSamplesAPI"] = new ISamplesAPI();
+    </script>
+    <script type="module">
 import {ISamplesRecord} from '../js/isamples-record.js';
-
-let API = new ISamplesAPI();
 
 async function loader(identifier, format) {
     const rele = document.getElementById("record-view");
-    const record = await rele.setData(API.thing(identifier, format), format);
+    const record = await rele.setData(globalThis.iSamplesAPI.thing(identifier, format), format);
     const ele = document.getElementById("record");
     ele.innerText = JSON.stringify(record,null,2);
 }
@@ -44,7 +45,12 @@ for (const e of document.getElementsByClassName("identifier")){
 </script>
 </head>
 <body>
-    <header></header>
+    <header>
+        <p>Rendering of iSamples record views using <code>&lt;isamples-record&gt;</code></p>
+        <p>Three record representations are available in iSamples - original, core, and solr. Core is the 
+            iSamples core record structure. Solr is the core record structure as it exists in Solr.
+        </p>
+    </header>
     <section>
         <p>Enter a PID to retrieve the record. e.g.:</p>
         <ul>
@@ -52,6 +58,7 @@ for (const e of document.getElementsByClassName("identifier")){
             <li class="identifier">ark:/65665/3f9782515-ef3b-40b0-97b3-0f30c5b0db03</li>
             <li class="identifier">ark:/21547/ANX2USGS_DRO_187009</li>
             <li class="identifier">ark:/28722/k2028tb6n</li>
+            <li class="identifier">ark:/21547/CZY2MBIO25352.2</li>
         </ul>
         <input type="text" id="record_pid" size="80"></input>
         <input type="button" id="load_original_record" value="Go Original"></input>
@@ -60,8 +67,34 @@ for (const e of document.getElementsByClassName("identifier")){
         <h3>Rendered view:</h3>
         <isamples-record id="record-view"></isamples-record>
         <h3>Record source:</h3>
-        <pre id="record" style="white-space:pre-wrap;overflow-y:auto;"></pre>
+        <div>
+            <pre id="record" style="white-space:pre-wrap;overflow-y:auto;border:1px dotted gray;padding:1rem;">No record loaded.</pre>
+        </div>        
     </section>
-    <footer></footer>
+    <footer><hr /><p>Log output:</p><p><code id="logger"></code></p></footer>
+    <script>
+(function (logger) {
+    console.old = console.log;
+    console.log = function () {
+        var output = "", arg, i;
+        for (i = 0; i < arguments.length; i++) {
+            arg = arguments[i];
+            output += "<span>";
+            if (
+                typeof arg === "object" &&
+                typeof JSON === "object" &&
+                typeof JSON.stringify === "function"
+            ) {
+                output += JSON.stringify(arg);   
+            } else {
+                output += arg;   
+            }
+            output += "</span>&nbsp;";
+        }
+        logger.innerHTML += output + "<br />";
+        console.old.apply(undefined, arguments);
+    };
+})(document.getElementById("logger"));
+    </script>
 </body>
 </html>

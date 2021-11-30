@@ -28,8 +28,15 @@ const _default_solr_columns =  [
 export class ISamplesAPI {
 
     constructor(options = {}) {
-        this.service_endpoint = options.service_endpoint || "http://localhost:8000";
-        this.solr_columns = options.solr_columns || _default_solr_columns;
+        this.serviceEndpoint = options.serviceEndpoint || "http://localhost:8000";
+        if (options.records !== undefined) {
+            this.solrColumns = options.records.columns || _default_solr_columns;
+        } else {
+            this.solrColumns = _default_solr_columns;
+        }
+        this.headers = options["headers"] || {"Accept":"application/json"};
+        this.defaultQuery = options["defaultQuery"] || "*:*";
+        this.eventBusName = options["eventBusName"] || null;
     }
 
     /**
@@ -38,25 +45,47 @@ export class ISamplesAPI {
      * @param {string or URL} url 
      * @returns 
      */
-    _fetchPromise(url) {
+    _fetchPromise(url, method="GET") {
         return (async() => {
             try {
-                let response = await fetch(url);
+                let response = await fetch(url, {
+                    method:method,
+                    headers: this.headers,
+                });
                 return response.json();
             } catch(e) {
-                console.error(e);
+                this.emitStatusMessage("error", e);
                 return null;
             }
         })();
     }
 
+    /**
+     * Send status notification to listeners via the messagebus 
+     * 
+     * This can be used to inform the user that something interesting
+     * happened, e.g. an error occurred or a background completed
+     * 
+     * @param {string} level Label for the status level, e.g. "INFO", "ERROR"
+     * @param {*} msg  The message to deliver, e.g. an exception or string
+     */
+    emitStatusMessage(level, msg) {
+        if (globalThis[this.eventBusName] !== undefined) {
+            globalThis[this.eventBusName].emit(
+                'status', 
+                null, 
+                {source: "ISamplesAPI", level:level, value: msg}
+            );
+        }
+    }
+
     thingStatus() {
-        const url = new URL(`/thing`, this.service_endpoint);
+        const url = new URL(`/thing`, this.serviceEndpoint);
         return this._fetchPromise(url);
     }
 
     things(offset=0, limit=1000, status=200, authority=null){
-        const url = new URL(`/thing/`, this.service_endpoint);
+        const url = new URL(`/thing/`, this.serviceEndpoint);
         url.searchParams.append("offset", offset);
         url.searchParams.append("limit", limit);
         url.searchParams.append("status", status);
@@ -85,7 +114,7 @@ export class ISamplesAPI {
      * @returns Promise to JSON response
      */
     thing(identifier, format="core") {
-        const url = new URL(`/thing/${encodeURIComponent(identifier)}`, this.service_endpoint);
+        const url = new URL(`/thing/${encodeURIComponent(identifier)}`, this.serviceEndpoint);
         format = format.toLowerCase();
         if (!["core", "original", "solr"].includes(format)) {
             throw `Invalid format: ${format}`;
@@ -94,35 +123,32 @@ export class ISamplesAPI {
         return this._fetchPromise(url);
     }
 
-    /**
-     * Return a Promise that resolves to an iSamples Core Record or null
-     */
-     originalRecord(pid) {
-        const url = new URL(`/thing/${encodeURIComponent(pid)}`, this.service_endpoint);
-        url.searchParams.append("format","original");
-        return this._fetchPromise(url);
+    select(params={}) {
+        let _url = new URL("/thing/select", this.serviceEndpoint);
+        const fields = params["fields"] || ["*", ];
+        delete params["fields"];
+        const fq = params["fq"] || [];
+        delete params["fq"];
+        const sorters = params["sorters"] || [];
+        delete params["sorters"];
+        const method = params["method"] || "GET";
+        params["q"] = params["q"] || "";
+        params["wt"] = params["wt"] || "json";
+        params["df"] = params["df"] || "searchText";
+        if (params["q"] == "") {
+            params["q"] = this.defaultQuery;
+        }
+        let _params = _url.searchParams;        
+        for (let key in params) {
+            _params.append(key, params[key]);
+        }
+        fq.forEach(_fq => _params.append("fq", _fq));
+        _params.append("fl", fields.join(","));
+
+        sorters.forEach(_srt => _params.append("sort", _srt.field+" "+_srt.dir))
+        return this._fetchPromise(_url, method);
     }
 
-    /**
-     * Return a Promise that resolves to an iSamples Core Record or null
-     */
-    coreRecord(pid) {
-        const url = new URL(`/thing/${encodeURIComponent(pid)}`, this.service_endpoint);
-        url.searchParams.append("format","core");
-        return this._fetchPromise(url);
-    }
-
-    /**
-     * Return a Promise that resolves to an iSamples solr Record or null
-     */
-     solrRecord(pid, fields="*") {
-        const url = new URL("/thing/select", this.service_endpoint);
-        url.searchParams.append("q", `id:${escapeLucene(pid)}`);
-        url.searchParams.append("wt", "json");
-        url.searchParams.append("fl", fields);
-        url.searchParams.append("rows", 1);
-        return this._fetchPromise(url);
-    }
 
 
 }

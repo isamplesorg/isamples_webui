@@ -3,6 +3,10 @@
  * 
  * The record is rendered by mapping values in the JSON record to 
  * entries in a HTML template.
+ * 
+ * This component does not retrieve the record. It renders the 
+ * result of a Promise of the record JSON, or by setting the
+ * record JSON directly using the setRecord() method.
  */
 import {LitElement, html, css} from "lit";
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
@@ -163,16 +167,18 @@ export class ISamplesRecord extends LitElement {
                 state: true,
                 type: Object,
             },
+            eventBusName: { type: String },
         };
     }
 
     constructor() {
         super();
+        this.eventBusName = "eventbus";
         this.resolver = template`<code>${0}</code> <a href='https://identifiers.org/${0}' target='_blank'>Source</a>`;
         this._record = null;        
         this._format = "";
         // List of concepts to be displayed in the record
-        // The ordering is the ordering of the display
+        // Ordering here is the ordering of the display
         this.conceptList = [
             "pid",
             "source",
@@ -236,11 +242,42 @@ export class ISamplesRecord extends LitElement {
         }
     }
 
+    statusMessage(level="info", message) {
+        if (globalThis[this.eventBusName] !== undefined) {
+            message = Array.isArray(message) ? message : [message, ];
+            console.log("RECORD ", this.eventBusName, message);
+            globalThis[this.eventBusName].emit(
+                "status",
+                null,
+                {"source":"ISamplesRecord", level:level, msg:message}
+            );
+        }
+    }
+
     /**
      * Get the record.
      */
     get record() {
         return this._record;
+    }
+
+    /**
+     * Clear the record.
+     */
+    clearRecord() {
+        this._record = null;
+        this.statusMessage("debug", "record view cleared");
+    }
+
+    /**
+     * Sets the record to the provided Object conforming to format
+     * 
+     * @param {*} data The data record
+     * @param {string} format The format of the record "original", "core", "solr"
+     */
+    setRecord(data, format) {
+        this._format = format;
+        this._record = data;
     }
 
     /**
@@ -255,7 +292,7 @@ export class ISamplesRecord extends LitElement {
         try {
             this._record = await Promise.resolve(dataPromise);            
         } catch {
-            console.warning("dataPromise raised on resolve");
+            this.statusMessage("warn", "dataPromise raised on resolve");
         }
         return this.record;
     }
