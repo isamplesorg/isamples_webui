@@ -157,7 +157,6 @@ export class ISamplesState extends LitElement {
      * @param changed: previous value
      */
     updated(changed) {
-        //console.log(`isamples-state.updated: `,changed);
         if (changed.has('eventBusName')) {
             // Subscribe to filter_changed events
             if (globalThis[this.eventBusName] !== undefined) {

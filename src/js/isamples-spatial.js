@@ -328,6 +328,11 @@ export class ISamplesSpatial {
     }
 
 
+    /**
+     * Draw a region by holding down ALT, click to start, drag, click to finish.
+     * 
+     * @param {*} selectBoxCallback 
+     */
     enableTracking(selectBoxCallback) {
         this.handler.setInputAction((click) => {
             this.startTracking(click)

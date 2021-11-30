@@ -37,6 +37,7 @@
     "serve": "browser-sync start -c bs-config.js",
     "build:css": "copyfiles -u 1 './src/css/*.css' dist",
     "build:html": "copyfiles -u 1 './src/**/*.html' dist",
+    "build:config": "copyfiles -u 1 './src/*.json' dist",
     "build:cesium": "copyfiles -u 4 './node_modules/cesium/Build/Cesium/Workers/**' './node_modules/cesium/Build/Cesium/Widgets/**' './node_modules/cesium/Build/Cesium/Assets/**' './node_modules/cesium/Build/Cesium/ThirdParty/**' dist/js",
     "build:js": "node esbuilder.js",
     "build": "run-s build:*",

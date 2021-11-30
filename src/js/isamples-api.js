@@ -24,11 +24,32 @@ const _default_solr_columns =  [
     {title:"Keywords", field:"keywords"},
 ];
 
+/**
+ * Load configuration and trap errors
+ * 
+ * Returns loaded JSON or {} on error.
+ * 
+ * @param {string} url 
+ * @returns dict
+ */
+export function loadConfig(url) {
+    return fetch(url)
+        .then((response) => { 
+            if (!response.ok) {
+                return {};
+            }
+            return response.json()
+        })
+        .catch((e) => {
+            console.warn(e)
+            return {};
+        })
+}
 
 export class ISamplesAPI {
 
     constructor(options = {}) {
-        this.serviceEndpoint = options.serviceEndpoint || "http://localhost:8000";
+        this.serviceEndpoint = options.serviceEndpoint || "https://dev.isamples.xyz/";
         if (options.records !== undefined) {
             this.solrColumns = options.records.columns || _default_solr_columns;
         } else {

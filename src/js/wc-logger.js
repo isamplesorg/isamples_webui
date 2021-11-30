@@ -104,6 +104,7 @@ export class EventLogger extends LitElement {
      * @param {Map} changed 
      */
     updated( changed ) {
+        console.log(changed);
         if (changed.has('eventBusName')) {            
             // Subscribe to filter_changed events
             if (globalThis[this.eventBusName] !== undefined) {
