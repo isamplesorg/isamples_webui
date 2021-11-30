@@ -2,7 +2,7 @@ import {
   p,
   r,
   s
-} from "./chunk-B4DODV5L.js";
+} from "./chunk-MQ2DMGPF.js";
 import "./chunk-XVZR6UTJ.js";
 
 // src/js/isamples-state.js
@@ -28,7 +28,6 @@ var ISamplesState = class extends s {
         state: true,
         type: Object,
         hasChanged(newVal, oldVal) {
-          console.log("isamples-state._fqs.hasChanged", newVal, oldVal);
           return true;
           if (oldVal === void 0) {
             return true;
@@ -37,7 +36,7 @@ var ISamplesState = class extends s {
             return true;
           }
           for (const [k, v] of Object.entries(newVal)) {
-            if (!k in oldVal) {
+            if (!(k in oldVal)) {
               return true;
             }
             if (oldVal[k] !== v) {
@@ -46,18 +45,27 @@ var ISamplesState = class extends s {
           }
           return false;
         }
+      },
+      eventBusName: {
+        type: String
       }
     };
   }
   constructor() {
     super();
-    this.q = "*:*";
+    this.q = "";
     this._fqs = {};
-    if (globalThis.eventBus !== void 0) {
-      globalThis.eventBus.on("filter_changed", this._handleQueryChanged);
-    } else {
-      console.warn("isamples-state: No globalThis.eventBus instance available.");
+    this.eventBusName = "eventbus";
+    this._eventHandler = null;
+  }
+  connectedCallback() {
+    super.connectedCallback();
+  }
+  disconnectedCallback() {
+    if (this._eventHandler !== null) {
+      globalThis[this.eventBusName].off("filter_changed", this._eventHandler);
     }
+    super.disconnectedCallback();
   }
   addFilterSource(name, initialValue) {
     if (this._fqs.hasOwnProperty(name)) {
@@ -71,7 +79,7 @@ var ISamplesState = class extends s {
       fqs: Object.assign({}, this._fqs)
     };
   }
-  _handleQueryChanged = (data) => {
+  _handleQueryChanged(data) {
     console.log("isamples-state._handleQueryChanged: ", data);
     if (data.name === "q") {
       this.q = data.value;
@@ -83,24 +91,35 @@ var ISamplesState = class extends s {
     } else {
       console.warn(`Received unexpected event detail name: ${data.name}`);
     }
-  };
+  }
   get _slottedChildren() {
     const slot = this.shadowRoot.querySelector("slot");
     const childNodes = slot.assignedNodes({ flatten: true });
     return Array.prototype.filter.call(childNodes, (node) => node.nodeType === Node.ELEMENT_NODE);
   }
   _notifyQueryChanged() {
-    console.log("isamples-state._notifyQueryChanged");
-    eventBus.emit("query_state_changed", null, { q: this.q, filter: this._fqs });
+    if (globalThis[this.eventBusName] !== void 0) {
+      globalThis[this.eventBusName].emit("query_state_changed", null, { q: this.q, filter: this._fqs });
+    }
   }
   setFilter(name, fq) {
-    console.log(`isamples-state.setFilter fq = ${name} : ${fq}`);
     this._fqs[name] = fq;
     this._fqs = Object.assign({}, this._fqs);
     this._notifyQueryChanged();
   }
   updated(changed) {
-    console.log(`isamples-state.updated: `, changed);
+    if (changed.has("eventBusName")) {
+      if (globalThis[this.eventBusName] !== void 0) {
+        if (this._eventHandler === null) {
+          this._eventHandler = (data) => {
+            this._handleQueryChanged(data);
+          };
+        }
+        globalThis[this.eventBusName].on("filter_changed", this._eventHandler);
+      } else {
+        console.warn(`EventLogger: No globalThis[${this.eventBusName}] instance available.`);
+      }
+    }
     let _notify = false;
     changed.forEach((_change, key, map) => {
       if (key === "q" && _change !== void 0) {
@@ -115,13 +134,15 @@ var ISamplesState = class extends s {
     this.q = e.target.value;
   }
   setDefaults(e) {
-    this.q = "*:*";
+    this.q = "";
   }
   render() {
     return p`
             <details open>
                 <summary>Q:
-                    <input .value=${this.q} @change=${this.qChanged} size="100"/><button type="button" @click=${this.setDefaults}>*:*</button>
+                    <input .value=${this.q} @change=${this.qChanged} size="100"/>
+                    <button type="button" @click=${this.qChanged}>&nbsp;Go&nbsp;&nbsp;</button>
+                    <button type="button" @click=${this.setDefaults}>Clear</button>
                 </summary>
                 <table>
                     ${Object.keys(this._fqs).map((k) => p`<tr><td>${k}</td><td class=".query">${this._fqs[k]}</td></tr>`)}
