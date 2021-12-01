@@ -812,11 +812,11 @@ var ISamplesRecord = class extends s {
         dt {
             float:left;
             clear: left;
-            width: 5rem;
+            width: 7rem;
             text-align: right;
         }
         dd {
-            margin: 0 0 0 6rem;
+            margin: 0 0 0 8rem;
             padding: 0 0 0.5rem 0;
             min-height: 1rem;
         }
@@ -857,7 +857,7 @@ var ISamplesRecord = class extends s {
         "label": { p: "$.label" },
         "description": { p: "$.description" },
         "producedBy": { p: "$.producedBy.responsibility", f: listFormatter },
-        "resultTime": { p: "$.producedBy.resultTime" },
+        "captureTime": { p: "$.producedBy.resultTime" },
         "placeName": { p: "$.producedBy.samplingSite.placeName", f: listFormatter },
         "contextCategory": { p: "$.hasContextCategory", f: listFormatter },
         "materialCategory": { p: "$.hasMaterialCategory", f: listFormatter },
@@ -875,7 +875,7 @@ var ISamplesRecord = class extends s {
         "source": { p: "$.source" },
         "description": { p: "$.description" },
         "producedBy": { p: "$.producedBy_responsibility", f: listFormatter },
-        "resultTime": { p: "$.producedBy_resultTime" },
+        "captureTime": { p: "$.producedBy_resultTime" },
         "placeName": { p: "$.producedBy_samplingSite_placeName", f: listFormatter },
         "contextCategory": { p: "$.hasContextCategory", f: listFormatter },
         "materialCategory": { p: "$.hasMaterialCategory", f: listFormatter },

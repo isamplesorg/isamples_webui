@@ -2,6 +2,9 @@ import {
   o
 } from "./chunk-WQZ2T75X.js";
 import {
+  GhCorner
+} from "./chunk-UHBWDRFQ.js";
+import {
   p,
   w
 } from "./chunk-MQ2DMGPF.js";
@@ -428,6 +431,7 @@ var Split = function(idsOption, options) {
 };
 var split_es_default = Split;
 export {
+  GhCorner,
   split_es_default as Split,
   p as html,
   w as render,

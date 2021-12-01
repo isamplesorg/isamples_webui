@@ -2,53 +2,60 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>    
+    <title>Single Record Rendering</title>    
     <!--
     Describe this page
     -->
+    <link rel="stylesheet" href="../css/common.css" />
     <style>
         .identifier {
             cursor: pointer;
         }
     </style>
     <script type="module">
-import {ISamplesAPI} from '../js/isamples-api.js';
-globalThis["iSamplesAPI"] = new ISamplesAPI();
-    </script>
-    <script type="module">
-import {ISamplesRecord} from '../js/isamples-record.js';
+    import {loadConfig, ISamplesAPI} from '../js/isamples-api.js';
+    import {ISamplesRecord} from '../js/isamples-record.js';
 
-async function loader(identifier, format) {
-    const rele = document.getElementById("record-view");
-    const record = await rele.setData(globalThis.iSamplesAPI.thing(identifier, format), format);
-    const ele = document.getElementById("record");
-    ele.innerText = JSON.stringify(record,null,2);
-}
+    const API_NAME = "iSamplesAPI";
 
-document.getElementById("load_original_record").onclick = () => {
-    loader(document.getElementById("record_pid").value, "original");
-};
-document.getElementById("load_core_record").onclick = () => {
-    loader(document.getElementById("record_pid").value, "core");
-};
-document.getElementById("load_solr_record").onclick = () => {
-    loader(document.getElementById("record_pid").value, "solr");
-};
-
-for (const e of document.getElementsByClassName("identifier")){
-    e.onclick = () => {
-        let t = document.getElementById("record_pid");
-        t.value = e.innerText;
+    async function loader(identifier, format) {
+        const rele = document.getElementById("record-view");
+        const record = await rele.setData(globalThis[API_NAME].thing(identifier, format), format);
+        const ele = document.getElementById("record");
+        ele.innerText = JSON.stringify(record,null,2);
     }
-};
+
+    loadConfig("/local-config.jsonX").then((settings) => {
+        globalThis[API_NAME] = new ISamplesAPI(settings);
+
+        document.getElementById("load_original_record").onclick = () => {
+            loader(document.getElementById("record_pid").value, "original");
+        };
+        document.getElementById("load_core_record").onclick = () => {
+            loader(document.getElementById("record_pid").value, "core");
+        };
+        document.getElementById("load_solr_record").onclick = () => {
+            loader(document.getElementById("record_pid").value, "solr");
+        };
+
+        for (const e of document.getElementsByClassName("identifier")){
+            e.onclick = () => {
+                let t = document.getElementById("record_pid");
+                t.value = e.innerText;
+            }
+        };
+
+    })
+
 
 </script>
 </head>
 <body>
     <header>
-        <p>Rendering of iSamples record views using <code>&lt;isamples-record&gt;</code></p>
-        <p>Three record representations are available in iSamples - original, core, and solr. Core is the 
-            iSamples core record structure. Solr is the core record structure as it exists in Solr.
+        <h1>Rendering of iSamples record views using &lt;isamples-record&gt; component</h1>
+        <p>Three record representations are available in iSamples - original, core, and solr. Core represents 
+            the record mapped to the iSamples core record structure. Solr is the core record structure as it 
+            exists in Solr.
         </p>
     </header>
     <section>
@@ -66,7 +73,7 @@ for (const e of document.getElementsByClassName("identifier")){
         <input type="button" id="load_solr_record" value="Go Solr"></input>
         <h3>Rendered view:</h3>
         <isamples-record id="record-view"></isamples-record>
-        <h3>Record source:</h3>
+        <h3>Source for rendering:</h3>
         <div>
             <pre id="record" style="white-space:pre-wrap;overflow-y:auto;border:1px dotted gray;padding:1rem;">No record loaded.</pre>
         </div>        
