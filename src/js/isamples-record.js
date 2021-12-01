@@ -150,11 +150,11 @@ export class ISamplesRecord extends LitElement {
         dt {
             float:left;
             clear: left;
-            width: 5rem;
+            width: 7rem;
             text-align: right;
         }
         dd {
-            margin: 0 0 0 6rem;
+            margin: 0 0 0 8rem;
             padding: 0 0 0.5rem 0;
             min-height: 1rem;
         }
@@ -209,7 +209,7 @@ export class ISamplesRecord extends LitElement {
                 "label": {p:"$.label"},
                 "description": {p:"$.description"},
                 "producedBy": {p:"$.producedBy.responsibility", f:listFormatter},
-                "resultTime": {p:"$.producedBy.resultTime"},
+                "captureTime": {p:"$.producedBy.resultTime"},
                 "placeName": {p:"$.producedBy.samplingSite.placeName", f:listFormatter},
                 "contextCategory": {p:"$.hasContextCategory", f:listFormatter},
                 "materialCategory": {p:"$.hasMaterialCategory", f:listFormatter},
@@ -227,7 +227,7 @@ export class ISamplesRecord extends LitElement {
                 "source":{p:"$.source", },
                 "description": {p:"$.description", },
                 "producedBy": {p:"$.producedBy_responsibility", f:listFormatter},
-                "resultTime": {p:"$.producedBy_resultTime", },
+                "captureTime": {p:"$.producedBy_resultTime", },
                 "placeName": {p:"$.producedBy_samplingSite_placeName", f:listFormatter},
                 "contextCategory": {p:"$.hasContextCategory", f:listFormatter},
                 "materialCategory": {p:"$.hasMaterialCategory", f:listFormatter},

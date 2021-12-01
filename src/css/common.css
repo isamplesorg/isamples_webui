@@ -1,20 +1,33 @@
 /* https://simplecss.org/ */
 /*@import 'https://cdn.simplecss.org/simple.min.css';
 */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;1,400;1,600&display=swap');
+@import url("https://fonts.googleapis.com/css?family=Roboto+Condensed:200,500");
+@import url("https://fonts.googleapis.com/css?family=Roboto+Mono:200,300,400");
 :root {
     --bg: #ffffff;
     --accent-bg: #fefeff;
-    --base-fontsize: 0.8em;
-    --mono-font: 'Cousine', 'Monaco', Consolas, Menlo, 'Andale Mono', 'Ubuntu Mono', monospace;
-    --text-font: 'Montserrat', sans-serif;
+    --base-fontsize: 14px;
+    --mono-font: 'Roboto Mono', Consolas, monospace;
+    --text-font: 'Roboto Condensed', sans-serif;
     --max-body-width: 95%;
+    --color: #333333;
+    --record-font-size: var(--base-fontsize, 1em);
 }
 
 body {
-    font-size: var(--base-fontsize, 1em);
+    font-size: var(--base-fontsize, 14px);
     max-width: var(--max-body-width, 95%);
-    font-family: var(--text-font);
+    font-family: var(--mono-font, 'Roboto Mono', Consolas, monospace);
+    font-weight: 300;
+    color: var(--color, #333333);
+}
+em {
+    background: #ffffb8;
+    font-style: normal;
+}
+.spacer {
+    width: 1rem;
+    display: inline-block;
 }
 
 h1 {
@@ -37,6 +50,22 @@ header {
     padding-top: 1rem;
     padding-bottom: 1rem;
 }
+
+dl {    
+}
+
+dt {
+    float: left;
+    clear: left;
+    width: 10rem;
+    text-align: left;    
+}
+
+dd {
+    margin: 0 0 0 11rem;
+    padding: 0 0 0.5rem 0;
+}
+
 
 code, kbd, pre, pre span, samp {
     font-family: var(--mono-font, monospace);
