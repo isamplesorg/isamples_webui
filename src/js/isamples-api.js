@@ -49,7 +49,7 @@ export function loadConfig(url) {
 export class ISamplesAPI {
 
     constructor(options = {}) {
-        this.serviceEndpoint = options.serviceEndpoint || "https://dev.isamples.xyz/";
+        this.serviceEndpoint = options.serviceEndpoint || "https://dev.isample.xyz/";
         if (options.records !== undefined) {
             this.solrColumns = options.records.columns || _default_solr_columns;
         } else {
