@@ -1,6 +1,7 @@
 import {
   ISamplesAPI
-} from "./chunk-V2EPIWMF.js";
+} from "./chunk-D4KMXI6D.js";
+import "./chunk-EN37BXKZ.js";
 import "./chunk-XVZR6UTJ.js";
 
 // node_modules/tabulator-tables/dist/js/tabulator_esm.js

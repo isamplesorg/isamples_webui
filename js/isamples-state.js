@@ -141,7 +141,7 @@ var ISamplesState = class extends s {
             <details open>
                 <summary>Q:
                     <input .value=${this.q} @change=${this.qChanged} size="100"/>
-                    <button type="button" @click=${this.qChanged}>&nbsp;Go&nbsp;&nbsp;</button>
+                    <button type="button" >&nbsp;Go&nbsp;&nbsp;</button>
                     <button type="button" @click=${this.setDefaults}>Clear</button>
                 </summary>
                 <table>
