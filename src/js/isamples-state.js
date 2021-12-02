@@ -184,6 +184,8 @@ export class ISamplesState extends LitElement {
         this.q = e.target.value;
     }
 
+
+
     setDefaults(e) {
         this.q = "";
     }
@@ -193,7 +195,7 @@ export class ISamplesState extends LitElement {
             <details open>
                 <summary>Q:
                     <input .value=${this.q} @change=${this.qChanged} size="100"/>
-                    <button type="button" @click=${this.qChanged}>&nbsp;Go&nbsp;&nbsp;</button>
+                    <button type="button" >&nbsp;Go&nbsp;&nbsp;</button>
                     <button type="button" @click=${this.setDefaults}>Clear</button>
                 </summary>
                 <table>
