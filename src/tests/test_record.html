@@ -25,7 +25,7 @@
         ele.innerText = JSON.stringify(record,null,2);
     }
 
-    loadConfig("/local-config.jsonX").then((settings) => {
+    loadConfig("/local-config.json").then((settings) => {
         globalThis[API_NAME] = new ISamplesAPI(settings);
 
         document.getElementById("load_original_record").onclick = () => {

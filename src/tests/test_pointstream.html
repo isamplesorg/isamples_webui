@@ -6,66 +6,102 @@
     <!--
     Handling streaming response from Mars / Solr
     -->
+    <link rel="stylesheet" href="../css/common.css" />
     <script type="module">
+        import { ISamplesAPI, loadConfig } from '../js/isamples-api.js';
+        import { ISamplesState } from '../js/isamples-state.js';
+        import { EventBus } from '../js/eventbus.js';
 
-import oboe  from '../js/oboe-browser.js';
+        const EVENTBUS_NAME = "iSamplesEventBus";
+        const API_NAME = "iSamplesAPI";
 
-let counter = 0;
-
-function setUI(msg) {
-    document.getElementById("output").innerText = `Values: ${msg}`;
-}
-
-const url = "http://localhost:8000/thing/stream?rows=100000";
-/* Not supported
-fetch(url).then( response => {
-    const reader = response.body.getReader();
-    oboe( reader )
-    .on('node', {
-        'docs.*': (doc) => {
-            console.log(doc);
+        function setStatus(count, msg) {
+            document.getElementById("counter").innerText = `${count}`;
+            document.getElementById("status").innerText = msg;
         }
-    })
-    .on('done', () => {
-        console.log("Done.")
-    })
-    .on('fail', () => {
-        console.log("Error")
-    })
-    // Proper streaming - is there a lib to support this?
-    reader.read().then(function processStream({done, value}) {
-        if (done) {
-            console.log("Stream complete.")
-            console.log(`Counter = ${counter}`);
-            return;
-        }
-        parser.parse(value);
-        return reader.read().then(processStream);
-    })
-});*/
 
-oboe( url )
-    .node('docs.*', (doc) => {
-        //console.log(doc);
-        if (doc.hasOwnProperty('x')) {
-            if (counter % 1000 === 0) {
-                setUI(counter);
+        function clearRows() {
+            document.getElementById("output").innerText = "";
+        }
+
+        function appendRows(rows) {
+            const newrows = document.createElement("pre");
+            newrows.appendChild(document.createTextNode(rows.join("\n")));
+            const ele = document.getElementById("output");
+            ele.insertBefore(newrows, ele.firstChild);
+        }
+
+        function loadRecords(q) {
+            let counter = 0;
+            let bundle = [];
+            const params = {
+                q: q,
+                df: "searchText",
+                rows: 100000,
             }
-            counter += 1;
+            // Call the stream method
+            globalThis[API_NAME].stream(
+                // request parameters
+                params,
+                // called per document
+                (doc) => {
+                    if (doc.hasOwnProperty('x')) {
+                        counter += 1;
+                        bundle.unshift(`${counter}: ${JSON.stringify(doc)}`);
+                        if (counter % 1000 === 0) {
+                            setStatus(counter, "Reading...");
+                            appendRows(bundle);
+                            bundle = [];
+                        }
+                    }
+                },
+                // called with the final document
+                (finaldoc) => {
+                    appendRows(bundle);
+                    setStatus(counter, "Complete.");
+                },
+                // called if things blowup
+                (err) => {
+                    console.error(err);
+                }
+            );
         }
-        return oboe.drop;
-    })
-    .done( (finalJson) => {
-        console.log(finalJson);
-        setUI(`${counter}\nComplete.`);
-    })
-    .fail( (err) => {
-        console.error(err);
-    })
+
+        
+        loadConfig("/local-config.json")
+        .then( (settings) => {
+            // Create the Event Bus instance before anything else
+            globalThis[ EVENTBUS_NAME ] = new EventBus();
+            settings.eventBusName = EVENTBUS_NAME;
+
+            // Update the web components using the event bus with the 
+            // event bus name. This triggers component subscription to
+            // events and enables them to emit events.
+            document.querySelectorAll("isamples-state, wc-logger").forEach((ele) => {
+                ele.eventBusName = EVENTBUS_NAME;
+            });
+
+            // Create the API instance for accessing data
+            globalThis[ API_NAME ] = new ISamplesAPI(settings);
+
+            // Do something when the query state changes
+            globalThis[ EVENTBUS_NAME ].on(
+                "query_state_changed",
+                (data) => {
+                    clearRows();
+                    setStatus(0,"Pending...");
+                    loadRecords(data.q);
+                });
+        });
 
 </script>
 </head>
 <body>
-<pre id="output"></pre>
+    <isamples-state></isamples-state>
+    <dl>
+        <dt>Count: </dt><dd id="counter">0</dd>
+        <dt>Status: </dt><dd id="status">Not started</dd>
+    </dl>
+<div id="output" style="max-height:75vh;overflow-y: scroll; border:1px dotted gray;"></div>
 </body>
 </html>
