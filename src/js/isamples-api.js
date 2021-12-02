@@ -2,6 +2,10 @@
  * Implements mechanisms for interacting with iSB or iSC API
  */
 
+// Required for handling the streaming response
+import oboe  from './oboe-browser.js';
+
+
 // For escaping solr query terms
 const SOLR_RESERVED = [' ', '+', '-', '&', '!', '(', ')', '{', '}', '[', ']', '^', '"', '~', '*', '?', ':', '\\'];
 const SOLR_VALUE_REGEXP = new RegExp("(\\" + SOLR_RESERVED.join("|\\") + ")", "g");
@@ -170,6 +174,47 @@ export class ISamplesAPI {
         return this._fetchPromise(_url, method);
     }
 
+    stream(params={}, perdoc_cb=null, finaldoc_cb=null, error_cb=null) {
+        const fields = params["fields"] || [ ];
+        delete params["fields"];
+        const fq = params["fq"] || [];
+        delete params["fq"];
+        const sorters = params["sorters"] || [];
+        delete params["sorters"];
+        params["q"] = params["q"] || "";
+        params["wt"] = params["wt"] || "json";
+        params["df"] = params["df"] || "searchText";
+        if (params["q"] == "") {
+            params["q"] = this.defaultQuery;
+        }
 
+        let _url = new URL("/thing/stream", this.serviceEndpoint);
+        let _params = _url.searchParams;        
+        for (let key in params) {
+            _params.append(key, params[key]);
+        }
+        fq.forEach(_fq => _params.append("fq", _fq));
+        _params.append("fl", fields.join(","));
+        sorters.forEach(_srt => _params.append("sort", _srt.field+" "+_srt.dir))
+        oboe( _url.toString() )
+            .node('docs.*', (doc) => {
+                if (perdoc_cb !== null) {
+                    perdoc_cb(doc);
+                }
+                return oboe.drop;
+            })
+            .done( (finalJson) => {
+                if (finaldoc_cb !== null) {
+                    finaldoc_cb(finalJson);
+                }
+            })
+            .fail( (err) => {
+                if (error_cb !=null) {
+                    error_cb(err)
+                } else {
+                    console.error(err);
+                }
+            })
+    }
 
 }
