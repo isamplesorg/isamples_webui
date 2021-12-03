@@ -24,10 +24,10 @@ export class RecordsTable {
      *     records.columns: List of Tabulator column specifiers
      *   }
      */
-    constructor(options) {
+    constructor(app, options) {
         // Use provided API or default one if none provided
-        this.API = globalThis[options.APIName] || new ISamplesAPI();
-        this.eventBusName = options.eventBusName || "eventbus";
+        this.API = app.API;
+        this.eventBusName = app.eventBusName || "eventbus";
         this.recordsElementId = options.records.elementId || "isamples-records";
         this.default_Q = options.defaultQuery || "*:*";
         this.table_height = options.records.tableHeight || "100%";

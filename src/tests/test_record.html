@@ -13,39 +13,38 @@
         }
     </style>
     <script type="module">
-    import {loadConfig, ISamplesAPI} from '../js/isamples-api.js';
-    import {ISamplesRecord} from '../js/isamples-record.js';
+        import {loadConfig, ISamplesApp } from '../js/isamples-app.js';
+        import {ISamplesRecord} from '../js/isamples-record.js';
 
-    const API_NAME = "iSamplesAPI";
 
-    async function loader(identifier, format) {
-        const rele = document.getElementById("record-view");
-        const record = await rele.setData(globalThis[API_NAME].thing(identifier, format), format);
-        const ele = document.getElementById("record");
-        ele.innerText = JSON.stringify(record,null,2);
-    }
+        async function loader(identifier, format) {
+            const rele = document.getElementById("record-view");
+            const record = await rele.setData(globalThis.iSamplesApp.API.thing(identifier, format), format);
+            const ele = document.getElementById("record");
+            ele.innerText = JSON.stringify(record,null,2);
+        }
 
-    loadConfig("/local-config.json").then((settings) => {
-        globalThis[API_NAME] = new ISamplesAPI(settings);
+        loadConfig("/local-config.json").then((settings) => {
+            globalThis.iSamplesApp = new ISamplesApp(settings);
 
-        document.getElementById("load_original_record").onclick = () => {
-            loader(document.getElementById("record_pid").value, "original");
-        };
-        document.getElementById("load_core_record").onclick = () => {
-            loader(document.getElementById("record_pid").value, "core");
-        };
-        document.getElementById("load_solr_record").onclick = () => {
-            loader(document.getElementById("record_pid").value, "solr");
-        };
+            document.getElementById("load_original_record").onclick = () => {
+                loader(document.getElementById("record_pid").value, "original");
+            };
+            document.getElementById("load_core_record").onclick = () => {
+                loader(document.getElementById("record_pid").value, "core");
+            };
+            document.getElementById("load_solr_record").onclick = () => {
+                loader(document.getElementById("record_pid").value, "solr");
+            };
 
-        for (const e of document.getElementsByClassName("identifier")){
-            e.onclick = () => {
-                let t = document.getElementById("record_pid");
-                t.value = e.innerText;
-            }
-        };
+            for (const e of document.getElementsByClassName("identifier")){
+                e.onclick = () => {
+                    let t = document.getElementById("record_pid");
+                    t.value = e.innerText;
+                }
+            };
 
-    })
+        })
 
 
 </script>

@@ -4,8 +4,8 @@
 @import "https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css";
 
 .tabulator {
-    font-family: var(--mono-font, monospace);
-    font-size: inherit;
+    font-family: var(--tabulator-font, monospace);
+    font-size: var(--tabulator-font-size, 0.8rem);
     vertical-align: auto;
 }
 .records-footer {
