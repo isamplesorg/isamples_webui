@@ -8,12 +8,8 @@
     -->
     <link rel="stylesheet" href="../css/common.css" />
     <script type="module">
-        import { ISamplesAPI, loadConfig } from '../js/isamples-api.js';
         import { ISamplesState } from '../js/isamples-state.js';
-        import { EventBus } from '../js/eventbus.js';
-
-        const EVENTBUS_NAME = "iSamplesEventBus";
-        const API_NAME = "iSamplesAPI";
+        import { loadConfig, ISamplesApp } from '../js/isamples-app.js';
 
         function setStatus(count, msg) {
             document.getElementById("counter").innerText = `${count}`;
@@ -40,7 +36,7 @@
                 rows: 100000,
             }
             // Call the stream method
-            globalThis[API_NAME].stream(
+            globalThis.iSamplesApp.API.stream(
                 // request parameters
                 params,
                 // called per document
@@ -71,21 +67,13 @@
         loadConfig("/local-config.json")
         .then( (settings) => {
             // Create the Event Bus instance before anything else
-            globalThis[ EVENTBUS_NAME ] = new EventBus();
-            settings.eventBusName = EVENTBUS_NAME;
-
-            // Update the web components using the event bus with the 
-            // event bus name. This triggers component subscription to
-            // events and enables them to emit events.
-            document.querySelectorAll("isamples-state, wc-logger").forEach((ele) => {
-                ele.eventBusName = EVENTBUS_NAME;
-            });
-
-            // Create the API instance for accessing data
-            globalThis[ API_NAME ] = new ISamplesAPI(settings);
+            globalThis.iSamplesApp = new ISamplesApp(settings);
+            
+            //Tell the app the components in use
+            globalThis.iSamplesApp.registerComponents("isamples-state");
 
             // Do something when the query state changes
-            globalThis[ EVENTBUS_NAME ].on(
+            globalThis.iSamplesApp.eventBus.on(
                 "query_state_changed",
                 (data) => {
                     clearRows();
@@ -97,6 +85,8 @@
 </script>
 </head>
 <body>
+    <h1>Streaming points example</h1>
+    <p>Record locations are streamed in response to a query.</p>
     <isamples-state></isamples-state>
     <dl>
         <dt>Count: </dt><dd id="counter">0</dd>

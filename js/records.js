@@ -1,6 +1,4 @@
-import {
-  ISamplesAPI
-} from "./chunk-D4KMXI6D.js";
+import "./chunk-KCZ3F5XF.js";
 import "./chunk-EN37BXKZ.js";
 import "./chunk-XVZR6UTJ.js";
 
@@ -16940,9 +16938,9 @@ new ModuleBinder(TabulatorFull, modules);
 
 // src/js/records.js
 var RecordsTable = class {
-  constructor(options) {
-    this.API = globalThis[options.APIName] || new ISamplesAPI();
-    this.eventBusName = options.eventBusName || "eventbus";
+  constructor(app, options) {
+    this.API = app.API;
+    this.eventBusName = app.eventBusName || "eventbus";
     this.recordsElementId = options.records.elementId || "isamples-records";
     this.default_Q = options.defaultQuery || "*:*";
     this.table_height = options.records.tableHeight || "100%";
