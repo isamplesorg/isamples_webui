@@ -27,14 +27,10 @@
         }
     </style>
     <script type="module">
-        import { ISamplesAPI, loadConfig } from '../js/isamples-api.js';
+        import { html, render, unsafeHTML } from '../js/isamples-ui-imports.js';
         import { ISamplesState } from '../js/isamples-state.js';
         import { EventLogger } from '../js/wc-logger.js';
-        import { EventBus } from '../js/eventbus.js';
-        import { html, render, unsafeHTML } from '../js/isamples-ui-imports.js';
-
-        const EVENTBUS_NAME = "iSamplesEventBus";
-        const API_NAME = "iSamplesAPI";
+        import { ISamplesApp, loadConfig } from '../js/isamples-app.js';
 
         function humanize(x, n) {
            return x.toFixed(n);
@@ -68,11 +64,11 @@
                 "fields":["id", "score", "source", "label", "searchText"],
             }
 
-            globalThis[API_NAME].select(params)
+            globalThis.iSamplesApp.API.select(params)
             .then((data) => {
                 console.log(data);
                 if (data["error"] !== undefined) {
-                    globalThis[EVENTBUS_NAME].emit(
+                    globalThis.iSamplesApp.eventBus.emit(
                         "status",
                         null,
                         {"source":"solr", level:"error", msg:[data.error, ]}
@@ -99,11 +95,11 @@
 
         // map console messages to the EventLogger
         function subscribeTo(eventName) {
-            globalThis[EVENTBUS_NAME].on(
+            globalThis.iSamplesApp.eventBus.on(
                 eventName,
                 (data) => {
                     console.log(`Event: ${eventName}:`, data);
-                    globalThis[EVENTBUS_NAME].emit(
+                    globalThis.iSamplesApp.eventBus.emit(
                         "status",
                         null,
                         {"source":eventName, level:"info", msg:[data, ]}
@@ -123,12 +119,8 @@
             const options = {
                 // Default Solr query
                 defaultQuery: '*:*',
-                // Name of the global API instance
-                APIName: API_NAME,
-                // Name of the global event bus
-                eventBusName: EVENTBUS_NAME,
                 // Address of the iSamples API service
-                serviceEndpoint: settings.serviceEndpoint || "http://localhost:8000/",
+                serviceEndpoint: settings.serviceEndpoint || null,
 
                 // Configuration for the records view
                 records: {
@@ -148,20 +140,12 @@
             };
 
             // Create the Event Bus instance before anything else
-            globalThis[ options.eventBusName ] = new EventBus();
+            globalThis.iSamplesApp = new ISamplesApp(options);
 
-            // Update the web components using the event bus with the 
-            // event bus name. This triggers component subscription to
-            // events and enables them to emit events.
-            document.querySelectorAll("isamples-state, wc-logger").forEach((ele) => {
-                ele.eventBusName = options.eventBusName;
-            });
-
-            // Create the API instance for accessing data
-            globalThis[ options.APIName ] = new ISamplesAPI(options);
+            globalThis.iSamplesApp.registerComponents("isamples-state, wc-logger");
 
             // Respond to query_state_changed by executing the query
-            globalThis.iSamplesEventBus.on(
+            globalThis.iSamplesApp.eventBus.on(
                 "query_state_changed",
                 (data) => {
                     document.getElementById("record_count").innerText = "loading...";

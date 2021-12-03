@@ -4,9 +4,7 @@
 
 import { LitElement, html, css } from "lit";
 
-import { ISamplesSolr } from "./isamples-solr.js";
-
-export class ISamplesSummary extends LitElement {
+export class ISamplesSummaryView extends LitElement {
 
     static get styles() {
         return css `
@@ -15,14 +13,14 @@ export class ISamplesSummary extends LitElement {
             /* border: dotted 1px gray; */
             padding: 16px;
             font-family: var(--mono-font, monospace);
-            font-size: 1.1em;
+            font-size: vat(--record-font-size, 1rem);
         }
         .selected {
             background-color: #cce6ff;
         }
         table {
             min-width: 50rem;
-            padding-top: 2rem;
+            padding-top: 0.5rem;
         }
         tbody tr:last-child td {
             border-bottom: 1px solid grey;
@@ -64,12 +62,14 @@ export class ISamplesSummary extends LitElement {
             _data: {
                 type: Object,
             },
+            eventBusName: {type: String},
+            appName: {type: String},
         };
     }
 
     constructor() {
         super();
-        this.queryStateId = "";
+        // Name is used when advertising FQ changed
         this.name = "summary";
         this.q = "*:*";
         this.fqs = [];
@@ -77,46 +77,24 @@ export class ISamplesSummary extends LitElement {
         this._data = {
             sources: []
         };
-        this.solr = new ISamplesSolr();
+        //this.solr = new ISamplesSolr();
         //this._facets = DEFAULT_FACETS;
+        this.appName = "isamples";
 
         // Subscribe to query_state_changed events
         let _this = this;
         this._queryStateChangedCallback =  function(data) {
             _this.queryChanged(data);
         }
-        try {
-            globalThis.eventBus.on('query_state_changed', this._queryStateChangedCallback);
-        } catch (e) {
-            console.warn(e);
-        }
-
     }
 
     connectedCallback() {
         super.connectedCallback();
-        const queryState = document.getElementById(this.queryStateId);
-        if (queryState !== null) {
-            // register this filter state provider with the query state manager
-            queryState.addFilterSource(this.name, '');
-
-            // get current query from query state manager, if available
-            const filters = queryState.getFilters();
-            this.q = filters.q;
-            let fqs = [];
-            for (const [k,v] of Object.entries(filters.fqs)){
-                if (k !== this.name) {
-                    fqs.append(v);
-                }
-            }
-            this.fqs = fqs;
-        }
-        this.loadSummary();
     }
 
     disconnectedCallback() {
         // detach from the eventBus
-        eventBus.detach('query_state_changed', this._queryStateChangedCallback);
+        globalThis[this.eventBusName].detach('query_state_changed', this._queryStateChangedCallback);
         super.disconnectedCallback();
     }
 
@@ -126,11 +104,15 @@ export class ISamplesSummary extends LitElement {
      * @returns {Promise<void>}
      */
     async loadSummary() {
-        this.solr.getSolrRecordSummary(this.q, this.fqs)
+        //this.solr.getSolrRecordSummary(this.q, this.fqs)
+        if (globalThis[this.appName] !== undefined) {
+            console.log("loadSummary",this.q, this.fq);
+            globalThis[this.appName].summary.getSolrRecordSummary(this.q, this.fq)
             .then(data => {
                 this._data = data;
                 console.log(this._data)
             });
+        }
     }
 
     /**
@@ -164,7 +146,19 @@ export class ISamplesSummary extends LitElement {
      * @param changed Map of property changes
      */
     updated(changed) {
-        //console.log("isamples-summary.updated:", changed);
+        console.log("isamples-summary.updated:", changed);
+        if (changed.has('appName')) {
+            this.loadSummary();
+        }
+        if (changed.has('eventBusName')) {
+            // Subscribe to filter_changed events
+            if (globalThis[this.eventBusName] !== undefined) {
+                globalThis[this.eventBusName].on('query_state_changed', this._queryStateChangedCallback);
+            } else {
+                console.warn(`EventLogger: No globalThis[${this.eventBusName}] instance available.`)
+            }            
+        }
+
         let _notify = false;
         changed.forEach((_change, key, map) => {
             if (key === "q" && _change !== undefined) {
@@ -191,7 +185,7 @@ export class ISamplesSummary extends LitElement {
             e.target.classList.add("selected");
             this._selected = fq;
             try {
-                globalThis.eventBus.emit('filter_changed', null, {name: this.name, value: fq})
+                globalThis[this.eventBusName].emit('filter_changed', null, {name: this.name, value: fq})
             } catch (e) {
                 console.warn(e)
             }
@@ -270,4 +264,4 @@ export class ISamplesSummary extends LitElement {
     }
 }
 
-window.customElements.define('isamples-summary', ISamplesSummary);
+window.customElements.define('isamples-summary', ISamplesSummaryView);

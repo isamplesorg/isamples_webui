@@ -87,7 +87,7 @@ export class ISamplesState extends LitElement {
      * @param name:String name of the filter
      * @param initialValue:String initial value of the filter
      */
-    addFilterSource(name, initialValue) {
+    addFilterSource(name, initialValue="") {
         if (this._fqs.hasOwnProperty(name)) {
             console.warn(`Existing filter ${name} is being replaced`);
         }
@@ -192,14 +192,14 @@ export class ISamplesState extends LitElement {
 
     render() {
         return html`
-            <details open>
+            <details>
                 <summary>Q:
                     <input .value=${this.q} @change=${this.qChanged} size="100"/>
                     <button type="button" >&nbsp;Go&nbsp;&nbsp;</button>
                     <button type="button" @click=${this.setDefaults}>Clear</button>
                 </summary>
                 <table>
-                    ${Object.keys(this._fqs).map((k) => html`<tr><td>${k}</td><td class=".query">${this._fqs[k]}</td></tr>`)}
+                    ${Object.keys(this._fqs).map((k) => html`<tr><td>${k}:</td><td class=".query">${this._fqs[k]}</td></tr>`)}
                 </table>
             </details>
             <slot ></slot>

@@ -1,3 +1,11 @@
+
+/****
+ * DEPRECATED
+ * 
+ * Functonality has been moved to ISamplesApi and ISamplesSummary
+ */
+console.warn("**** ISamplesSolr is deprecated ****")
+
 // Missing number value
 export const MISSING_VALUE = "-9999";
 
