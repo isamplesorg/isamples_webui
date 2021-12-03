@@ -88,6 +88,7 @@ export class ISamplesState extends LitElement {
      * @param initialValue:String initial value of the filter
      */
     addFilterSource(name, initialValue="") {
+        console.log("Adding filter source: ", name, initialValue);
         if (this._fqs.hasOwnProperty(name)) {
             console.warn(`Existing filter ${name} is being replaced`);
         }
