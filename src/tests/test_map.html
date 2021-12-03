@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Testing Cesium view</title>
+    <link rel="stylesheet" href="../css/common.css" />
+    <link rel="stylesheet" href="../css/records.css" />
     <link href="../js/Widgets/widgets.css" rel="stylesheet">
     <style>
         #cesiumContainer {
             width: 100%;
-            height: 90vh;
+            height: 60vh;
         }
       
         .spatial-hud {
@@ -28,13 +30,38 @@
             margin-top: 0;
             margin-bottom: 0;
         }
+
+        <style>
+    .gutter {
+        background-color: #eee;
+        background-repeat: no-repeat;
+        background-position: 50%;
+    }
+
+    .gutter.gutter-horizontal {
+        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+        cursor: col-resize;
+    }
+
+    .gutter.gutter-vertical {
+        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
+        cursor: row-resize;
+    }        
+    </style>
+
     </style>
     <script type="module">
+        //This is necessary for Cesium to find it's assets
         globalThis.CESIUM_BASE_URL = "/js/";
     </script>
     <script type="module">
+    import { Split } from '../js/isamples-ui-imports.js';
 
+    import {ISamplesState} from '../js/isamples-state.js';
     import {ISamplesSpatial, SpatialView, PointStreamDatasource} from "../js/isamples-spatial.js";
+    import {loadConfig, ISamplesApp} from "../js/isamples-app.js";
+    import { RecordsTable } from "../js/records.js";
+    import { ISamplesRecord } from '../js/isamples-record.js';
 
     /**
      * Format float x with n decimal places
@@ -44,6 +71,7 @@
         //return x.toFixed(n).replace(/\.?0*$/, '');
     }
 
+    /*
     function fetchRecords(fq) {
         const Q = "*:*"
         let _url = new URL("/thing/select", "https://mars.cyverse.org");
@@ -71,34 +99,22 @@
                 ele.innerText = rows.join("\n");
             })
     }
+    */
 
     async function countRecordsInBB(bb) {
         //const Q = `producedBy_samplingSite_location_rpt:[${bb.min_lat},${bb.min_lon} TO ${bb.max_lat},${bb.max_lon}]`
         const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
-        console.log(Q);
-        document.getElementById("q_bounds").innerText = Q;
-        let _url = new URL("/thing/select", "https://mars.cyverse.org");
-        let params = _url.searchParams;
-        params.append("q", Q);
-        params.append("wt", "json");
-        params.append("fl", "id");
-        params.append("rows", 0);
-        let response = await fetch(_url);
-        let data = await response.json();
-        return data.response.numFound;
+        return await globalThis.isamplesapp.API.countRecordsQuery(Q)
     }
 
-
     // ==================
-
+    let viewer = null;
+    let bbox = null;
+    let selPoints = null;
     const moorea = new SpatialView(-149.8169236266867, -17.451466233002286, 2004.7347996772614, 201.84408760864753, -20.853642866175978);
     const patagonia = new SpatialView(-69.60169132023925, -54.315990127766646, 1781.4560051617016, 173.54573250470798, -15.85292472305027);
+    const FQname = "Spatial FQ";
 
-    let bbox = null;
-    export let viewer = new ISamplesSpatial("cesiumContainer");
-    viewer.addPointsBySource(642092);
-    viewer.visit(moorea);
-    let selPoints = await viewer.addDataSource( new PointStreamDatasource("BB Points") );
 
     function showCoordinates(lon, lat, height) {
         const e = document.getElementById("position");
@@ -107,9 +123,9 @@
 
     function clearBoundingBox() {
         viewer.removeEntity(bbox);
+        globalThis.isamplesapp.eventBus.emit('filter_changed', null, {name: FQname, value: ""});
         selPoints.clear();
         document.getElementById("clear-bb").style.display = "none"
-        document.getElementById("q_bounds").innerText = "";
     }
 
     async function selectedBoxCallback(bb) {
@@ -119,54 +135,105 @@
         bbox = viewer.addRectangle(bb, text);
 
         // Load the point stream
-        const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
-        let _url = new URL("/thing/stream", "http://localhost:8000");
-        let params = _url.searchParams;
-        params.append("q", Q);
-        params.append("rows", 10000);
-        selPoints.load(_url.toString());
+        const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');        
+        selPoints.loadApi(Q, 10000, globalThis.isamplesapp.API);
+
+        globalThis.isamplesapp.eventBus.emit('filter_changed', null, {name: FQname, value: Q});
 
         const btn = document.getElementById("clear-bb")
         btn.style.display = "block";
         btn.onclick = clearBoundingBox;
-
     }
 
-    /*
-    function addHud() {
-        let hud = html`<div class="spatial-hud">
-            <p><code id='position'>0, 0, 0</code></p>
-            <p><button id='clear-bb' style='display:none'>Clear BB</button></p>
-        </div>`;
-        const v = document.querySelector("div.cesium-viewer");
-        render(hud, v); 
-    }
-    */
+    loadConfig("/local-config.js")
+    .then((settings) => {
+        const options = {
+                appName: settings.appName ?? "isamplesapp",
+                // Address of the iSamples API service
+                serviceEndpoint: settings.serviceEndpoint || null,
 
-    viewer.addHud("cesiumContainer");
-    viewer.trackMouseCoordinates(showCoordinates);
-    viewer.enableTracking(selectedBoxCallback);
+                // Configuration for the records view
+                records: {
+                    elementId: "records-view",
+                    // Height of the table div
+                    tableHeight: '25rem',
+                    // Number of records to retrieve in a page
+                    pageSize: 100,
+                    // Columns to show in the table
+                    columns: [
+                        {title:"ID", field:"id"},
+                        {title:"Source", field:"source"},
+                        {title:"Label", field:"label"},
+                        {title:"hasContext...", field:"hasContextCategory"},
+                        {title:"hasMaterial...", field:"hasMaterialCategory"},
+                        {title:"hasSpecimen...", field:"hasSpecimenCategory"},
+                        {title:"Produced", field:"producedBy_resultTime"},
+                        {title:"Keywords", field:"keywords"},
+                    ],
+                }
+            };        
 
-    globalThis.viewer = viewer;
+        globalThis.isamplesapp = new ISamplesApp(options);
 
-    document.getElementById("visitMoorea").onclick = () => {
+        globalThis.isamplesapp.registerComponents("isamples-state,isamples-record");
+
+        document.getElementById("queryview").addFilterSource(FQname);
+
+        // create the records view
+        const records = new RecordsTable(globalThis.isamplesapp, options);
+
+
+        viewer = new ISamplesSpatial("cesiumContainer");
+        viewer.addPointsBySource(642092);
         viewer.visit(moorea);
-    }
-    document.getElementById("visitPatagonia").onclick = () => {
-        viewer.visit(patagonia);
-    }
+        viewer.addDataSource( new PointStreamDatasource("BB Points") ).then((res) => {selPoints = res});
+
+        viewer.addHud("cesiumContainer");
+        viewer.trackMouseCoordinates(showCoordinates);
+        viewer.enableTracking(selectedBoxCallback);
+
+        globalThis.viewer = viewer;
+
+        document.getElementById("visitMoorea").onclick = () => {
+            viewer.visit(moorea);
+        }
+        document.getElementById("visitPatagonia").onclick = () => {
+            viewer.visit(patagonia);
+        }
+            // Subscribe "record_selected" to load the clicked record
+            // into the record view
+            globalThis.isamplesapp.eventBus.on(
+                "record_selected",
+                (data) => {
+                    const rele = document.getElementById("record-view");
+                    rele.setData(globalThis.isamplesapp.API.thing(data.value, "solr"), "solr");
+                }
+            );
+            // Subscribe "query_state_changed" to clear the current record view
+            globalThis.isamplesapp.eventBus.on(
+                "query_state_changed",
+                (data) => {
+                    const rele = document.getElementById("record-view");
+                    rele.clearRecord();
+                }
+            );
+
+    })
     
     </script>
 </head>
 <body>
 <header></header>
 <section>
-<div id="cesiumContainer">
-</div>
-<button id="visitMoorea">Visit Moorea</button><button id="visitPatagonia">Visit Patagonia</button>
+    <isamples-state id="queryview"></isamples-state>
+    <div id="cesiumContainer"></div>
+    <button id="visitMoorea">Visit Moorea</button><button id="visitPatagonia">Visit Patagonia</button>
+    <div style="display:flex;flex-direction: row;">
+        <div id="records-view"></div>
+        <isamples-record id="record-view" ></isamples-record>
+    </div>
 </section>
 <footer>
-    <pre id="q_bounds" width="80em"></pre>
 </footer>
 </body>
 </html>

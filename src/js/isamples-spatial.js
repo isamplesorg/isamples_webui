@@ -11,13 +11,6 @@ import oboe from "./oboe-browser.js";
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwNzk3NjkyMy1iNGI1LTRkN2UtODRiMy04OTYwYWE0N2M3ZTkiLCJpZCI6Njk1MTcsImlhdCI6MTYzMzU0MTQ3N30.e70dpNzOCDRLDGxRguQCC-tRzGzA-23Xgno5lNgCeB4';
 
 
-//export function recordSelectCallback(id) {
-//    console.log(`RECORD CALLBACk: ${id}`);
-//}
-//setSelectedRecordCallback(recordSelectCallback);
-
-
-
 /**
  * Describes a camera viewpoint for Cesium.
  * All units are degrees.
@@ -225,6 +218,48 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
             console.error(err);
         })
     }
+
+    loadApi(query, max_rows, api) {
+        this.isLoading = true;
+        this.clear()
+        this.clustering.enabled = true;
+        this.clustering.clusterPoints = true;
+        this.clustering.minimumClusterSize = 3;
+        this.clustering.pixelRange = 15;
+        const _color = Cesium.Color.GREEN.withAlpha(0.5);
+        const params = {
+            q: query,
+            rows: max_rows
+        }
+        api.stream(
+            params, 
+            (doc) => {
+                // Handle the data records, e.g. response.docs[0].doc
+                if (doc.hasOwnProperty('x')) {
+                    const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, 1);
+                    this.entities.add({
+                        position: p0,
+                        point: {
+                            color: _color,
+                            pixelSize: 5,
+                            outlineColor: Cesium.Color.YELLOW,
+                            outlineWidth: 3,
+                            heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
+                        },
+                    })                
+                }
+            },
+            (final) => {
+                this.isLoading = false;
+                this.pointsClusterStyle();
+                console.log("Point stream complete");    
+            },
+            (err) => {
+                this.isLoading = false;
+                console.error(err);    
+            })
+    }
+
 }
 
 

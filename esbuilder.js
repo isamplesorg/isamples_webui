@@ -30,6 +30,7 @@ build({
         'src/js/isamples-summary.js',
         'src/js/isamples-spatial.js',
         'src/js/isamples-temporal.js',
+        'src/js/isamples-app.js',
     ],
     bundle: true,
     outdir: "dist/js",
