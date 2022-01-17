@@ -1,10 +1,14 @@
 {
   "devDependencies": {
+    "@babel/core": "^7.16.7",
+    "@babel/preset-env": "^7.16.8",
+    "@babel/preset-react": "^7.16.7",
     "@rollup/plugin-node-resolve": "^13.0.6",
     "@web/dev-server": "^0.1.25",
     "@web/dev-server-rollup": "^0.3.11",
     "@web/rollup-plugin-copy": "^0.3.0",
     "@web/rollup-plugin-html": "^1.10.1",
+    "babel-loader": "^8.2.3",
     "copyfiles": "^2.4.1",
     "esbuild": "^0.13.14",
     "esm": "^3.2.25",
@@ -22,6 +26,8 @@
   "dependencies": {
     "@datadavev/oauth-autho": "^0.0.1",
     "@octokit/request": "^5.6.2",
+    "babelify": "^10.0.0",
+    "browserify": "^17.0.0",
     "browserify-zlib": "^0.2.0",
     "cesium": "^1.87.1",
     "esbuild-node-builtins": "^0.1.0",
@@ -29,6 +35,10 @@
     "jsonpath-plus": "^6.0.1",
     "lit": "^2.0.2",
     "pretty-print-json": "^1.1.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "redux": "^4.1.2",
+    "solr-faceted-search-react": "^0.12.1",
     "split.js": "^1.6.4",
     "tabulator-tables": "^5.0.7",
     "url": "^0.11.0"
