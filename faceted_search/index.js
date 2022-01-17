@@ -15,19 +15,15 @@ const store = createStore(solrReducer);
 // The search fields and filterable facets you want
 const fields = [
 	{label: "All text fields", field: "*", type: "text"},
+    {label: "name", field: "name", type: "text"},
     {label: "Source", field: "source", type: "list-facet", facetSort:"index"},
-	{label: "Name", field: "name_t", type: "text"},
-	{label: "Characteristics", field: "characteristics_ss", type: "list-facet"},
-	{label: "Date of birth", field: "birthDate_i", type: "range-facet"},
-	{label: "Date of death", field: "deathDate_i", type: "range-facet"}
+	{label: "s", field: "s", type: "list-facet"},
+	{label: "p", field: "p", type: "list-facet"},
+	{label: "o", field: "o", type: "list-facet"},
+	{label: "id", field: "id", type: "list-facet"},
+    {label: "tstamp", field: "tstamp", type: "range-facet"}
 ];
 
-// The sortable fields you want
-const sortFields = [
-	{label: "Name", field: "koppelnaam_s"},
-	{label: "Date of birth", field: "birthDate_i"},
-	{label: "Date of death", field: "deathDate_i"}
-];
 
 // Construct the solr client api class
 const solrClient = 	new SolrClient({
