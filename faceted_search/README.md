@@ -30,13 +30,13 @@ The file contains the Solr faceted search UI componment.
 The search fields and filterable facets you want. The blow is an example with local isamples_inabox solr with sesear records.
 ```
 const fields = [
-	{label: "All text fields", field: "*", type: "text"},
+    {label: "All text fields", field: "*", type: "text"},
     {label: "name", field: "name", type: "text"},
     {label: "Source", field: "source", type: "list-facet", facetSort:"index"},
-	{label: "s", field: "s", type: "list-facet"},
-	{label: "p", field: "p", type: "list-facet"},
-	{label: "o", field: "o", type: "list-facet"},
-	{label: "id", field: "id", type: "list-facet"},
+    {label: "s", field: "s", type: "list-facet"},
+    {label: "p", field: "p", type: "list-facet"},
+    {label: "o", field: "o", type: "list-facet"},
+    {label: "id", field: "id", type: "list-facet"},
     {label: "tstamp", field: "tstamp", type: "range-facet"}
 ];
 ```
