@@ -5,7 +5,7 @@ Solr facted search UI
 
 To build a simply webapp with browerify
 
-The minimal required libraries.
+The minimal required packages.
 ```
 npm i react react-dom --save
 npm add -D @babel/core babel-loader @babel/preset-env @babel/preset-react
