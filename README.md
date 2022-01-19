@@ -7,6 +7,15 @@ Web interface to iSB and iSC APIs
 
 Generally following guidelines under https://modern-web.dev/
 
+### Prerequisites
+
+1. Install npm: `brew install npm`
+2. Install browsersync: `npm install -g browser-sync`
+3. Install minica: `brew install minica`
+4. Set up minica with localhost: `minica --domains localhost`
+
+### Running
+
 Setup:
 ```
 npm install
