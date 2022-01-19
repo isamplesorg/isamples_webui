@@ -24,6 +24,13 @@ const fields = [
     {label: "tstamp", field: "tstamp", type: "range-facet"}
 ];
 
+// The sortable fields you want
+const sortFields = [
+	{label: "Name", field: "koppelnaam_s"},
+	{label: "Date of birth", field: "birthDate_i"},
+	{label: "Date of death", field: "deathDate_i"}
+];
+
 
 // Construct the solr client api class
 const solrClient = 	new SolrClient({
