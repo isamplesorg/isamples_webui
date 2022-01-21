@@ -14,7 +14,7 @@ npm i browserify babelify redux solr-faceted-search-react --save
 
 Run browserify
 ```
-../node_modules/.bin/browserify index.js \
+./node_modules/.bin/browserify index.js \
                 --require react \
                 --require react-dom \
                 --transform [ babelify --presets [ @babel/react @babel/env ] ] \
