@@ -22,36 +22,38 @@ var fields = [{
   label: "All text fields",
   field: "*",
   type: "text"
-}, {
-  label: "name",
-  field: "name",
-  type: "text"
-}, {
+}, // {label: "id", field: "id", facetSort:"index"},
+// {label: "indexUpdatedTime", field: "indexUpdatedTime", type: "list-facet", facetSort:"range-facet"},
+// {label: "sourceUpdatedTime", field: "sourceUpdatedTime", type: "list-facet", facetSort:"range-facet"},
+// {label: "label", field: "label", type: "list-facet", facetSort:"text"},
+{
   label: "Source",
   field: "source",
   type: "list-facet",
   facetSort: "index"
 }, {
-  label: "s",
-  field: "s",
-  type: "list-facet"
+  label: "Context",
+  field: "hasContextCategory",
+  type: "list-facet",
+  facetSort: "count"
 }, {
-  label: "p",
-  field: "p",
-  type: "list-facet"
+  label: "Material",
+  field: "hasMaterialCategory",
+  type: "list-facet",
+  facetSort: "count"
 }, {
-  label: "o",
-  field: "o",
-  type: "list-facet"
+  label: "Specimen",
+  field: "hasSpecimenCategory",
+  type: "list-facet",
+  facetSort: "count"
 }, {
-  label: "id",
-  field: "id",
-  type: "list-facet"
-}, {
-  label: "tstamp",
-  field: "tstamp",
-  type: "range-facet"
-}]; // The sortable fields you want
+  label: "Registrant",
+  field: "registrant",
+  type: "list-facet",
+  facetSort: "count"
+} // {label: "All text fields", field: "*", type: "text"},
+// {label: "Source", field: "source", type: "list-facet", facetSort:"index"},
+]; // The sortable fields you want
 
 var sortFields = [{
   label: "Name",
@@ -65,7 +67,8 @@ var sortFields = [{
 }]; // Construct the solr client api class
 
 var solrClient = new _solrFacetedSearchReact.SolrClient({
-  url: "http://localhost:8983/solr/isb_rel/select",
+  // url: "http://localhost:8983/solr/isb_rel/select",
+  url: "http://localhost:8984/solr/isb_core_records/select",
   searchFields: fields,
   sortFields: sortFields,
   // Delegate change callback to redux dispatcher

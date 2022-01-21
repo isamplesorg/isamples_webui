@@ -15,13 +15,11 @@ const store = createStore(solrReducer);
 // The search fields and filterable facets you want
 const fields = [
 	{label: "All text fields", field: "*", type: "text"},
-    {label: "name", field: "name", type: "text"},
-    {label: "Source", field: "source", type: "list-facet", facetSort:"index"},
-	{label: "s", field: "s", type: "list-facet"},
-	{label: "p", field: "p", type: "list-facet"},
-	{label: "o", field: "o", type: "list-facet"},
-	{label: "id", field: "id", type: "list-facet"},
-    {label: "tstamp", field: "tstamp", type: "range-facet"}
+	{label: "Source", field: "source", type: "list-facet", facetSort:"index"},
+	{label: "Context", field: "hasContextCategory", type: "list-facet", facetSort:"count"},
+	{label: "Material", field: "hasMaterialCategory", type: "list-facet", facetSort:"count"},
+	{label: "Specimen", field: "hasSpecimenCategory", type: "list-facet", facetSort:"count"},
+	{label: "Registrant", field: "registrant", type: "list-facet", facetSort:"count"},
 ];
 
 // The sortable fields you want
@@ -34,7 +32,7 @@ const sortFields = [
 
 // Construct the solr client api class
 const solrClient = 	new SolrClient({
-	url: "http://localhost:8983/solr/isb_rel/select",
+	url: "http://localhost:8984/solr/isb_core_records/select",
 	searchFields: fields,
 	sortFields: sortFields,
 
