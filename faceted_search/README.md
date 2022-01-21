@@ -27,26 +27,23 @@ Load this [index.html](index.html) in a browser
 ## index.js
 The file contains the Solr faceted search UI componment.
 
-The search fields and filterable facets you want. The blow is an example with local isamples_inabox solr with sesear records.
+The search fields and filterable facets you want.
 ```
 const fields = [
     {label: "All text fields", field: "*", type: "text"},
-    {label: "name", field: "name", type: "text"},
-    {label: "Source", field: "source", type: "list-facet", facetSort:"index"},
-    {label: "s", field: "s", type: "list-facet"},
-    {label: "p", field: "p", type: "list-facet"},
-    {label: "o", field: "o", type: "list-facet"},
-    {label: "id", field: "id", type: "list-facet"},
-    {label: "tstamp", field: "tstamp", type: "range-facet"}
+	{label: "Source", field: "source", type: "list-facet", facetSort:"index"},
+	{label: "Context", field: "hasContextCategory", type: "list-facet", facetSort:"count"},
+	{label: "Material", field: "hasMaterialCategory", type: "list-facet", facetSort:"count"},
+	{label: "Specimen", field: "hasSpecimenCategory", type: "list-facet", facetSort:"count"},
+	{label: "Registrant", field: "registrant", type: "list-facet", facetSort:"count"},
 ];
 ```
 
 Construct the solr client api class.
-The url is the solr select api. The current url is the local solr server one.
-The url for iSamples is "https://mars.cyverse.org/thing/select". 
+The url is the solr select api. 
 ```
 const solrClient = 	new SolrClient({
-	url: "http://localhost:8983/solr/isb_rel/select",
+	url: "http://localhost:8984/solr/isb_core_records/select",
 	searchFields: fields,
 	sortFields: sortFields,
 
@@ -55,30 +52,3 @@ const solrClient = 	new SolrClient({
 });
 ```
 
-## local solr setup
-To start solr with CORS
-
-Find the local solr folder, the current solr version is 1.11.1
-```
-cd 1.11.1
-```
-
-Edit the file server/etc/webdefault.xml and add these lines just above the last closing tag
-```
-	<!-- enable CORS filters (only suitable for local testing, use a proxy for real world application) -->
-	<filter>
-		<filter-name>cross-origin</filter-name>
-		<filter-class>org.eclipse.jetty.servlets.CrossOriginFilter</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>cross-origin</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-	<!--- /enable CORS filters -->
-</web-app>
-```
-
-If you install solr with homebrew, restart solr.
-```
-brew services restart solr
-```
