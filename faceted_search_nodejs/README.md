@@ -2,7 +2,7 @@
 
 deploy solr-faceted-search-react in create-react-app
 
-# setup nodejs
+## setup nodejs
 ```
 npm install
 ```
@@ -17,4 +17,7 @@ iSamples/solr-faceted-search-react fork. https://github.com/isamplesorg/solr-fac
 ```
 npm link ../path_to_local_solr_faceted_search_react
 ```
+
+## Current issue
+THe solr-faceted-search-react can be imported but it will throw an error, "Cannot find module 'react".
 

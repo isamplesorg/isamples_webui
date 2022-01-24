@@ -9,10 +9,20 @@ The minimal required packages.
 ```
 npm i react react-dom --save
 npm add -D @babel/core babel-loader @babel/preset-env @babel/preset-react
-npm i browserify babelify redux solr-faceted-search-react --save 
+npm i browserify babelify redux  --save 
 ```
 
-Run browserify
+The package solr-faceted-search-react has many outdated dependencies. 
+The lastest fork version: https://github.com/isamplesorg/solr-faceted-search-react.git.
+Please clone this fork, go back to this folder and link it
+```
+# by link
+npm link ../path_to/solr-faceted-search-react
+# or by install
+npm install ../path_to/solr-faceted-search-react
+```
+
+Run browserify (Each time modify the index.js, please rerun this command)
 ```
 ./node_modules/.bin/browserify index.js \
                 --require react \
@@ -43,6 +53,7 @@ Construct the solr client api class.
 The url is the solr select api. 
 ```
 const solrClient = 	new SolrClient({
+	# the local iSample solr select API
 	url: "http://localhost:8984/solr/isb_core_records/select",
 	searchFields: fields,
 	sortFields: sortFields,

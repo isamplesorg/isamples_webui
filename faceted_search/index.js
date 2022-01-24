@@ -32,6 +32,7 @@ const sortFields = [
 
 // Construct the solr client api class
 const solrClient = 	new SolrClient({
+	// url: "https://mars.cyverse.org/thing/select?fl=source%2C%20hasContextCategory%2C%20hasMaterialCategory%2C%20hasSpecimenCategory%2C%20registrant&q=*%3A*",
 	url: "http://localhost:8984/solr/isb_core_records/select",
 	searchFields: fields,
 	sortFields: sortFields,
@@ -45,6 +46,7 @@ store.subscribe(() =>
 	// In stead of using the handlers passed along in the onChange callback of SolrClient
 	// use the .getHandlers() method to get the default click / change handlers
 	ReactDOM.render(
+
 		<SolrFacetedSearch
 			{...store.getState()}
 			{...solrClient.getHandlers()}
@@ -57,5 +59,6 @@ store.subscribe(() =>
 
 document.addEventListener("DOMContentLoaded", () => {
 	// this will send an initial search initializing the app
+	
 	solrClient.initialize();
 });
