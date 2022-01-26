@@ -7,6 +7,15 @@ Web interface to iSB and iSC APIs
 
 Generally following guidelines under https://modern-web.dev/
 
+### Prerequisites
+
+1. Install npm: `brew install npm`
+2. Install browsersync: `npm install -g browser-sync`
+3. Install minica: `brew install minica`
+4. Set up minica with localhost: `minica --domains localhost`
+
+### Running
+
 Setup:
 ```
 npm install
@@ -34,3 +43,4 @@ configuration for https is in `bs-config.js` in the `https` section.
 [Minica](https://github.com/jsha/minica) provides a convenient CA for local development
 purposes. My setup keeps the CA in `~/.local/etc/ca`.
 
+If everything is running properly, you should see an index page at https://localhost:2000/index.html
