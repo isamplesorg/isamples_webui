@@ -14,7 +14,8 @@ import { createStore } from "redux"
 const store = createStore(solrReducer);
 // The search fields and filterable facets you want
 const fields = [
-	{label: "All text fields", field: "*", type: "text"},
+	{label: "All text fields", field: "searchText", type: "text"},
+	{label: "Identifier", field: "id", type: "text"},
 	{label: "Source", field: "source", type: "list-facet", facetSort:"index"},
 	{label: "Context", field: "hasContextCategory", type: "list-facet", facetSort:"count"},
 	{label: "Material", field: "hasMaterialCategory", type: "list-facet", facetSort:"count"},
@@ -24,9 +25,6 @@ const fields = [
 
 // The sortable fields you want
 const sortFields = [
-	{label: "Name", field: "koppelnaam_s"},
-	{label: "Date of birth", field: "birthDate_i"},
-	{label: "Date of death", field: "deathDate_i"}
 ];
 
 
