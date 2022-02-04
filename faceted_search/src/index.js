@@ -45,7 +45,7 @@ const sortFields = [
 
 // Construct the solr client api class
 const solrClient = new SolrClient({
-    url: "http://localhost:8984/solr/isb_core_records/select",
+    url: config.solr_url,
     searchFields: fields,
     sortFields: sortFields,
     rows: 20,
