@@ -65,16 +65,22 @@ function APP() {
 
     useEffect(() => {
         if (!curState && searchParams){
-            console.log(searchParams)
-            console.log(searchParams.get("searchFields"));
-            // let searchFields = JSON.parse(decode(searchParams.get("searchFields")));
-            // let start = JSON.parse(decode(searchParams.get("start")));
-            // setCurState(true);
-            // solrClient.setCurrentPage(5);
+			let encodedSearchFields = searchParams.get("searchFields")
+			let encodedStart = searchParams.get("start")
+			if (encodedSearchFields != null && encodedStart != null) {
+				let start = JSON.parse(decode(encodedStart));
+				let searchFields = JSON.parse(decode(encodedSearchFields));
+				setCurState(true);
+				let state = store.getState()
+				state["query"]["start"] = start
+				state["query"]["searchFields"] = searchFields
+				store.dispatch({type: "SET_SOLR_STATE", state: state})
+			}
         }
         let searchFields = encode(JSON.stringify(store.getState()['query']['searchFields']))
         let start = encode(JSON.stringify(store.getState()['query']['start']))
-        setSearchParams({searchFields, start});
+		let searchParamsDict = {"searchFields": searchFields, "start": start}
+        setSearchParams(searchParamsDict);
     },[searchParams, store.getState()]);
     
     return (
