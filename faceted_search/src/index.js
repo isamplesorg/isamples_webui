@@ -10,6 +10,7 @@ import {
 import solrReducer from "./solr-reducer";
 import { createStore } from "redux"
 
+const config = require("./config.json")
 // Create a store for the reducer.
 const store = createStore(solrReducer);
 // The search fields and filterable facets you want
@@ -30,7 +31,7 @@ const sortFields = [
 
 // Construct the solr client api class
 const solrClient = 	new SolrClient({
-	url: "http://localhost:8984/solr/isb_core_records/select",
+	url: config.solr_url,
 	searchFields: fields,
 	sortFields: sortFields,
 

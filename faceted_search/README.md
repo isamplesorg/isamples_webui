@@ -6,13 +6,16 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 In the project directory, you can run:
 
-### `npm start`
+### `npm run localdev`
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
+
+Note that since we are npm linking the `solr-faceted-search-react` component, you'll need to make sure you've started a webpack watch in *that* directory for those changes to show up in this project:
+`npm run watch`
 
 ### `npm test`
 
