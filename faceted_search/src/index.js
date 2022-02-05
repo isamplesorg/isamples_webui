@@ -59,27 +59,51 @@ const solrClient = new SolrClient({
 
 
 function APP() {
+	// https://reactrouterdotcom.fly.dev/docs/en/v6/api#usesearchparams
+	// Used for modifying the query string
     let [searchParams, setSearchParams] = useSearchParams();
+
+	// https://reactjs.org/docs/hooks-state.html
+	// Simple boolean to remember whether we've already decoded state or not (not sure if this will work in all cases, but continue investigating)
     let [curState, setCurState] = useState(false);
 
 
+	// A note about when this gets called -- https://reactjs.org/docs/hooks-reference.html#useeffect
+	// This is called asynchronously after a render is complete.  The rule is that render itself must be
+	// stateless, so state mutating operations need to be contained here.  In our case the sequence is
+	// (1) User clicks something in the UI (like enables or disables a search facet )
+	// (2) UI refreshes
+	// …some time passes
+	// (3) This gets called, and we write back the current query string to the browser's location using setSearchParams
     useEffect(() => {
+
+		// This if says "if we haven't previously decoded from searchParams and we have some"
         if (!curState && searchParams){
+			// Read the encoded fields out of the dictionary.  Note that these *must* match up with what we're encoding down below
 			let encodedSearchFields = searchParams.get("searchFields")
 			let encodedStart = searchParams.get("start")
 			if (encodedSearchFields != null && encodedStart != null) {
 				let start = JSON.parse(decode(encodedStart));
 				let searchFields = JSON.parse(decode(encodedSearchFields));
+
+				// Remember that we've already done this (again, this needs testing to make sure it works in all circumstances)
 				setCurState(true);
+				// Get the redux state manager so we may mutate it with the values we just decoded
 				let state = store.getState()
 				state["query"]["start"] = start
 				state["query"]["searchFields"] = searchFields
+
+				// And this is the key to get things to re-render with the decoded values.  It triggers a callback in the store
+				// which causes a re-render because we store.subscribe() with a callback to re-render the APP
 				store.dispatch({type: "SET_SOLR_STATE", state: state})
 			}
         }
+		// For now, encode only the selected search facets and start page in the searchParams
         let searchFields = encode(JSON.stringify(store.getState()['query']['searchFields']))
         let start = encode(JSON.stringify(store.getState()['query']['start']))
 		let searchParamsDict = {"searchFields": searchFields, "start": start}
+		
+		// Update the query parameters with the latest values selected in the UI
         setSearchParams(searchParamsDict);
     },[searchParams, store.getState()]);
     
@@ -96,8 +120,7 @@ function APP() {
 
 // Register your app with the store
 store.subscribe(() =>
-    // In stead of using the handlers passed along in the onChange callback of SolrClient
-    // use the .getHandlers() method to get the default click / change handlers
+	// The inclusion of the BrowserRouter and Routes wrapping our APP is what allows the searchParams functionality to work.
     ReactDOM.render(
         <BrowserRouter>
             <Routes>
