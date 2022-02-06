@@ -101,7 +101,7 @@ function APP() {
 		// 	}
         // }
 		// *********************** For learning ******************************
-		
+
 		// For now, encode only the selected search facets and start page in the searchParams
         let searchFields = encode(JSON.stringify(store.getState()['query']['searchFields']))
         let start = encode(JSON.stringify(store.getState()['query']['start']))
@@ -141,8 +141,8 @@ store.subscribe(() =>
 document.addEventListener("DOMContentLoaded", () => {
     // this will send an initial search initializing the app
 	// We just need to set state when we firstly open the page with url
-	// So, we only need to set the inital state with the parameters rather than set then in the useEffect
-	// Get the parameters when the page loaded at the first time. 
+	// So, we only need to set the initalize solrClient rather than set them in the useEffect
+	// Get the parameters when the page loads. 
 	let CurURL = window.location.href;
 	let url = new URL(CurURL);
 	// Read the encoded fields out of the dictionary.  Note that these *must* match up with what we're encoding down above
@@ -152,6 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	if (start && searchFields){
 		let decodedStart = JSON.parse(decode(start));
 		let decodedSearchFields = JSON.parse(decode(searchFields));
+		// Update solrClient and request a new solr query
 		solrClient.setInitPage(decodedStart, decodedSearchFields)
 	}else{
 		solrClient.initialize();
