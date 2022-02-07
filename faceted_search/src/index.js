@@ -8,7 +8,7 @@ import {
 } from "solr-faceted-search-react";
 
 import solrReducer from "./solr-reducer";
-import { combineReducers, createStore } from "redux";
+import { createStore } from "redux";
 
 // react router to define url
 import { 
@@ -103,7 +103,6 @@ function APP() {
 		// *********************** For learning ******************************
 
 		// For now, encode only the selected search facets and start page in the searchParams
-		console.log(store.getState()['query']['sortFields'])
         let searchFields = encode(JSON.stringify(store.getState()['query']['searchFields']))
         let start = encode(JSON.stringify(store.getState()['query']['start']))
 		let sortFields = encode(JSON.stringify(store.getState()['query']['sortFields'])) 
