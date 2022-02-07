@@ -103,9 +103,11 @@ function APP() {
 		// *********************** For learning ******************************
 
 		// For now, encode only the selected search facets and start page in the searchParams
+		console.log(store.getState()['query']['sortFields'])
         let searchFields = encode(JSON.stringify(store.getState()['query']['searchFields']))
         let start = encode(JSON.stringify(store.getState()['query']['start']))
-		let searchParamsDict = {"searchFields": searchFields, "start": start}
+		let sortFields = encode(JSON.stringify(store.getState()['query']['sortFields'])) 
+		let searchParamsDict = {"searchFields": searchFields, "start": start, "sortFields": sortFields}
 		
 		// Update the query parameters with the latest values selected in the UI
         setSearchParams(searchParamsDict);
@@ -148,12 +150,14 @@ document.addEventListener("DOMContentLoaded", () => {
 	// Read the encoded fields out of the dictionary.  Note that these *must* match up with what we're encoding down above
 	let start = url.searchParams.get('start');
 	let searchFields = url.searchParams.get('searchFields');
-	console.log(start)
+	let sortFields = url.searchParams.get('sortFields');
+
 	if (start && searchFields){
 		let decodedStart = JSON.parse(decode(start));
 		let decodedSearchFields = JSON.parse(decode(searchFields));
+		let decodedSortFields = JSON.parse(decode(sortFields));
 		// Update solrClient and request a new solr query
-		solrClient.setInitPage(decodedStart, decodedSearchFields)
+		solrClient.setInitPage(decodedStart, decodedSearchFields, decodedSortFields)
 	}else{
 		solrClient.initialize();
 	}
