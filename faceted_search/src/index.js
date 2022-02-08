@@ -65,6 +65,9 @@ function APP() {
 	// https://reactrouterdotcom.fly.dev/docs/en/v6/api#usesearchparams
 	// Used for modifying the query string
     let [searchParams, setSearchParams] = useSearchParams();
+
+	// https://reactjs.org/docs/refs-and-the-dom.html
+	// Help use to access DOM element
 	const Ref = useRef(null);
 
 	// A note about when this gets called -- https://reactjs.org/docs/hooks-reference.html#useeffect
@@ -80,6 +83,7 @@ function APP() {
         let start = encode(JSON.stringify(store.getState()['query']['start']/store.getState()['query']['rows']));
 		let sortFields = encode(JSON.stringify(store.getState()['query']['sortFields']));
 		let searchParamsDict = {"searchFields": searchFields, "start": start, "sortFields": sortFields};
+
 		// These are the arbitrary way to get text search value
 		let allTextFieldsValue = store.getState()['query']['searchFields'][0];
 		let identiFierValue = store.getState()['query']['searchFields'][1];
