@@ -71,7 +71,7 @@ function APP() {
     useEffect(() => {
 		// For now, encode only the selected search facets and start page in the searchParams
         let searchFields = encode(JSON.stringify(store.getState()['query']['searchFields']));
-        let start = encode(JSON.stringify(store.getState()['query']['start']));
+        let start = encode(JSON.stringify(store.getState()['query']['start']/store.getState()['query']['rows']));
 		let sortFields = encode(JSON.stringify(store.getState()['query']['sortFields']));
 		let searchParamsDict = {"searchFields": searchFields, "start": start, "sortFields": sortFields};
 		
@@ -123,7 +123,11 @@ document.addEventListener("DOMContentLoaded", () => {
 		let decodedSearchFields = JSON.parse(decode(searchFields));
 		let decodedSortFields = JSON.parse(decode(sortFields));
 		// Update solrClient and request a new solr query
-		solrClient.setInitPage(decodedStart, decodedSearchFields, decodedSortFields);
+		let ParamesDict = {'searchFields': decodedSearchFields, 'sortFields': decodedSortFields};
+
+		// Use solrClient built-in functions
+		solrClient.setInitialQuery(ParamesDict);
+		solrClient.setCurrentPage(decodedStart)
 	}else{
 		solrClient.initialize();
 	}
