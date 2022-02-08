@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect,useRef } from 'react';
 import ReactDOM from 'react-dom';
 import reportWebVitals from './reportWebVitals';
 
@@ -21,9 +21,14 @@ import {
 // encode and decode parameter
 import { encode, decode } from "plantuml-encoder"
 
+// addition helper functions
+import { convertToLink, highlight } from './solr-library-extension';
+
 const config = require("./config.json")
 // Create a store for the reducer.
 const store = createStore(solrReducer);
+
+
 
 // The search fields and filterable facets you want
 const fields = [
@@ -60,6 +65,7 @@ function APP() {
 	// https://reactrouterdotcom.fly.dev/docs/en/v6/api#usesearchparams
 	// Used for modifying the query string
     let [searchParams, setSearchParams] = useSearchParams();
+	const Ref = useRef(null);
 
 	// A note about when this gets called -- https://reactjs.org/docs/hooks-reference.html#useeffect
 	// This is called asynchronously after a render is complete.  The rule is that render itself must be
@@ -74,13 +80,20 @@ function APP() {
         let start = encode(JSON.stringify(store.getState()['query']['start']/store.getState()['query']['rows']));
 		let sortFields = encode(JSON.stringify(store.getState()['query']['sortFields']));
 		let searchParamsDict = {"searchFields": searchFields, "start": start, "sortFields": sortFields};
+		// These are the arbitrary way to get text search value
+		let allTextFieldsValue = store.getState()['query']['searchFields'][0];
+		let identiFierValue = store.getState()['query']['searchFields'][1];
 		
 		// Update the query parameters with the latest values selected in the UI
         setSearchParams(searchParamsDict);
+		highlight("All text fields", allTextFieldsValue ,Ref.current)
+		convertToLink('Identifier', "https://n2t.net/", Ref.current)
+		highlight("Identifier", identiFierValue ,Ref.current)
+		
     },[searchParams, store.getState()]);
     
     return (
-        <div>
+        <div ref={Ref}>
             <SolrFacetedSearch
                         {...store.getState()}
                         {...solrClient.getHandlers()}
