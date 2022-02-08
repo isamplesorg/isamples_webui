@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import reportWebVitals from './reportWebVitals';
 
 import {
-    SolrFacetedSearch,
-    SolrClient
+    	SolrFacetedSearch,
+    	SolrClient
 } from "solr-faceted-search-react";
 
 import solrReducer from "./solr-reducer";
@@ -12,10 +12,10 @@ import { createStore } from "redux";
 
 // react router to define url
 import { 
-    BrowserRouter,
-    Routes,
-    Route,
-    useSearchParams,
+		BrowserRouter,
+		Routes,
+		Route,
+		useSearchParams,
 } from 'react-router-dom';
 
 // encode and decode parameter
@@ -27,33 +27,33 @@ const store = createStore(solrReducer);
 
 // The search fields and filterable facets you want
 const fields = [
-    {label: "All text fields", field: "searchText", type: "text"},
-    {label: "Identifier", field: "id", type: "text"},
-    {label: "Source", field: "source", type: "list-facet", facetSort:"index"},
-    {label: "Context", field: "hasContextCategory", type: "list-facet", facetSort:"count"},
-    {label: "Material", field: "hasMaterialCategory", type: "list-facet", facetSort:"count"},
-    {label: "Specimen", field: "hasSpecimenCategory", type: "list-facet", facetSort:"count"},
-    {label: "Registrant", field: "registrant", type: "list-facet", facetSort:"count"},
+		{label: "All text fields", field: "searchText", type: "text"},
+		{label: "Identifier", field: "id", type: "text"},
+		{label: "Source", field: "source", type: "list-facet", facetSort:"index"},
+		{label: "Context", field: "hasContextCategory", type: "list-facet", facetSort:"count"},
+		{label: "Material", field: "hasMaterialCategory", type: "list-facet", facetSort:"count"},
+		{label: "Specimen", field: "hasSpecimenCategory", type: "list-facet", facetSort:"count"},
+		{label: "Registrant", field: "registrant", type: "list-facet", facetSort:"count"},
 ];
 
 // The sortable fields you want
 const sortFields = [
-    {label: "Identifier", field: "id"},
-    {label: "Registrant", field: "registrant"},
+		{label: "Identifier", field: "id"},
+		{label: "Registrant", field: "registrant"},
 ];
 
 
 // Construct the solr client api class
 const solrClient = new SolrClient({
-    url: config.solr_url,
-    searchFields: fields,
-    sortFields: sortFields,
-    rows: 20,
-    pageStrategy: "paginate",
-    start: 0,
+		url: config.solr_url,
+		searchFields: fields,
+		sortFields: sortFields,
+		rows: 20,
+		pageStrategy: "paginate",
+		start: 0,
 
-    // Delegate change callback to redux dispatcher
-    onChange: (state) => {store.dispatch({type: "SET_SOLR_STATE", state: state})}
+		// Delegate change callback to redux dispatcher
+		onChange: (state) => {store.dispatch({type: "SET_SOLR_STATE", state: state})}
 });
 
 function APP() {
