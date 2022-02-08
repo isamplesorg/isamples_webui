@@ -12,7 +12,7 @@ import { createStore } from "redux";
 
 // react router to define url
 import { 
-		BrowserRouter,
+		HashRouter,
 		Routes,
 		Route,
 		useSearchParams,
@@ -109,13 +109,13 @@ function APP() {
 
 // Register your app with the store
 store.subscribe(() =>
-	// The inclusion of the BrowserRouter and Routes wrapping our APP is what allows the searchParams functionality to work.
+	// The inclusion of the HashRouter and Routes wrapping our APP is what allows the searchParams functionality to work.
     ReactDOM.render(
-        <BrowserRouter>
+        <HashRouter>
             <Routes>
                 <Route path="/" element={<APP />}/>
             </Routes>
-        </BrowserRouter>
+        </HashRouter>
         ,
         document.getElementById("app")
     )
@@ -138,12 +138,21 @@ document.addEventListener("DOMContentLoaded", () => {
 	// console.log(searchParams)
 	let CurURL = window.location.href;
 	let url = new URL(CurURL);
-	// Read the encoded fields out of the dictionary.  Note that these *must* match up with what we're encoding down above
-	let start = url.searchParams.get('start');
-	let searchFields = url.searchParams.get('searchFields');
-	let sortFields = url.searchParams.get('sortFields');
+	// Read the encoded fields out of the dictionary.  Note that these *must* match up with what we're encoding up above
+    let hash = url.hash;
+    let hasEncodedFields = false;
+    let start = null;
+    let searchFields = null;
+    let sortFields = null;
+    if (hash != null) {
+        let searchParams = new URLSearchParams(url.hash.substring(2));
+        start = searchParams.get('start');
+        searchFields = searchParams.get('searchFields');
+        sortFields = searchParams.get('sortFields');
+        hasEncodedFields = Boolean(start && searchFields);
+    }
 
-	if (start && searchFields){
+	if (hasEncodedFields){
 		let decodedStart = JSON.parse(decode(start));
 		let decodedSearchFields = JSON.parse(decode(searchFields));
 		let decodedSortFields = JSON.parse(decode(sortFields));
