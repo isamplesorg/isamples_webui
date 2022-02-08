@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import reportWebVitals from './reportWebVitals';
 
@@ -144,6 +144,8 @@ document.addEventListener("DOMContentLoaded", () => {
 	// We just need to set state when we firstly open the page with url
 	// So, we only need to set the initalize solrClient rather than set them in the useEffect
 	// Get the parameters when the page loads. 
+	// let [searchParams, setSearchParams] = useSearchParams();
+	// console.log(searchParams)
 	let CurURL = window.location.href;
 	let url = new URL(CurURL);
 	// Read the encoded fields out of the dictionary.  Note that these *must* match up with what we're encoding down above
