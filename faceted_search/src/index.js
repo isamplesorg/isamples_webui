@@ -86,9 +86,9 @@ function APP() {
 		
 		// Update the query parameters with the latest values selected in the UI
         setSearchParams(searchParamsDict);
-		highlight("All text fields", allTextFieldsValue ,Ref.current)
-		convertToLink('Identifier', "https://n2t.net/", Ref.current)
-		highlight("Identifier", identiFierValue ,Ref.current)
+		highlight("All text fields", allTextFieldsValue ,Ref.current);
+		convertToLink('Identifier', "https://n2t.net/", Ref.current);
+		highlight("Identifier", identiFierValue ,Ref.current);
 		
     },[searchParams, store.getState()]);
     
