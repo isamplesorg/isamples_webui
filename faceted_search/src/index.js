@@ -104,6 +104,15 @@ store.subscribe(() =>
     )
 );
 
+export const appendAnalytics = () => {
+    const script = document.createElement("script");
+    script.src = "https://metrics.isample.xyz/js/plausible.js";
+    script.defer = true;
+    script.src = config.analytics_src;
+    script.setAttribute("data-domain", config.analytics_domain);
+    document.head.appendChild(script);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     // this will send an initial search initializing the app
 	// We just need to set state when we firstly open the page with url
@@ -133,5 +142,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	}else{
 		solrClient.initialize();
 	}
+    appendAnalytics();
 });
 reportWebVitals();
