@@ -32,33 +32,33 @@ const store = createStore(solrReducer);
 
 // The search fields and filterable facets you want
 const fields = [
-		{label: "All text fields", field: "searchText", type: "text"},
-		{label: "Identifier", field: "id", type: "text"},
-		{label: "Source", field: "source", type: "list-facet", facetSort:"index"},
-		{label: "Context", field: "hasContextCategory", type: "list-facet", facetSort:"count"},
-		{label: "Material", field: "hasMaterialCategory", type: "list-facet", facetSort:"count"},
-		{label: "Specimen", field: "hasSpecimenCategory", type: "list-facet", facetSort:"count"},
-		{label: "Registrant", field: "registrant", type: "list-facet", facetSort:"count"},
+	{label: "All text fields", field: "searchText", type: "text"},
+	{label: "Identifier", field: "id", type: "text"},
+	{label: "Source", field: "source", type: "list-facet", facetSort:"index"},
+	{label: "Context", field: "hasContextCategory", type: "list-facet", facetSort:"count"},
+	{label: "Material", field: "hasMaterialCategory", type: "list-facet", facetSort:"count"},
+	{label: "Specimen", field: "hasSpecimenCategory", type: "list-facet", facetSort:"count"},
+	{label: "Registrant", field: "registrant", type: "list-facet", facetSort:"count"},
 ];
 
 // The sortable fields you want
 const sortFields = [
-		{label: "Identifier", field: "id"},
-		{label: "Registrant", field: "registrant"},
+	{label: "Identifier", field: "id"},
+	{label: "Registrant", field: "registrant"},
 ];
 
 
 // Construct the solr client api class
 const solrClient = new SolrClient({
-		url: config.solr_url,
-		searchFields: fields,
-		sortFields: sortFields,
-		rows: 20,
-		pageStrategy: "paginate",
-		start: 0,
+	url: config.solr_url,
+	searchFields: fields,
+	sortFields: sortFields,
+	rows: 20,
+	pageStrategy: "paginate",
+	start: 0,
 
-		// Delegate change callback to redux dispatcher
-		onChange: (state) => {store.dispatch({type: "SET_SOLR_STATE", state: state})}
+	// Delegate change callback to redux dispatcher
+	onChange: (state) => {store.dispatch({type: "SET_SOLR_STATE", state: state})}
 });
 
 function APP() {
@@ -79,17 +79,17 @@ function APP() {
 	// (3) This gets called, and we write back the current query string to the browser's location using setSearchParams
     useEffect(() => {
 		// For now, encode only the selected search facets and start page in the searchParams
-        let searchFields = encode(JSON.stringify(store.getState()['query']['searchFields']));
-        let start = encode(JSON.stringify(store.getState()['query']['start']/store.getState()['query']['rows']));
+		let searchFields = encode(JSON.stringify(store.getState()['query']['searchFields']));
+		let start = encode(JSON.stringify(store.getState()['query']['start']/store.getState()['query']['rows']));
 		let sortFields = encode(JSON.stringify(store.getState()['query']['sortFields']));
 		let searchParamsDict = {"searchFields": searchFields, "start": start, "sortFields": sortFields};
 
 		// These are the arbitrary way to get text search value
 		let allTextFieldsValue = store.getState()['query']['searchFields'][0];
 		let identiFierValue = store.getState()['query']['searchFields'][1];
-		
+
 		// Update the query parameters with the latest values selected in the UI
-        setSearchParams(searchParamsDict);
+		setSearchParams(searchParamsDict);
 		highlight("All text fields", allTextFieldsValue ,Ref.current);
 		convertToLink('Identifier', "https://n2t.net/", Ref.current);
 		highlight("Identifier", identiFierValue ,Ref.current);

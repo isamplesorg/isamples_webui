@@ -1,5 +1,5 @@
 // Purpose: This file is to export iSamples customized UI functions
-// Suggestions: In this file, we would create several HTML DOM node. Using jQuery might be a good idea.
+// Suggestions: In this file, we would create several HTML DOM nodes. Using jQuery might be a good idea.
 //              Currently, let us check if these work.
 
 // find the current records list
