@@ -126,7 +126,9 @@ document.addEventListener("DOMContentLoaded", () => {
 		let ParamesDict = {'searchFields': decodedSearchFields, 'sortFields': decodedSortFields};
 
 		// Use solrClient built-in functions
+		// set initial query. This function would not send a query.
 		solrClient.setInitialQuery(ParamesDict);
+		// set page. This function will send a query.
 		solrClient.setCurrentPage(decodedStart)
 	}else{
 		solrClient.initialize();
