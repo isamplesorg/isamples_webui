@@ -106,7 +106,6 @@ store.subscribe(() =>
 
 export const appendAnalytics = () => {
     const script = document.createElement("script");
-    script.src = "https://metrics.isample.xyz/js/plausible.js";
     script.defer = true;
     script.src = config.analytics_src;
     script.setAttribute("data-domain", config.analytics_domain);
