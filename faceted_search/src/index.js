@@ -68,7 +68,7 @@ const solrClient = new SolrClient({
 	start: 0,
 
 	// Delegate change callback to redux dispatcher
-	onChange: (state) => {store.dispatch({type: "SET_SOLR_STATE", state: state})}
+	onChange: (state) => store.dispatch({type: "SET_SOLR_STATE", state: state})
 });
 
 function APP() {
