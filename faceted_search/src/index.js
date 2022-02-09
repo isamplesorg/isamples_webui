@@ -4,7 +4,8 @@ import reportWebVitals from './reportWebVitals';
 
 import {
     	SolrFacetedSearch,
-    	SolrClient
+    	SolrClient,
+		defaultComponentPack
 } from "solr-faceted-search-react";
 
 import solrReducer from "./solr-reducer";
@@ -21,8 +22,9 @@ import {
 // encode and decode parameter
 import { encode, decode } from "plantuml-encoder"
 
-// addition helper functions
-import { convertToLink, highlight } from './solr-library-extension';
+
+// iSamples results react component
+import isamplesResult from './iSamples_results';
 
 const config = require("./config.json")
 // Create a store for the reducer.
@@ -47,6 +49,14 @@ const sortFields = [
 	{label: "Registrant", field: "registrant"},
 ];
 
+// Create a cutom component pack from the default component pack
+const iSamples_componentPack = {
+	...defaultComponentPack,
+	results: {
+		...defaultComponentPack.results,
+		result: isamplesResult
+	}
+}
 
 // Construct the solr client api class
 const solrClient = new SolrClient({
@@ -84,15 +94,8 @@ function APP() {
 		let sortFields = encode(JSON.stringify(store.getState()['query']['sortFields']));
 		let searchParamsDict = {"searchFields": searchFields, "start": start, "sortFields": sortFields};
 
-		// These are the arbitrary way to get text search value
-		let allTextFieldsValue = store.getState()['query']['searchFields'][0];
-		let identiFierValue = store.getState()['query']['searchFields'][1];
-
 		// Update the query parameters with the latest values selected in the UI
 		setSearchParams(searchParamsDict);
-		highlight("All text fields", allTextFieldsValue ,Ref.current);
-		convertToLink('Identifier', "https://n2t.net/", Ref.current);
-		highlight("Identifier", identiFierValue ,Ref.current);
 		
     },[searchParams, store.getState()]);
     
@@ -102,6 +105,7 @@ function APP() {
                         {...store.getState()}
                         {...solrClient.getHandlers()}
                         bootstrapCss={true}
+						customComponents={iSamples_componentPack}
                         onSelectDoc={(doc) => {console.log(doc); }} />
         </div>
     );
