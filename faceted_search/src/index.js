@@ -1,4 +1,4 @@
-import React, { useEffect,useRef } from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import reportWebVitals from './reportWebVitals';
 
@@ -76,10 +76,6 @@ function APP() {
 	// Used for modifying the query string
     let [searchParams, setSearchParams] = useSearchParams();
 
-	// https://reactjs.org/docs/refs-and-the-dom.html
-	// Help use to access DOM element
-	const Ref = useRef(null);
-
 	// A note about when this gets called -- https://reactjs.org/docs/hooks-reference.html#useeffect
 	// This is called asynchronously after a render is complete.  The rule is that render itself must be
 	// stateless, so state mutating operations need to be contained here.  In our case the sequence is
@@ -100,7 +96,7 @@ function APP() {
     },[searchParams, store.getState()]);
     
     return (
-        <div ref={Ref}>
+        <div>
             <SolrFacetedSearch
                         {...store.getState()}
                         {...solrClient.getHandlers()}
