@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom';
 import reportWebVitals from './reportWebVitals';
 
 import {
-  SolrFacetedSearch,
-  SolrClient,
-  defaultComponentPack
+	SolrFacetedSearch,
+	SolrClient,
+	defaultComponentPack
 } from "solr-faceted-search-react";
 
 import solrReducer from "./solr-reducer";
@@ -13,10 +13,10 @@ import { createStore } from "redux";
 
 // react router to define url
 import { 
-  HashRouter,
-  Routes,
-  Route,
-  useSearchParams,
+	HashRouter,
+	Routes,
+	Route,
+	useSearchParams,
 } from 'react-router-dom';
 
 // encode and decode parameter
@@ -32,139 +32,139 @@ const store = createStore(solrReducer);
 
 // The search fields and filterable facets you want
 const fields = [
-  {label: "All text fields", field: "searchText", type: "text"},
-  {label: "Identifier", field: "id", type: "text"},
-  {label: "Source", field: "source", type: "list-facet", facetSort:"index"},
-  {label: "Context", field: "hasContextCategory", type: "list-facet", facetSort:"count"},
-  {label: "Material", field: "hasMaterialCategory", type: "list-facet", facetSort:"count"},
-  {label: "Specimen", field: "hasSpecimenCategory", type: "list-facet", facetSort:"count"},
-  {label: "Registrant", field: "registrant", type: "list-facet", facetSort:"count"},
+	{label: "All text fields", field: "searchText", type: "text"},
+	{label: "Identifier", field: "id", type: "text"},
+	{label: "Source", field: "source", type: "list-facet", facetSort:"index"},
+	{label: "Context", field: "hasContextCategory", type: "list-facet", facetSort:"count"},
+	{label: "Material", field: "hasMaterialCategory", type: "list-facet", facetSort:"count"},
+	{label: "Specimen", field: "hasSpecimenCategory", type: "list-facet", facetSort:"count"},
+	{label: "Registrant", field: "registrant", type: "list-facet", facetSort:"count"},
 ];
 
 // The sortable fields you want
 const sortFields = [
-  {label: "Identifier", field: "id"},
-  {label: "Registrant", field: "registrant"},
+	{label: "Identifier", field: "id"},
+	{label: "Registrant", field: "registrant"},
 ];
 
 // Create a cutom component pack from the default component pack
 const iSamples_componentPack = {
-  ...defaultComponentPack,
-  results: {
-    ...defaultComponentPack.results,
-    result: iSamplesResult
-  }
+	...defaultComponentPack,
+	results: {
+		...defaultComponentPack.results,
+		result: iSamplesResult
+	}
 }
 
 // Construct the solr client api class
 const solrClient = new SolrClient({
-  url: config.solr_url,
-  searchFields: fields,
-  sortFields: sortFields,
-  rows: 20,
-  pageStrategy: "paginate",
+	url: config.solr_url,
+	searchFields: fields,
+	sortFields: sortFields,
+	rows: 20,
+	pageStrategy: "paginate",
 
-  // Delegate change callback to redux dispatcher
-  onChange: (state) => store.dispatch({type: "SET_SOLR_STATE", state: state})
+	// Delegate change callback to redux dispatcher
+	onChange: (state) => store.dispatch({type: "SET_SOLR_STATE", state: state})
 });
 
 function APP() {
-  // https://reactrouterdotcom.fly.dev/docs/en/v6/api#usesearchparams
-  // Used for modifying the query string
-  let [searchParams, setSearchParams] = useSearchParams();
+	// https://reactrouterdotcom.fly.dev/docs/en/v6/api#usesearchparams
+	// Used for modifying the query string
+	let [searchParams, setSearchParams] = useSearchParams();
 
-  // A note about when this gets called -- https://reactjs.org/docs/hooks-reference.html#useeffect
-  // This is called asynchronously after a render is complete.  The rule is that render itself must be
-  // stateless, so state mutating operations need to be contained here.  In our case the sequence is
-  // (1) User clicks something in the UI (like enables or disables a search facet )
-  // (2) UI refreshes
-  // …some time passes
-  // (3) This gets called, and we write back the current query string to the browser's location using setSearchParams
-  useEffect(() => {
-    // For now, encode only the selected search facets and start page in the searchParams
-    const searchFields = encode(JSON.stringify(store.getState()['query']['searchFields']));
-    const start = encode(JSON.stringify(store.getState()['query']['start']/store.getState()['query']['rows']));
-    const sortFields = encode(JSON.stringify(store.getState()['query']['sortFields']));
-    const searchParamsDict = {searchFields, start, sortFields};
+	// A note about when this gets called -- https://reactjs.org/docs/hooks-reference.html#useeffect
+	// This is called asynchronously after a render is complete.  The rule is that render itself must be
+	// stateless, so state mutating operations need to be contained here.  In our case the sequence is
+	// (1) User clicks something in the UI (like enables or disables a search facet )
+	// (2) UI refreshes
+	// …some time passes
+	// (3) This gets called, and we write back the current query string to the browser's location using setSearchParams
+	useEffect(() => {
+		// For now, encode only the selected search facets and start page in the searchParams
+		const searchFields = encode(JSON.stringify(store.getState()['query']['searchFields']));
+		const start = encode(JSON.stringify(store.getState()['query']['start']/store.getState()['query']['rows']));
+		const sortFields = encode(JSON.stringify(store.getState()['query']['sortFields']));
+		const searchParamsDict = {searchFields, start, sortFields};
 
-    // Update the query parameters with the latest values selected in the UI
-    setSearchParams(searchParamsDict);
-    
-  }, [searchParams, store.getState()]);
-    
-  return (
-      <div>
-          <SolrFacetedSearch
-              {...store.getState()}
-              {...solrClient.getHandlers()}
-              bootstrapCss={true}
-              customComponents={iSamples_componentPack}
-              onSelectDoc={(doc) => {console.log(doc); }} 
-          />
-      </div>
-  );
+		// Update the query parameters with the latest values selected in the UI
+		setSearchParams(searchParamsDict);
+		
+	}, [searchParams, store.getState()]);
+		
+	return (
+		<div>
+			<SolrFacetedSearch
+				{...store.getState()}
+				{...solrClient.getHandlers()}
+				bootstrapCss={true}
+				customComponents={iSamples_componentPack}
+				onSelectDoc={(doc) => {console.log(doc); }} 
+			/>
+		</div>
+	);
 };
 
 // Register your app with the store
 store.subscribe(() =>
-  // The inclusion of the HashRouter and Routes wrapping our APP is what allows the searchParams functionality to work.
-  ReactDOM.render(
-    <HashRouter>
-        <Routes>
-            <Route path="/" element={<APP />}/>
-        </Routes>
-    </HashRouter>
-    ,
-    document.getElementById("app")
-  )
+	// The inclusion of the HashRouter and Routes wrapping our APP is what allows the searchParams functionality to work.
+	ReactDOM.render(
+		<HashRouter>
+				<Routes>
+						<Route path="/" element={<APP />}/>
+				</Routes>
+		</HashRouter>
+		,
+		document.getElementById("app")
+	)
 );
 
 export const appendAnalytics = () => {
-  const script = document.createElement("script");
-  script.defer = true;
-  script.src = config.analytics_src;
-  script.setAttribute("data-domain", config.analytics_domain);
-  document.head.appendChild(script);
+	const script = document.createElement("script");
+	script.defer = true;
+	script.src = config.analytics_src;
+	script.setAttribute("data-domain", config.analytics_domain);
+	document.head.appendChild(script);
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  // this will send an initial search initializing the app
-  // We just need to set state when we firstly open the page with url
-  // So, we only need to set the initalize solrClient rather than set them in the useEffect
-  // Get the parameters when the page loads. 
-  // let [searchParams, setSearchParams] = useSearchParams();
-  // console.log(searchParams)
-  const curURL = window.location.href;
-  const url = new URL(curURL);
-  // Read the encoded fields out of the dictionary.  Note that these *must* match up with what we're encoding up above
-  const hash = url.hash;
-  let hasEncodedFields = false;
-  let start = null;
-  let searchFields = null;
-  let sortFields = null;
-  if (hash != null) {
-      let searchParams = new URLSearchParams(url.hash.substring(2));
-      start = searchParams.get('start');
-      searchFields = searchParams.get('searchFields');
-      sortFields = searchParams.get('sortFields');
-      hasEncodedFields = Boolean(start && searchFields);
-  }
+	// this will send an initial search initializing the app
+	// We just need to set state when we firstly open the page with url
+	// So, we only need to set the initalize solrClient rather than set them in the useEffect
+	// Get the parameters when the page loads. 
+	// let [searchParams, setSearchParams] = useSearchParams();
+	// console.log(searchParams)
+	const curURL = window.location.href;
+	const url = new URL(curURL);
+	// Read the encoded fields out of the dictionary.  Note that these *must* match up with what we're encoding up above
+	const hash = url.hash;
+	let hasEncodedFields = false;
+	let start = null;
+	let searchFields = null;
+	let sortFields = null;
+	if (hash != null) {
+		let searchParams = new URLSearchParams(url.hash.substring(2));
+		start = searchParams.get('start');
+		searchFields = searchParams.get('searchFields');
+		sortFields = searchParams.get('sortFields');
+		hasEncodedFields = Boolean(start && searchFields);
+	}
 
-  if (hasEncodedFields){
-    const decodedStart = JSON.parse(decode(start));
-    const decodedSearchFields = JSON.parse(decode(searchFields));
-    const decodedSortFields = JSON.parse(decode(sortFields));
-    // Update solrClient and request a new solr query
-    const paramesDict = {'searchFields': decodedSearchFields, 'sortFields': decodedSortFields};
+	if (hasEncodedFields){
+		const decodedStart = JSON.parse(decode(start));
+		const decodedSearchFields = JSON.parse(decode(searchFields));
+		const decodedSortFields = JSON.parse(decode(sortFields));
+		// Update solrClient and request a new solr query
+		const paramesDict = {'searchFields': decodedSearchFields, 'sortFields': decodedSortFields};
 
-    // Use solrClient built-in functions
-    // set initial query. This function would not send a query.
-    solrClient.setInitialQuery(paramesDict);
-    // set page. This function will send a query.
-    solrClient.setCurrentPage(decodedStart)
-  }else{
-    solrClient.initialize();
-  }
-  appendAnalytics();
+		// Use solrClient built-in functions
+		// set initial query. This function would not send a query.
+		solrClient.setInitialQuery(paramesDict);
+		// set page. This function will send a query.
+		solrClient.setCurrentPage(decodedStart)
+	}else{
+		solrClient.initialize();
+	}
+	appendAnalytics();
 });
 reportWebVitals();
