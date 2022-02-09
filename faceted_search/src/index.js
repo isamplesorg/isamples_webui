@@ -12,7 +12,7 @@ import solrReducer from "./solr-reducer";
 import { createStore } from "redux";
 
 // react router to define url
-import { 
+import {
 	HashRouter,
 	Routes,
 	Route,
@@ -21,7 +21,6 @@ import {
 
 // encode and decode parameter
 import { encode, decode } from "plantuml-encoder"
-
 
 // iSamples results react component
 import iSamplesResult from './iSamples_results';
@@ -89,9 +88,9 @@ function APP() {
 
 		// Update the query parameters with the latest values selected in the UI
 		setSearchParams(searchParamsDict);
-		
+
 	}, [searchParams, store.getState()]);
-		
+
 	return (
 		<div>
 			<SolrFacetedSearch
@@ -99,7 +98,7 @@ function APP() {
 				{...solrClient.getHandlers()}
 				bootstrapCss={true}
 				customComponents={iSamples_componentPack}
-				onSelectDoc={(doc) => {console.log(doc); }} 
+				onSelectDoc={(doc) => {console.log(doc); }}
 			/>
 		</div>
 	);
@@ -131,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	// this will send an initial search initializing the app
 	// We just need to set state when we firstly open the page with url
 	// So, we only need to set the initalize solrClient rather than set them in the useEffect
-	// Get the parameters when the page loads. 
+	// Get the parameters when the page loads.
 	// let [searchParams, setSearchParams] = useSearchParams();
 	// console.log(searchParams)
 	const curURL = window.location.href;
