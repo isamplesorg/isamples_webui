@@ -42,6 +42,14 @@ Instead, it will copy all the configuration files and the transitive dependencie
 
 You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
+## Code Formatting
+
+We've configured .editorconfig with the formatter settings for this project.  Assuming you're using Visual Studio Code, you ought to be able to install the editor config extension and formatting should just work.
+
+## Debugging
+
+The .vscode project checked in has the correct launch target for launching the Chrome debugger.  Start the node server, then launch the debugger and breakpoints should work out of the box.
+
 ## Learn More
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
