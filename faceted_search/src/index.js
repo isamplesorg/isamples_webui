@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import reportWebVitals from './reportWebVitals';
 
 import {
-    	SolrFacetedSearch,
-    	SolrClient,
+		SolrFacetedSearch,
+		SolrClient,
 		defaultComponentPack
 } from "solr-faceted-search-react";
 
