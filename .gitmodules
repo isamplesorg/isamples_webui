@@ -1,3 +1,4 @@
 [submodule "src/node_modules/solr-faceted-search-react"]
 	path = src/node_modules/solr-faceted-search-react
 	url = https://github.com/isamplesorg/solr-faceted-search-react.git
+    branch = develop
