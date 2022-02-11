@@ -29,13 +29,15 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm i
+      working-directory: ./faceted_search
     - run: npm run build --if-present
+      working-directory: ./faceted_search
     #- run: npm test
-    - name: Deploy
-      uses: peaceiris/actions-gh-pages@v3
-      if: ${{ github.ref == 'refs/heads/main' }}
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./dist
-        cname: find.isample.xyz
+    # - name: Deploy
+    #   uses: peaceiris/actions-gh-pages@v3
+    #   if: ${{ github.ref == 'refs/heads/main' }}
+    #   with:
+    #     github_token: ${{ secrets.GITHUB_TOKEN }}
+    #     publish_dir: ./dist
+    #     cname: find.isample.xyz
         
