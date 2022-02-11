@@ -2,6 +2,12 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Submodule Init
+The `solr-faceted-search-react` is a git submodule located in `src/node_modules`.  To initialize it when you check out, do 
+`git submodule init`
+If you've already done that, make sure that you are up to date with all of the remote branches specified in `.gitmodules`:
+`git submodule update --remote`
+
 ## Available Scripts
 
 In the project directory, you can run:
@@ -13,9 +19,6 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
-
-Note that since we are npm linking the `solr-faceted-search-react` component, you'll need to make sure you've started a webpack watch in *that* directory for those changes to show up in this project:
-`npm run watch`
 
 ### `npm test`
 
