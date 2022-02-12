@@ -68,8 +68,7 @@ class TextSearch extends React.Component {
             {bootstrapCss ? (
             <span
               onMouseOver={(e) => {this.toggle()}}
-              onMouseOut={(e) => {this.toggle()}}
-              >
+              onMouseOut={(e) => {this.toggle()}}>
 							<span className={cx("glyphicon", {
                 "glyphicon-info-sign": !collapse
               })}/>
