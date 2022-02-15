@@ -1,6 +1,6 @@
 import React from "react";
 
-class PopUp extends React.Component{
+class PopUp extends React.Component {
 
   render() {
     return (
