@@ -34,32 +34,32 @@ const store = createStore(solrReducer);
 
 // The search fields and filterable facets you want
 const fields = [
-	{label: "All text fields", field: "searchText", type: "text"},
-	{label: "Identifier", field: "id", type: "text"},
-	{label: "Source", field: "source", type: "list-facet", facetSort:"index"},
-	{label: "Context", field: "hasContextCategory", type: "list-facet", facetSort:"count"},
-	{label: "Material", field: "hasMaterialCategory", type: "list-facet", facetSort:"count"},
-	{label: "Specimen", field: "hasSpecimenCategory", type: "list-facet", facetSort:"count"},
-	{label: "Registrant", field: "registrant", type: "list-facet", facetSort:"count"},
+	{ label: "All text fields", field: "searchText", type: "text" },
+	{ label: "Identifier", field: "id", type: "text" },
+	{ label: "Source", field: "source", type: "list-facet", facetSort: "index" },
+	{ label: "Context", field: "hasContextCategory", type: "list-facet", facetSort: "count" },
+	{ label: "Material", field: "hasMaterialCategory", type: "list-facet", facetSort: "count" },
+	{ label: "Specimen", field: "hasSpecimenCategory", type: "list-facet", facetSort: "count" },
+	{ label: "Registrant", field: "registrant", type: "list-facet", facetSort: "count" },
 ];
 
 // The sortable fields you want
 const sortFields = [
-	{label: "Identifier", field: "id"},
-	{label: "Registrant", field: "registrant"},
+	{ label: "Identifier", field: "id" },
+	{ label: "Registrant", field: "registrant" },
 ];
 
 // Create a cutom component pack from the default component pack
 const iSamples_componentPack = {
-  ...defaultComponentPack,
-  results: {
-    ...defaultComponentPack.results,
-    result: iSamplesResult
-  },
-  searchFields: {
-    ...defaultComponentPack.searchFields,
-    text: TextSearch
-  }
+	...defaultComponentPack,
+	results: {
+		...defaultComponentPack.results,
+		result: iSamplesResult
+	},
+	searchFields: {
+		...defaultComponentPack.searchFields,
+		text: TextSearch
+	}
 }
 
 // Construct the solr client api class
@@ -71,7 +71,7 @@ const solrClient = new SolrClient({
 	pageStrategy: "paginate",
 
 	// Delegate change callback to redux dispatcher
-	onChange: (state) => store.dispatch({type: "SET_SOLR_STATE", state: state})
+	onChange: (state) => store.dispatch({ type: "SET_SOLR_STATE", state: state })
 });
 
 function APP() {
@@ -79,7 +79,7 @@ function APP() {
 	// Used for modifying the query string
 	let [searchParams, setSearchParams] = useSearchParams();
 
-  const storeState = store.getState();
+	const storeState = store.getState();
 	// A note about when this gets called -- https://reactjs.org/docs/hooks-reference.html#useeffect
 	// This is called asynchronously after a render is complete.  The rule is that render itself must be
 	// stateless, so state mutating operations need to be contained here.  In our case the sequence is
@@ -90,9 +90,9 @@ function APP() {
 	useEffect(() => {
 		// For now, encode only the selected search facets and start page in the searchParams
 		const searchFields = encode(JSON.stringify(store.getState()['query']['searchFields']));
-		const start = encode(JSON.stringify(store.getState()['query']['start']/store.getState()['query']['rows']));
+		const start = encode(JSON.stringify(store.getState()['query']['start'] / store.getState()['query']['rows']));
 		const sortFields = encode(JSON.stringify(store.getState()['query']['sortFields']));
-		const searchParamsDict = {searchFields, start, sortFields};
+		const searchParamsDict = { searchFields, start, sortFields };
 
 		// Update the query parameters with the latest values selected in the UI
 		setSearchParams(searchParamsDict);
@@ -101,16 +101,16 @@ function APP() {
 
 	return (
 		<div>
-      <Table
-        docs={store.getState()['results']['docs']}
-        fields={store.getState()['query']['searchFields']}
-      />
+			<Table
+				docs={store.getState()['results']['docs']}
+				fields={store.getState()['query']['searchFields']}
+			/>
 			<SolrFacetedSearch
 				{...store.getState()}
 				{...solrClient.getHandlers()}
 				bootstrapCss={true}
 				customComponents={iSamples_componentPack}
-				onSelectDoc={(doc) => {console.log(doc); }}
+				onSelectDoc={(doc) => { console.log(doc); }}
 			/>
 		</div>
 	);
@@ -121,9 +121,9 @@ store.subscribe(() =>
 	// The inclusion of the HashRouter and Routes wrapping our APP is what allows the searchParams functionality to work.
 	ReactDOM.render(
 		<HashRouter>
-				<Routes>
-						<Route path="/" element={<APP />}/>
-				</Routes>
+			<Routes>
+				<Route path="/" element={<APP />} />
+			</Routes>
 		</HashRouter>
 		,
 		document.getElementById("app")
@@ -161,19 +161,19 @@ document.addEventListener("DOMContentLoaded", () => {
 		hasEncodedFields = Boolean(start && searchFields);
 	}
 
-	if (hasEncodedFields){
+	if (hasEncodedFields) {
 		const decodedStart = JSON.parse(decode(start));
 		const decodedSearchFields = JSON.parse(decode(searchFields));
 		const decodedSortFields = JSON.parse(decode(sortFields));
 		// Update solrClient and request a new solr query
-		const paramesDict = {'searchFields': decodedSearchFields, 'sortFields': decodedSortFields};
+		const paramesDict = { 'searchFields': decodedSearchFields, 'sortFields': decodedSortFields };
 
 		// Use solrClient built-in functions
 		// set initial query. This function would not send a query.
 		solrClient.setInitialQuery(paramesDict);
 		// set page. This function will send a query.
 		solrClient.setCurrentPage(decodedStart)
-	}else{
+	} else {
 		solrClient.initialize();
 	}
 	appendAnalytics();
