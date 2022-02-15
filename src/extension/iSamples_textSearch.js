@@ -42,7 +42,7 @@ class TextSearch extends React.Component {
   }
 
   // popup window toggle
-  toggle(){
+  toggle() {
     this.setState((prevState) => ({
       value: prevState.value,
       hint: !prevState.hint
@@ -50,41 +50,41 @@ class TextSearch extends React.Component {
   }
 
   render() {
-    const {label, bootstrapCss, collapse} = this.props;
+    const { label, bootstrapCss, collapse } = this.props;
 
     return (
-      <li className={cx({"list-group-item": bootstrapCss})}>
+      <li className={cx({ "list-group-item": bootstrapCss })}>
         <header onClick={this.toggleExpand.bind(this)}>
           <h5>
             {bootstrapCss ? (<span>
-							<span className={cx("glyphicon", {
+              <span className={cx("glyphicon", {
                 "glyphicon-collapse-down": !collapse,
                 "glyphicon-collapse-up": collapse
-              })}/>{" "}
-						</span>) : null}
+              })} />{" "}
+            </span>) : null}
             {label}
             {/* /Add popup windom/ */}
             &nbsp;&nbsp;&nbsp;
             {bootstrapCss ? (
-            <span
-              onMouseOver={(e) => {this.toggle()}}
-              onMouseOut={(e) => {this.toggle()}}>
-							<span className={cx("glyphicon", {
-                "glyphicon-info-sign": !collapse
-              })}/>
-						</span>) : null}
-            {this.state.hint ? <PopUp/> : null}
+              <span
+                onMouseOver={(e) => { this.toggle() }}
+                onMouseOut={(e) => { this.toggle() }}>
+                <span className={cx("glyphicon", {
+                  "glyphicon-info-sign": !collapse
+                })} />
+              </span>) : null}
+            {this.state.hint ? <PopUp /> : null}
           </h5>
         </header>
-        <div style={{display: collapse ? "none" : "block"}}>
+        <div style={{ display: collapse ? "none" : "block" }}>
           <input
             onChange={this.handleInputChange.bind(this)}
             onKeyDown={this.handleInputKeyDown.bind(this)}
-            value={this.state.value || ""}/>
+            value={this.state.value || ""} />
           &nbsp;
-          <button className={cx({"btn": bootstrapCss, "btn-default": bootstrapCss, "btn-sm": bootstrapCss})}
-                  onClick={this.handleSubmit.bind(this)}>
-            <SearchIcon/>
+          <button className={cx({ "btn": bootstrapCss, "btn-default": bootstrapCss, "btn-sm": bootstrapCss })}
+            onClick={this.handleSubmit.bind(this)}>
+            <SearchIcon />
           </button>
         </div>
       </li>
