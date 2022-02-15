@@ -111,7 +111,7 @@ svg.search-icon {
   border: solid #ddd 1px;
   width: 400px;
   z-index: 100;
-  padding: 10px 5px 10px 20px;
+  padding: 10px 10px 10px 0px;
   border-radius: 10px;
   font-size: small;
 }

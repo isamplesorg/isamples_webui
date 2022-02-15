@@ -50,15 +50,15 @@ const sortFields = [
 
 // Create a cutom component pack from the default component pack
 const iSamples_componentPack = {
-	...defaultComponentPack,
-	results: {
-		...defaultComponentPack.results,
-		result: iSamplesResult
-	},
+  ...defaultComponentPack,
+  results: {
+    ...defaultComponentPack.results,
+    result: iSamplesResult
+  },
   searchFields: {
-		...defaultComponentPack.searchFields,
-		text: TextSearch
-	}
+    ...defaultComponentPack.searchFields,
+    text: TextSearch
+  }
 }
 
 // Construct the solr client api class
