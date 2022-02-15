@@ -26,7 +26,6 @@ import { encode, decode } from "plantuml-encoder"
 // iSamples results react component
 import iSamplesResult from './extension/iSamples_results';
 import TextSearch from './extension/iSamples_textSearch';
-import Table from './extension/react_table';
 
 const config = require("./config.json")
 // Create a store for the reducer.
@@ -101,7 +100,6 @@ function APP() {
 
 	return (
 		<div>
-      <Table data={store.getState()['results']['docs']}/>
 			<SolrFacetedSearch
 				{...store.getState()}
 				{...solrClient.getHandlers()}
