@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import reportWebVitals from './reportWebVitals';
+import './index.css';
 
 import {
 	SolrFacetedSearch,
@@ -23,7 +24,8 @@ import {
 import { encode, decode } from "plantuml-encoder"
 
 // iSamples results react component
-import iSamplesResult from './iSamples_results';
+import iSamplesResult from './extension/iSamples_results';
+import TextSearch from './extension/iSamples_textSearch';
 
 const config = require("./config.json")
 // Create a store for the reducer.
@@ -52,6 +54,10 @@ const iSamples_componentPack = {
 	results: {
 		...defaultComponentPack.results,
 		result: iSamplesResult
+	},
+  searchFields: {
+		...defaultComponentPack.searchFields,
+		text: TextSearch
 	}
 }
 
