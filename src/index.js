@@ -101,7 +101,10 @@ function APP() {
 
 	return (
 		<div>
-      <Table data={store.getState()['results']['docs']}/>
+      <Table
+        docs={store.getState()['results']['docs']}
+        fields={store.getState()['query']['searchFields']}
+      />
 			<SolrFacetedSearch
 				{...store.getState()}
 				{...solrClient.getHandlers()}

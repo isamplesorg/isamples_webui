@@ -115,3 +115,26 @@ svg.search-icon {
   border-radius: 10px;
   font-size: small;
 }
+
+.recordTable {
+  height: 500px;
+  padding: 50px;
+  overflow: scroll;
+}
+
+table {
+  border: solid 1px blue;
+}
+
+tr {
+  border-bottom: solid 3px black;
+  background-color: aliceblue;
+  color: black;
+  font-weight: bold;
+}
+
+td {
+  padding: 10px;
+  border: solid 1px gray;
+  background-color: papayawhip;
+}
