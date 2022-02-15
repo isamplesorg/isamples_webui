@@ -72,6 +72,7 @@ function APP() {
 	// Used for modifying the query string
 	let [searchParams, setSearchParams] = useSearchParams();
 
+  const storeState = store.getState();
 	// A note about when this gets called -- https://reactjs.org/docs/hooks-reference.html#useeffect
 	// This is called asynchronously after a render is complete.  The rule is that render itself must be
 	// stateless, so state mutating operations need to be contained here.  In our case the sequence is
@@ -89,7 +90,7 @@ function APP() {
 		// Update the query parameters with the latest values selected in the UI
 		setSearchParams(searchParamsDict);
 
-	}, [searchParams, store.getState()]);
+	}, [searchParams, storeState, setSearchParams]);
 
 	return (
 		<div>

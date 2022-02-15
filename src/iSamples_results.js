@@ -17,13 +17,14 @@ class iSamples_Result extends React.Component {
 	HighlightWords(field, text){
 		if (field.type === 'text' && field.value !== undefined){
 			// replace "&", "|", "(", ")", "*", "'", """ and duplicated whitespace with only one whitespace
-			const values = field.value.replaceAll(/\&|\*|\(|\)|\||\"|\'/g,"").replaceAll(/\s+/g," ").split(" ");
+			const values = field.value.replaceAll(/&|\*|\(|\)|\||"|'/g,"").replaceAll(/\s+/g," ").split(" ");
 
 			// split original text by search words insensitively by regex pattern
 			// g is for regex global and i is for insensitive.
 			values.map((value) => {
 				const regex = new RegExp(value, "gi");
 				text = text.split(regex).join("<span style='background-color:yellow;'>" + value + "</span>");
+        return text;
 			})
 		}
 
