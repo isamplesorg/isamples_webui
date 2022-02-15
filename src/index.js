@@ -26,6 +26,7 @@ import { encode, decode } from "plantuml-encoder"
 // iSamples results react component
 import iSamplesResult from './extension/iSamples_results';
 import TextSearch from './extension/iSamples_textSearch';
+import Table from './extension/react_table';
 
 const config = require("./config.json")
 // Create a store for the reducer.
@@ -50,15 +51,15 @@ const sortFields = [
 
 // Create a cutom component pack from the default component pack
 const iSamples_componentPack = {
-	...defaultComponentPack,
-	results: {
-		...defaultComponentPack.results,
-		result: iSamplesResult
-	},
+  ...defaultComponentPack,
+  results: {
+    ...defaultComponentPack.results,
+    result: iSamplesResult
+  },
   searchFields: {
-		...defaultComponentPack.searchFields,
-		text: TextSearch
-	}
+    ...defaultComponentPack.searchFields,
+    text: TextSearch
+  }
 }
 
 // Construct the solr client api class
@@ -100,6 +101,7 @@ function APP() {
 
 	return (
 		<div>
+      <Table data={store.getState()['results']['docs']}/>
 			<SolrFacetedSearch
 				{...store.getState()}
 				{...solrClient.getHandlers()}
