@@ -33,14 +33,17 @@ const config = require("./config.json")
 const store = createStore(solrReducer);
 
 // The search fields and filterable facets you want
+// Add collapse to set the default displayed fields
+// collapse: true => hidden
+// collapse: fasle => shown
 const fields = [
-  { label: "All text fields", field: "searchText", type: "text" },
-  { label: "Identifier", field: "id", type: "text" },
-  { label: "Source", field: "source", type: "list-facet", facetSort: "index" },
-  { label: "Context", field: "hasContextCategory", type: "list-facet", facetSort: "count" },
-  { label: "Material", field: "hasMaterialCategory", type: "list-facet", facetSort: "count" },
-  { label: "Specimen", field: "hasSpecimenCategory", type: "list-facet", facetSort: "count" },
-  { label: "Registrant", field: "registrant", type: "list-facet", facetSort: "count" },
+  { label: "All text fields", field: "searchText", type: "text", collapse: false },
+  { label: "Identifier", field: "id", type: "text", collapse: false },
+  { label: "Source", field: "source", type: "list-facet", facetSort: "index", collapse: false },
+  { label: "Context", field: "hasContextCategory", type: "list-facet", facetSort: "count", collapse: false },
+  { label: "Material", field: "hasMaterialCategory", type: "list-facet", facetSort: "count", collapse: false },
+  { label: "Specimen", field: "hasSpecimenCategory", type: "list-facet", facetSort: "count", collapse: false },
+  { label: "Registrant", field: "registrant", type: "list-facet", facetSort: "count", collapse: false },
 ];
 
 // The sortable fields you want
@@ -164,10 +167,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const decodedSortFields = JSON.parse(decode(sortFields));
     // Update solrClient and request a new solr query
     const paramesDict = { 'searchFields': decodedSearchFields, 'sortFields': decodedSortFields };
-
     // Use solrClient built-in functions
     // set initial query. This function would not send a query.
+    // This APIs could only merge field values rather than collapse
     solrClient.setInitialQuery(paramesDict);
+    // set initial collapse
+    decodedSearchFields
+      .forEach((field) => {
+        solrClient.setCollapse(field.field, field.collapse);
+      });
     // set page. This function will send a query.
     solrClient.setCurrentPage(decodedStart)
   } else {

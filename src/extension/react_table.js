@@ -1,5 +1,3 @@
-
-
 import React from "react";
 import { useTable } from "react-table";
 import parse from 'html-react-parser'
@@ -43,11 +41,13 @@ function Table(props) {
   // We could define cell functions to render different format result.
   // Usage: Cell: Function | React.Component => JSX
   const columns = React.useMemo(
-    () => fields.map((field) => ({
-      Header: field.label,
-      accessor: field.field,
-      Cell: ({ value }) => <CellModify field={field} value={value} />
-    })),
+    () => fields
+      .filter((field) => field.collapse !== true)
+      .map((field) => ({
+        Header: field.label,
+        accessor: field.field,
+        Cell: ({ value }) => <CellModify field={field} value={value} />
+      })),
     [fields]
   )
 

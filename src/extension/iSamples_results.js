@@ -1,5 +1,3 @@
-
-
 // This is the customized result component of solr-faceted-search-react
 import PropTypes from 'prop-types';
 import React from "react";
@@ -40,7 +38,7 @@ class iSamples_Result extends React.Component {
     return (
       <li className={cx({ "list-group-item": bootstrapCss })} onClick={() => this.props.onSelect(doc)}>
         <ul>
-          {fields.filter((field) => field.field !== "*").map((field, i) =>
+          {fields.filter((field) => field.field !== "*" && field.collapse !== true).map((field, i) =>
             <li key={i}>
               <label>{field.label || field.field}</label>
               {field.field === "id" ?
