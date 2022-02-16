@@ -33,9 +33,12 @@ const config = require("./config.json")
 const store = createStore(solrReducer);
 
 // The search fields and filterable facets you want
+// Add collapse to set the default displayed fields
+// collapse: true => hidden
+// collapse: fasle => shown
 const fields = [
   { label: "All text fields", field: "searchText", type: "text", collapse: false },
-  { label: "Identifier", field: "id", type: "text", collapse: true },
+  { label: "Identifier", field: "id", type: "text", collapse: false },
   { label: "Source", field: "source", type: "list-facet", facetSort: "index", collapse: false },
   { label: "Context", field: "hasContextCategory", type: "list-facet", facetSort: "count", collapse: false },
   { label: "Material", field: "hasMaterialCategory", type: "list-facet", facetSort: "count", collapse: false },
