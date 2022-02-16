@@ -45,33 +45,37 @@ class ResultList extends React.Component {
     const doc = this.props.children[0].length !== 0 ? this.props.children[0].map((record) => (record['props']['doc'])) : [];
     const fields = this.props.children[0].length !== 0 ? this.props.children[0][0]['props']['fields'] : [];
 
-    if (this.state.facet === 'List') {
-      return (
-        <div className={cx({ "paginationBox": bootstrapCss })}>
-          <ButGroup
-            bootstrapCss={bootstrapCss}
-            switchFormat={this.switchFormat.bind(this)}
-            active={this.state.facet}
-          />
-          <ul className={cx({ "list-group": bootstrapCss })}>
-            {this.props.children}
-          </ul>
-        </div>
-      )
-    } else if (this.state.facet === 'Table') {
-      return (
-        <div className={cx({ "paginationBox": bootstrapCss })}>
-          <ButGroup
-            bootstrapCss={bootstrapCss}
-            switchFormat={this.switchFormat.bind(this)}
-            active={this.state.facet}
-          />
-          <Table
-            docs={doc}
-            fields={fields}
-          />
-        </div>
-      )
+    // conditional rendering.
+    switch(this.state.facet){
+      case 'List':
+        return (
+          <div className={cx({ "paginationBox": bootstrapCss })}>
+            <ButGroup
+              bootstrapCss={bootstrapCss}
+              switchFormat={this.switchFormat.bind(this)}
+              active={this.state.facet}
+            />
+            <ul className={cx({ "list-group": bootstrapCss })}>
+              {this.props.children}
+            </ul>
+          </div>
+        )
+      case 'Table':
+        return (
+          <div className={cx({ "paginationBox": bootstrapCss })}>
+            <ButGroup
+              bootstrapCss={bootstrapCss}
+              switchFormat={this.switchFormat.bind(this)}
+              active={this.state.facet}
+            />
+            <Table
+              docs={doc}
+              fields={fields}
+            />
+          </div>
+        )
+      default:
+        return 'Facet type error!'
     }
   }
 }
