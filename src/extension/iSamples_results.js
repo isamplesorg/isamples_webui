@@ -1,3 +1,5 @@
+
+
 // This is the customized result component of solr-faceted-search-react
 import PropTypes from 'prop-types';
 import React from "react";
@@ -11,7 +13,6 @@ class iSamples_Result extends React.Component {
 
     return value.join(", ");
   }
-
 
   // Highlight the search words in the result text.
   HighlightWords(field, text) {
