@@ -9,6 +9,7 @@ class TextSearch extends React.Component {
   constructor(props) {
     super(props);
 
+    this.textInput = React.createRef();
     this.state = {
       value: "",
       hint: false
@@ -38,6 +39,7 @@ class TextSearch extends React.Component {
   }
 
   toggleExpand() {
+    this.props.onChange(this.props.field, "");
     this.props.onSetCollapse(this.props.field, !(this.props.collapse || false));
   }
 
@@ -78,6 +80,7 @@ class TextSearch extends React.Component {
         </header>
         <div style={{ display: collapse ? "none" : "block" }}>
           <input
+            ref={this.textInput}
             onChange={this.handleInputChange.bind(this)}
             onKeyDown={this.handleInputKeyDown.bind(this)}
             value={this.state.value || ""} />

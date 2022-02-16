@@ -34,13 +34,13 @@ const store = createStore(solrReducer);
 
 // The search fields and filterable facets you want
 const fields = [
-  { label: "All text fields", field: "searchText", type: "text" },
-  { label: "Identifier", field: "id", type: "text" },
-  { label: "Source", field: "source", type: "list-facet", facetSort: "index" },
-  { label: "Context", field: "hasContextCategory", type: "list-facet", facetSort: "count" },
-  { label: "Material", field: "hasMaterialCategory", type: "list-facet", facetSort: "count" },
-  { label: "Specimen", field: "hasSpecimenCategory", type: "list-facet", facetSort: "count" },
-  { label: "Registrant", field: "registrant", type: "list-facet", facetSort: "count" },
+  { label: "All text fields", field: "searchText", type: "text", collapse: false },
+  { label: "Identifier", field: "id", type: "text", collapse: true },
+  { label: "Source", field: "source", type: "list-facet", facetSort: "index", collapse: false },
+  { label: "Context", field: "hasContextCategory", type: "list-facet", facetSort: "count", collapse: false },
+  { label: "Material", field: "hasMaterialCategory", type: "list-facet", facetSort: "count", collapse: false },
+  { label: "Specimen", field: "hasSpecimenCategory", type: "list-facet", facetSort: "count", collapse: false },
+  { label: "Registrant", field: "registrant", type: "list-facet", facetSort: "count", collapse: false },
 ];
 
 // The sortable fields you want

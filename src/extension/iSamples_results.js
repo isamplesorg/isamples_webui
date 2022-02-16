@@ -40,7 +40,7 @@ class iSamples_Result extends React.Component {
     return (
       <li className={cx({ "list-group-item": bootstrapCss })} onClick={() => this.props.onSelect(doc)}>
         <ul>
-          {fields.filter((field) => field.field !== "*").map((field, i) =>
+          {fields.filter((field) => field.field !== "*" && field.collapse !== true).map((field, i) =>
             <li key={i}>
               <label>{field.label || field.field}</label>
               {field.field === "id" ?
