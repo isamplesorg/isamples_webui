@@ -5,11 +5,6 @@ function Table(props) {
 
   const { docs, fields } = props;
 
-  // check if the data is empty
-  const colFields = docs.length !== 0 ?
-    fields.map((field) => ({ Header: field.label, accessor: field.field }))
-    : [];
-
   // https://react-table.tanstack.com/docs/quick-start
   // Setup data and columns for react table
   // We must use "data", "columns" variable names for the useTable
@@ -20,8 +15,8 @@ function Table(props) {
   )
 
   const columns = React.useMemo(
-    () => colFields,
-    [docs]
+    () => fields.map((field) => ({ Header: field.label, accessor: field.field })),
+    [fields]
   )
 
   // define the react table APIs

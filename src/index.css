@@ -111,30 +111,44 @@ svg.search-icon {
   border: solid #ddd 1px;
   width: 400px;
   z-index: 100;
-  padding: 10px 5px 10px 20px;
+  padding: 10px 0px 10px 0px;
   border-radius: 10px;
   font-size: small;
 }
 
 .recordTable {
-  height: 500px;
-  padding: 50px;
   overflow: scroll;
 }
 
+.paginationBox {
+  position: relative;
+}
+
+.swithButtonBox {
+  position: absolute;
+  top: -40px;
+  bottom: 0;
+  height: 30px;
+  margin-left: 10px;
+}
+
+.margin-right-xs {
+  margin-right: 0.25em;
+}
+
 table {
-  border: solid 1px blue;
+  border-spacing: 0;
+  border: 1px solid #ddd;
+  color: #666666;
 }
 
-tr {
-  border-bottom: solid 3px black;
-  background-color: aliceblue;
-  color: black;
-  font-weight: bold;
-}
 
+th,
 td {
-  padding: 10px;
-  border: solid 1px gray;
-  background-color: papayawhip;
+  margin: 0;
+  padding: 10px 15px;
+  border-bottom: 1px solid #ddd;
+  border-right: 1px solid #ddd;
 }
+
+
