@@ -166,6 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const paramesDict = { 'searchFields': decodedSearchFields, 'sortFields': decodedSortFields };
     // Use solrClient built-in functions
     // set initial query. This function would not send a query.
+    // This APIs could only merge field values rather than collapse
     solrClient.setInitialQuery(paramesDict);
     // set initial collapse
     decodedSearchFields
