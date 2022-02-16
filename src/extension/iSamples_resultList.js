@@ -57,7 +57,6 @@ class ResultList extends React.Component {
             {this.props.children}
           </ul>
         </div>
-
       )
     } else if (this.state.facet === 'Table') {
       return (

@@ -9,6 +9,7 @@ function Table(props) {
   // Setup data and columns for react table
   // We must use "data", "columns" variable names for the useTable
   // or it will throw an error
+  console.log(docs.map((record) => record['id']))
   const data = React.useMemo(
     () => docs,
     [docs]
@@ -62,8 +63,6 @@ function Table(props) {
       </table>
     </div>
   )
-
 };
-
 
 export default Table;

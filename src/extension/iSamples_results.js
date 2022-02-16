@@ -12,7 +12,6 @@ class iSamples_Result extends React.Component {
     return value.join(", ");
   }
 
-
   // Highlight the search words in the result text.
   HighlightWords(field, text) {
     if (field.type === 'text' && field.value !== undefined) {
