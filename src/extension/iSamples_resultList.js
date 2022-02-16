@@ -8,23 +8,26 @@ const ButGroup = (props) => {
   const { switchFormat, bootstrapCss, active } = props;
 
   return (
-    <div className={cx({ "swithButtonBox": bootstrapCss })}>
-      <button className={cx({
-        "btn": bootstrapCss,
-        "btn-default": bootstrapCss,
-        "btn-sm": bootstrapCss,
-        "pull-left": bootstrapCss,
-        "margin-right-xs": bootstrapCss,
-        "active": active === 'List'
-      })} onClick={() => switchFormat("List")}>List</button>
-      <button className={cx({
-        "btn": bootstrapCss,
-        "btn-default": bootstrapCss,
-        "btn-sm": bootstrapCss,
-        "pull-left": bootstrapCss,
-        "margin-right-xs": bootstrapCss,
-        "active": active === 'Table'
-      })} onClick={() => switchFormat("Table")}>Table</button>
+    <div className={cx({ "paginationBox": bootstrapCss })}>
+      <div className={cx({ "swithButtonBox": bootstrapCss })}>
+        <button className={cx({
+          "btn": bootstrapCss,
+          "btn-default": bootstrapCss,
+          "btn-sm": bootstrapCss,
+          "pull-left": bootstrapCss,
+          "margin-right-xs": bootstrapCss,
+          "active": active === 'List'
+        })} onClick={() => switchFormat("List")}>List</button>
+        <button className={cx({
+          "btn": bootstrapCss,
+          "btn-default": bootstrapCss,
+          "btn-sm": bootstrapCss,
+          "pull-left": bootstrapCss,
+          "margin-right-xs": bootstrapCss,
+          "active": active === 'Table'
+        })} onClick={() => switchFormat("Table")}>Table</button>
+      </div>
+      {props.children}
     </div>
   );
 };
@@ -49,30 +52,28 @@ class ResultList extends React.Component {
     switch (this.state.facet) {
       case 'List':
         return (
-          <div className={cx({ "paginationBox": bootstrapCss })}>
-            <ButGroup
-              bootstrapCss={bootstrapCss}
-              switchFormat={this.switchFormat.bind(this)}
-              active={this.state.facet}
-            />
-            <ul className={cx({ "list-group": bootstrapCss })}>
-              {this.props.children}
-            </ul>
-          </div>
+          <ButGroup
+            bootstrapCss={bootstrapCss}
+            switchFormat={this.switchFormat.bind(this)}
+            active={this.state.facet}
+            children={
+              <ul className={cx({ "list-group": bootstrapCss })}>
+                {this.props.children}
+              </ul>}
+          />
         )
       case 'Table':
         return (
-          <div className={cx({ "paginationBox": bootstrapCss })}>
-            <ButGroup
-              bootstrapCss={bootstrapCss}
-              switchFormat={this.switchFormat.bind(this)}
-              active={this.state.facet}
-            />
-            <Table
-              docs={doc}
-              fields={fields}
-            />
-          </div>
+          <ButGroup
+            bootstrapCss={bootstrapCss}
+            switchFormat={this.switchFormat.bind(this)}
+            active={this.state.facet}
+            children={
+              <Table
+                docs={doc}
+                fields={fields}
+              />
+            } />
         )
       default:
         return 'Facet type error!'
