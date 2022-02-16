@@ -164,10 +164,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const decodedSortFields = JSON.parse(decode(sortFields));
     // Update solrClient and request a new solr query
     const paramesDict = { 'searchFields': decodedSearchFields, 'sortFields': decodedSortFields };
-
     // Use solrClient built-in functions
     // set initial query. This function would not send a query.
     solrClient.setInitialQuery(paramesDict);
+    // set initial collapse
+    decodedSearchFields
+      .forEach((field) => {
+        solrClient.setCollapse(field.field, field.collapse);
+      });
     // set page. This function will send a query.
     solrClient.setCurrentPage(decodedStart)
   } else {

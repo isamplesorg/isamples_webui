@@ -39,7 +39,6 @@ class TextSearch extends React.Component {
   }
 
   toggleExpand() {
-    this.props.onChange(this.props.field, "");
     this.props.onSetCollapse(this.props.field, !(this.props.collapse || false));
   }
 
