@@ -19,7 +19,8 @@ function Table(props) {
   // We could define cell functions to render different format result.
   // Usage: Cell: Function | React.Component => JSX
   const columns = React.useMemo(
-    () => fields.filter((field) => field.collapse !== true)
+    () => fields
+      .filter((field) => field.collapse !== true)
       .map((field) => ({
         Header: field.label,
         accessor: field.field,
