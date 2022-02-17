@@ -21,11 +21,12 @@ function Table(props) {
   // We could define cell functions to render different format result.
   // Usage: Cell: Function | React.Component => JSX
   const columns = React.useMemo(
-    () => fields.map((field) => ({
-      Header: field.label,
-      accessor: field.field,
-      Cell: ({ value }) => <ResultWrapper field={field} value={value} />
-    })),
+    () => fields.filter((field) => field.collapse !== true)
+      .map((field) => ({
+        Header: field.label,
+        accessor: field.field,
+        Cell: ({ value }) => <ResultWrapper field={field} value={value} />
+      })),
     [fields]
   )
 
