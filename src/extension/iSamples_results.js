@@ -4,7 +4,7 @@
 import PropTypes from 'prop-types';
 import React from "react";
 import cx from "classnames";
-import { ResultWrapper } from "./uilities";
+import { ResultWrapper } from "./utilities";
 
 class iSamples_Result extends React.Component {
 

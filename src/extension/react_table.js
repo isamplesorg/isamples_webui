@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useTable } from "react-table";
-import { ResultWrapper } from "./uilities";
+import { ResultWrapper } from "./utilities";
 
 function Table(props) {
 
