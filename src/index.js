@@ -35,7 +35,7 @@ const store = createStore(solrReducer);
 // The search fields and filterable facets you want
 // Add collapse to set the default displayed fields
 // collapse: true => hidden
-// collapse: fasle => shown
+// collapse: false => shown
 const fields = [
   { label: "All text fields", field: "searchText", type: "text", collapse: false },
   { label: "Identifier", field: "id", type: "text", collapse: false },
