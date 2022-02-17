@@ -3,7 +3,7 @@ import parse from 'html-react-parser'
 
 // functional components to highlight search text and covert indentifers to the links
 // same function from iSamples_results.js
-export function ResultWrapper(props){
+export function ResultWrapper(props) {
   const { field, value } = props
   let text = [].concat(value || null).filter((v) => v !== null).join(", ");
 
