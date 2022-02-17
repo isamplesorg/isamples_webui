@@ -26,6 +26,7 @@ import { encode, decode } from "plantuml-encoder"
 // iSamples results react component
 import iSamplesResult from './extension/iSamples_results';
 import TextSearch from './extension/iSamples_textSearch';
+import ResultList from './extension/iSamples_resultList';
 
 const config = require("./config.json")
 // Create a store for the reducer.
@@ -53,7 +54,8 @@ const iSamples_componentPack = {
   ...defaultComponentPack,
   results: {
     ...defaultComponentPack.results,
-    result: iSamplesResult
+    result: iSamplesResult,
+    list: ResultList
   },
   searchFields: {
     ...defaultComponentPack.searchFields,
