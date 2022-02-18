@@ -26,6 +26,7 @@ import { encode, decode } from "plantuml-encoder"
 // iSamples results react component
 import iSamplesResult from './extension/iSamples_results';
 import TextSearch from './extension/iSamples_textSearch';
+import iSamples_RangeFacet from './extension/iSamples_rangeFacet';
 
 const config = require("./config.json")
 // Create a store for the reducer.
@@ -40,7 +41,7 @@ const fields = [
   { label: "Material", field: "hasMaterialCategory", type: "list-facet", facetSort: "count" },
   { label: "Specimen", field: "hasSpecimenCategory", type: "list-facet", facetSort: "count" },
   { label: "Registrant", field: "registrant", type: "list-facet", facetSort: "count" },
-  { label: "Collection Date", field: "producedBy_resultTimeRange", type: "date-range-facet", value: [1800, 2022] }
+  { label: "Collection Date", field: "producedBy_resultTimeRange", type: "date-range-facet", minValue: 1800, maxValue: 2022 }
 ];
 
 // The sortable fields you want
@@ -58,7 +59,8 @@ const iSamples_componentPack = {
   },
   searchFields: {
     ...defaultComponentPack.searchFields,
-    text: TextSearch
+    text: TextSearch,
+    "date-range-facet": iSamples_RangeFacet,
   }
 }
 
