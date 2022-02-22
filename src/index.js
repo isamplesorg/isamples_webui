@@ -26,6 +26,7 @@ import { encode, decode } from "plantuml-encoder"
 // iSamples results react component
 import iSamplesResult from './extension/iSamples_results';
 import TextSearch from './extension/iSamples_textSearch';
+import ResultList from './extension/iSamples_resultList';
 import iSamples_RangeFacet from './extension/iSamples_rangeFacet';
 
 const config = require("./config.json")
@@ -55,7 +56,8 @@ const iSamples_componentPack = {
   ...defaultComponentPack,
   results: {
     ...defaultComponentPack.results,
-    result: iSamplesResult
+    result: iSamplesResult,
+    list: ResultList
   },
   searchFields: {
     ...defaultComponentPack.searchFields,
