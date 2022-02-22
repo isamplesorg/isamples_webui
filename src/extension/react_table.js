@@ -1,12 +1,12 @@
-
-
-import React from "react";
+import React, { useState } from "react";
 import { useTable } from "react-table";
 import { ResultWrapper } from "./utilities";
+import cx from "classnames";
 
 function Table(props) {
 
   const { docs, fields } = props;
+  const [collapse, setCollapse] = useState(false);
 
   // https://react-table.tanstack.com/docs/quick-start
   // Setup data and columns for react table
@@ -15,7 +15,7 @@ function Table(props) {
   const data = React.useMemo(
     () => docs,
     [docs]
-  )
+  );
 
   // https://react-table.tanstack.com/docs/api/useTable
   // We could define cell functions to render different format result.
@@ -28,8 +28,10 @@ function Table(props) {
         Cell: ({ value }) => <ResultWrapper field={field} value={value} />
       })),
     [fields]
-  )
+  );
 
+  // https://react-table.tanstack.com/docs/examples/column-hiding
+  // React table APIs for the columns hidden.
   const IndeterminateCheckbox = React.forwardRef(
     ({ indeterminate, ...rest }, ref) => {
       const defaultRef = React.useRef()
@@ -41,7 +43,7 @@ function Table(props) {
 
       return <input type="checkbox" ref={resolvedRef} {...rest} />
     }
-  )
+  );
 
   // define the react table APIs
   const {
@@ -52,25 +54,39 @@ function Table(props) {
     prepareRow,
     allColumns,
     getToggleHideAllColumnsProps,
-  } = useTable({ columns, data })
+  } = useTable({ columns, data });
+
+  const toggleExpand = () => {
+    setCollapse(!collapse)
+  };
 
   return (
     <>
       <div className="field_select_group">
-        <div className="fields">
-          <label>
-            <IndeterminateCheckbox {...getToggleHideAllColumnsProps()} /> Toggle
-            All
-          </label>
-        </div>
-        {allColumns.map(column => (
-          <div className="fields" key={column.id}>
-            <label>
-              <input type="checkbox" {...column.getToggleHiddenProps()} />{' '}
-              {column.id}
-            </label>
+        <span onClick={toggleExpand.bind(this)}
+          className={cx("glyphicon fieldsIcon", {
+            "glyphicon-collapse-down": !collapse,
+            "glyphicon-collapse-up": collapse
+          })} />
+        {collapse ?
+          <div className="popBoxField">
+            <div >
+              <label>
+                <IndeterminateCheckbox {...getToggleHideAllColumnsProps()} /> Toggle All
+              </label>
+            </div>
+            {allColumns.map(column => (
+              <div key={column.id}>
+                <label>
+                  <input type="checkbox" {...column.getToggleHiddenProps()} />{' '}
+                  {column.Header}
+                </label>
+              </div>
+            ))}
           </div>
-        ))}
+          :
+          null
+        }
       </div>
       <div className="recordTable">
         <table {...getTableProps()}>
@@ -92,8 +108,7 @@ function Table(props) {
                 <tr {...row.getRowProps()}>
                   {row.cells.map(cell => {
                     return (
-                      <td
-                        {...cell.getCellProps()}>
+                      <td {...cell.getCellProps()}>
                         {cell.render('Cell')}
                       </td>
                     )
