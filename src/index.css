@@ -142,11 +142,38 @@ table {
   color: #666666;
 }
 
-
 th,
 td {
   margin: 0;
   padding: 10px 15px;
   border-bottom: 1px solid #ddd;
   border-right: 1px solid #ddd;
+}
+
+.field_select_group {
+  position: absolute;
+  top: -35px;
+  right: 10px;
+  color: #666666;
+}
+
+.fieldsIcon {
+  font-size: 25px;
+}
+
+.glyphicon:hover{
+  color: rgb(155, 155, 150);
+  cursor: pointer;
+}
+
+.popBoxField {
+  position: absolute;
+  right: 0;
+  width:fit-content;
+  background-color: rgb(255, 255, 255);
+  border: solid #ddd 1px;
+  z-index: 100;
+  padding: 15px;
+  border-radius: 10px;
+  white-space: nowrap;
 }
