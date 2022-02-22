@@ -2,7 +2,9 @@ import PropTypes from 'prop-types';
 import React from "react";
 import cx from "classnames";
 
-import RangeSlider from "./iSamples_rangeSlider";
+import {
+  defaultComponentPack
+} from "solr-faceted-search-react";
 
 
 class iSamples_RangeFacet extends React.Component {
@@ -116,7 +118,7 @@ class iSamples_RangeFacet extends React.Component {
         </header>
 
         <div style={{display: collapse ? "none" : "block"}}>
-          <RangeSlider lowerLimit={this.getPercentage(range, filterRange[0])} onChange={this.onRangeChange.bind(this)}
+          <defaultComponentPack.searchFields.rangeSlider lowerLimit={this.getPercentage(range, filterRange[0])} onChange={this.onRangeChange.bind(this)}
                        upperLimit={this.getPercentage(range, filterRange[1])}/>
           <label>{filterRange[0]}</label>
           <label className={cx({"pull-right": bootstrapCss})}>{filterRange[1]}</label>
