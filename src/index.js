@@ -46,6 +46,10 @@ const fields = [
 // The sortable fields you want
 const sortFields = [
   { label: "Identifier", field: "id" },
+  { label: "Source", field: "source" },
+  { label: "Context", field: "hasContextCategory" },
+  { label: "Material", field: "hasMaterialCategory" },
+  { label: "Specimen", field: "hasSpecimenCategory" },
   { label: "Registrant", field: "registrant" },
 ];
 

@@ -142,7 +142,6 @@ table {
   color: #666666;
 }
 
-
 th,
 td {
   margin: 0;
@@ -150,3 +149,18 @@ td {
   border-bottom: 1px solid #ddd;
   border-right: 1px solid #ddd;
 }
+
+.field_select_group {
+  padding: 10px;
+  color: #666666;
+}
+
+.fields {
+  width: 20%;
+  display:inline-block;
+  box-sizing: border-box;
+  padding: 1%;
+  border: 1px solid #ddd;
+  margin:-1px 0 0 -1px;
+}
+
