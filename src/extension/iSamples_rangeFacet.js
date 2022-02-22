@@ -12,34 +12,34 @@ class iSamples_RangeFacet extends React.Component {
 
     this.state = {
       value: props.value,
+      // New state values for min and max range for slider UI.
       minValue: props.minValue,
       maxValue: props.maxValue
     };
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.value && nextProps.value.length > 0) {
-      this.setState({value: nextProps.value, minValue: nextProps.minValue, maxValue: nextProps.maxValue});
-    } else {
-      // this.setState({value: [1850, 2022], minValue: 1850, maxValue: 2022});
-      console.log("no value");
-    }
+    this.setState({value: nextProps.value});
   }
 
 
-  facetsToRange() {
-    const {facets} = this.props;
-    if (facets == null || facets.length === 0) {
-      return this.state;
-    }
-    return facets
-      .filter((facet, i) => i % 2 === 0)
-      .map((v) => parseInt(v))
-      .sort((a, b) => a > b ? 1 : -1)
-      .filter((a, i, me) => i === 0 || i === me.length - 1);
-  }
+  // This function converts the faceted data to range values for the slider.  Since we have
+  // changed the functionality to no longer consult the facets when rendering, it is unneeded.
+  // facetsToRange() {
+  //   const {facets} = this.props;
+  //   if (facets == null || facets.length === 0) {
+  //     return this.state;
+  //   }
+  //   return facets
+  //     .filter((facet, i) => i % 2 === 0)
+  //     .map((v) => parseInt(v))
+  //     .sort((a, b) => a > b ? 1 : -1)
+  //     .filter((a, i, me) => i === 0 || i === me.length - 1);
+  // }
 
   onRangeChange(range) {
+    // Original line consulted the faceted data to figure out the range value from selection.
+    // const bounds = this.facetsToRange();
     const bounds = [this.state.minValue, this.state.maxValue];
     const lowerBound = bounds[0];
     const upperBound = bounds[1];
@@ -81,14 +81,15 @@ class iSamples_RangeFacet extends React.Component {
     const {label, field, bootstrapCss, collapse} = this.props;
     const {value} = this.state;
 
-
-    const range = this.facetsToRange();
+    // Original line was:
+    // const range = this.facetsToRange();
+    // Instead, make our UI range always conform to min/max values rather than the returned facets.
+    const range = [this.state.minValue, this.state.maxValue];
 
     const filterRange = value.length > 0 ? value : range;
 
 
     return (
-
       <li className={cx("range-facet", {"list-group-item": bootstrapCss})} id={`solr-range-facet-${field}`}>
         <header onClick={this.toggleExpand.bind(this)}>
           <button style={{display: this.state.expanded ? "block" : "none"}}
@@ -115,8 +116,8 @@ class iSamples_RangeFacet extends React.Component {
         </header>
 
         <div style={{display: collapse ? "none" : "block"}}>
-          <RangeSlider lowerLimit={0} onChange={this.onRangeChange.bind(this)}
-                       upperLimit={1}/>
+          <RangeSlider lowerLimit={this.getPercentage(range, filterRange[0])} onChange={this.onRangeChange.bind(this)}
+                       upperLimit={this.getPercentage(range, filterRange[1])}/>
           <label>{filterRange[0]}</label>
           <label className={cx({"pull-right": bootstrapCss})}>{filterRange[1]}</label>
         </div>
@@ -138,8 +139,8 @@ iSamples_RangeFacet.propTypes = {
   onChange: PropTypes.func,
   onSetCollapse: PropTypes.func,
   value: PropTypes.array,
-  minValue: PropTypes.number,
-  maxValue: PropTypes.number
+  minValue: PropTypes.number.isRequired,
+  maxValue: PropTypes.number.isRequired
 };
 
 export default iSamples_RangeFacet;
