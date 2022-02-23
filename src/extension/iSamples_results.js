@@ -1,5 +1,3 @@
-
-
 // This is the customized result component of solr-faceted-search-react
 import PropTypes from 'prop-types';
 import React from "react";

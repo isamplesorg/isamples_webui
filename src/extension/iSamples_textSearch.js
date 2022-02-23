@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import React from "react";
 import cx from "classnames";
-import SearchIcon from "../icons/search";
 import PopUp from './popup';
 
 
@@ -84,7 +83,7 @@ class TextSearch extends React.Component {
           &nbsp;
           <button className={cx({ "btn": bootstrapCss, "btn-default": bootstrapCss, "btn-sm": bootstrapCss })}
             onClick={this.handleSubmit.bind(this)}>
-            <SearchIcon />
+            <span className={cx("glyphicon glyphicon-search")} />
           </button>
         </div>
       </li>
