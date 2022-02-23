@@ -42,7 +42,7 @@ const fields = [
   { label: "Material", field: "hasMaterialCategory", type: "list-facet", facetSort: "count" },
   { label: "Specimen", field: "hasSpecimenCategory", type: "list-facet", facetSort: "count" },
   { label: "Registrant", field: "registrant", type: "list-facet", facetSort: "count" },
-  { label: "Collection Date", field: "producedBy_resultTimeRange", type: "date-range-facet", minValue: 1800, maxValue: 2022 }
+  { label: "Collection Date", field: "producedBy_resultTimeRange", type: "date-range-facet", minValue: 1800, maxValue: new Date().getFullYear() }
 ];
 
 // The sortable fields you want
