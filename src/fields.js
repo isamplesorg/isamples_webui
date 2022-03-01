@@ -12,7 +12,7 @@ export const fields = [
   { label: "Material", field: "hasMaterialCategory", type: "list-facet", facetSort: "count", collapse: true },
   { label: "Specimen", field: "hasSpecimenCategory", type: "list-facet", facetSort: "count", collapse: true },
   { label: "Registrant", field: "registrant", type: "list-facet", facetSort: "count", collapse: true },
-  { label: "Sampling Purpose", field: "samplingPurpose", type: "list-facet", facetSort: "index", hidden: true, collapse: true },
-  { label: "Keywords", field: "keywords", type: "text", facetSort: "index", hidden: true },
+  { label: "Sampling Purpose", field: "samplingPurpose", type: "list-facet", facetSort: "index", collapse: true },
+  { label: "Keywords", field: "keywords", type: "text", facetSort: "index"},
   { label: "Collection Date", field: "producedBy_resultTimeRange", type: "date-range-facet", minValue: 1800, maxValue: new Date().getFullYear() }
 ];
