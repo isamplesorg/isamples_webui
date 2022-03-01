@@ -64,7 +64,6 @@ const iSamples_componentPack = {
 // Construct the solr client api class
 const solrClient = new SolrClient({
   url: config.solr_url,
-  // only use the fields with hidden === false
   searchFields: fields,
   sortFields: sortFields,
   rows: 20,
