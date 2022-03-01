@@ -65,7 +65,7 @@ const iSamples_componentPack = {
 const solrClient = new SolrClient({
   url: config.solr_url,
   // only use the fields with hidden === false
-  searchFields: fields.filter((field) => !(field.hidden || false)),
+  searchFields: fields,
   sortFields: sortFields,
   rows: 20,
   pageStrategy: "paginate",
