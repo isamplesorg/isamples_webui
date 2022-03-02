@@ -28,22 +28,12 @@ import iSamplesResult from './extension/iSamples_results';
 import TextSearch from './extension/iSamples_textSearch';
 import ResultList from './extension/iSamples_resultList';
 import iSamples_RangeFacet from './extension/iSamples_rangeFacet';
+import SearchFieldContainer from './extension/iSamples_containers';
+import { fields } from './fields';
 
 const config = require("./config.json")
 // Create a store for the reducer.
 const store = createStore(solrReducer);
-
-// The search fields and filterable facets you want
-const fields = [
-  { label: "All text fields", field: "searchText", type: "text" },
-  { label: "Identifier", field: "id", type: "text" },
-  { label: "Source", field: "source", type: "list-facet", facetSort: "index" },
-  { label: "Context", field: "hasContextCategory", type: "list-facet", facetSort: "count" },
-  { label: "Material", field: "hasMaterialCategory", type: "list-facet", facetSort: "count" },
-  { label: "Specimen", field: "hasSpecimenCategory", type: "list-facet", facetSort: "count" },
-  { label: "Registrant", field: "registrant", type: "list-facet", facetSort: "count" },
-  { label: "Collection Date", field: "producedBy_resultTimeRange", type: "date-range-facet", minValue: 1800, maxValue: new Date().getFullYear() }
-];
 
 // The sortable fields you want
 const sortFields = [
@@ -66,6 +56,7 @@ const iSamples_componentPack = {
   searchFields: {
     ...defaultComponentPack.searchFields,
     text: TextSearch,
+    container: SearchFieldContainer,
     "date-range-facet": iSamples_RangeFacet,
   }
 }

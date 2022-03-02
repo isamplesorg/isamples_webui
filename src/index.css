@@ -50,7 +50,7 @@ a {
 .solr-search-results ul label {
   display: inline-block;
   margin: 0 20px 0 0;
-  width: 120px;
+  width: 150px;
   color: #666;
   overflow: hidden;
   white-space: nowrap;
@@ -176,4 +176,9 @@ td {
   padding: 15px;
   border-radius: 10px;
   white-space: nowrap;
+}
+
+.fieldsSelect{
+  padding: 10px;
+  color: #666666;
 }

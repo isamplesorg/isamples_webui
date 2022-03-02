@@ -18,7 +18,7 @@ class iSamples_Result extends React.Component {
     return (
       <li className={cx({ "list-group-item": bootstrapCss })} onClick={() => this.props.onSelect(doc)}>
         <ul>
-          {fields.filter((field) => field.field !== "*").map((field, i) =>
+          {fields.filter((field) => field.field !== "*" && field.hidden !== true).map((field, i) =>
             <li key={i}>
               <label>{field.label || field.field}</label>
               <ResultWrapper field={field} value={this.renderValue(field.field, doc)} />
