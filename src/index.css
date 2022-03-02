@@ -50,12 +50,12 @@ a {
 .solr-search-results ul label {
   display: inline-block;
   margin: 0 20px 0 0;
-  width: 150px;
+  width: 180px;
   color: #666;
   overflow: hidden;
   white-space: nowrap;
   vertical-align: bottom;
-  text-overflow: ellipsis
+  text-overflow: ellipsis;
 }
 
 .solr-search-results ul li ul {
@@ -106,7 +106,7 @@ svg.search-icon {
 }
 
 .popBox {
-  position: fixed;
+  position: absolute;
   background-color: rgb(255, 255, 255);
   border: solid #ddd 1px;
   width: 400px;

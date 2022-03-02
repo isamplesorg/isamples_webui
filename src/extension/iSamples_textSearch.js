@@ -49,9 +49,20 @@ class TextSearch extends React.Component {
   }
 
   render() {
-    const { label, bootstrapCss, collapse } = this.props;
+    const { label, bootstrapCss, collapse, type } = this.props;
 
-    return (
+    return (type === "non-facet" ?
+      <li className={cx({ "list-group-item": bootstrapCss })}>
+        <header>
+          <h5>
+            {bootstrapCss ? (<span>
+              <span className={cx("glyphicon glyphicon-check")} />{" "}
+            </span>) : null}
+            {label}
+          </h5>
+        </header>
+      </li>
+      :
       <li className={cx({ "list-group-item": bootstrapCss })}>
         <header onClick={this.toggleExpand.bind(this)}>
           <h5>

@@ -22,3 +22,14 @@ export function ResultWrapper(props) {
 
   return field.field === 'id' ? <a href={"https://n2t.net/" + value}>{parse(text)}</a> : parse(text)
 }
+
+
+// functiona to sort the searchFields so the "text" type facets will be in the front
+// and "non-facet" type facets will be in the back
+export function sortSearchFields(fields) {
+  const textType = fields.filter((field) => field.type === 'text');
+  const otherTypes = fields.filter((field) => field.type !== 'text' && field.type !== 'non-facet');
+  const nonType = fields.filter((field) => field.type === 'non-facet');
+
+  return [...textType, ...otherTypes, ...nonType];
+}

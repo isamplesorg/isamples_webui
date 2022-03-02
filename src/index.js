@@ -30,6 +30,7 @@ import ResultList from './extension/iSamples_resultList';
 import iSamples_RangeFacet from './extension/iSamples_rangeFacet';
 import SearchFieldContainer from './extension/iSamples_containers';
 import { fields } from './fields';
+import { sortSearchFields } from './extension/utilities';
 
 const config = require("./config.json")
 // Create a store for the reducer.
@@ -58,13 +59,15 @@ const iSamples_componentPack = {
     text: TextSearch,
     container: SearchFieldContainer,
     "date-range-facet": iSamples_RangeFacet,
+    "non-facet": TextSearch,
   }
 }
 
 // Construct the solr client api class
 const solrClient = new SolrClient({
   url: config.solr_url,
-  searchFields: fields,
+  // searchFields: sortSearchFields(fields),
+  searchFields: fields.sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase())),
   sortFields: sortFields,
   rows: 20,
   pageStrategy: "paginate",
