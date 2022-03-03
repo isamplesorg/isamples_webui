@@ -66,7 +66,6 @@ const iSamples_componentPack = {
 // Construct the solr client api class
 const solrClient = new SolrClient({
   url: config.solr_url,
-  // searchFields: sortSearchFields(fields),
   searchFields: fields.sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase())),
   sortFields: sortFields,
   rows: 20,
