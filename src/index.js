@@ -30,7 +30,7 @@ import ResultList from './extension/iSamples_resultList';
 import iSamples_RangeFacet from './extension/iSamples_rangeFacet';
 import SearchFieldContainer from './extension/iSamples_containers';
 import { fields } from './fields';
-import { sortSearchFields } from './extension/utilities';
+import ScrollToTop from "./components/scrollTop"
 
 const config = require("./config.json")
 // Create a store for the reducer.
@@ -107,9 +107,11 @@ function APP() {
         {...store.getState()}
         {...solrClient.getHandlers()}
         bootstrapCss={true}
+        showCsvExport={true}
         customComponents={iSamples_componentPack}
         onSelectDoc={(doc) => { console.log(doc); }}
       />
+      <ScrollToTop />
     </div>
   );
 };

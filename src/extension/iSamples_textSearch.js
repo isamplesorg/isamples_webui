@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from "react";
 import cx from "classnames";
-import PopUp from './popup';
+import PopUp from '../components/popup';
 
 
 class TextSearch extends React.Component {
@@ -52,16 +52,18 @@ class TextSearch extends React.Component {
     const { label, bootstrapCss, collapse, type } = this.props;
 
     return (type === "non-facet" ?
-      <li className={cx({ "list-group-item": bootstrapCss })}>
-        <header>
-          <h5>
-            {bootstrapCss ? (<span>
-              <span className={cx("glyphicon glyphicon-check")} />{" "}
-            </span>) : null}
-            {label}
-          </h5>
-        </header>
-      </li>
+      // reserved if we need to render label for non type
+      // <li className={cx({ "list-group-item": bootstrapCss })}>
+      //   <header>
+      //     <h5>
+      //       {bootstrapCss ? (<span>
+      //         <span className={cx("glyphicon glyphicon-check")} />{" "}
+      //       </span>) : null}
+      //       {label}
+      //     </h5>
+      //   </header>
+      // </li>
+      null
       :
       <li className={cx({ "list-group-item": bootstrapCss })}>
         <header onClick={this.toggleExpand.bind(this)}>

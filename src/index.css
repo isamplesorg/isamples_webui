@@ -182,3 +182,13 @@ td {
   padding: 10px;
   color: #666666;
 }
+
+.scroll-to-top {
+  position: fixed;
+  bottom: 0px;
+  right: 20px;
+  animation: fadeIn 700ms ease-in-out 1s both;
+  cursor: pointer;
+  font-size: 40px;
+  padding: 4px;
+}

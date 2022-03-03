@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from "react";
 import cx from "classnames";
-import Table from './react_table';
+import Table from '../components/react_table';
 
 // Functional conponent to render button group
 const ButGroup = (props) => {
