@@ -52,10 +52,15 @@ a {
   margin: 0 20px 0 0;
   width: 180px;
   color: #666;
-  overflow: hidden;
+  overflow-y: scroll;
   white-space: nowrap;
   vertical-align: bottom;
-  text-overflow: ellipsis;
+}
+
+.solr-search-results ul label::-webkit-scrollbar {
+  width: 0;  /* Remove scrollbar space */
+  height: 0;
+  background: transparent;  /* Optional: just make scrollbar invisible */
 }
 
 .solr-search-results ul li ul {
