@@ -59,7 +59,7 @@ const iSamples_componentPack = {
     text: TextSearch,
     container: SearchFieldContainer,
     "date-range-facet": iSamples_RangeFacet,
-    "non-facet": TextSearch,
+    "non-search": TextSearch,
   }
 }
 
