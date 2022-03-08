@@ -31,6 +31,7 @@ import iSamples_RangeFacet from './extension/iSamples_rangeFacet';
 import SearchFieldContainer from './extension/iSamples_containers';
 import { fields } from './fields';
 import ScrollToTop from "./components/scrollTop"
+import { wellFormatField } from './components/utilities';
 
 const config = require("./config.json")
 // Create a store for the reducer.
@@ -63,10 +64,13 @@ const iSamples_componentPack = {
   }
 }
 
+// add well format label properties if the users don't specify.
+const defaultFields = fields.map((obj) => obj.label ? obj : { ...obj, label: wellFormatField(obj.field) });
+
 // Construct the solr client api class
 const solrClient = new SolrClient({
   url: config.solr_url,
-  searchFields: fields.sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase())),
+  searchFields: defaultFields.sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase())),
   sortFields: sortFields,
   rows: 20,
   pageStrategy: "paginate",
