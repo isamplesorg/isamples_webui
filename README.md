@@ -8,6 +8,9 @@ The `solr-faceted-search-react` is a git submodule located in `src/node_modules`
 If you've already done that, make sure that you are up to date with all of the remote branches specified in `.gitmodules`:
 `git submodule update --remote`
 
+## npm initialization
+In order to get all the necessary javascript packages installed, make sure you run `npm install` after first checkout.
+
 ## Available Scripts
 
 In the project directory, you can run:
