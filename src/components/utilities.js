@@ -22,3 +22,4 @@ export function ResultWrapper(props) {
 
   return field.field === 'id' ? <a href={"https://n2t.net/" + value}>{parse(text)}</a> : parse(text)
 }
+

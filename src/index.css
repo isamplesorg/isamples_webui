@@ -50,12 +50,17 @@ a {
 .solr-search-results ul label {
   display: inline-block;
   margin: 0 20px 0 0;
-  width: 150px;
+  width: 180px;
   color: #666;
-  overflow: hidden;
+  overflow-y: scroll;
   white-space: nowrap;
   vertical-align: bottom;
-  text-overflow: ellipsis
+}
+
+.solr-search-results ul label::-webkit-scrollbar {
+  width: 0;  /* Remove scrollbar space */
+  height: 0;
+  background: transparent;  /* Optional: just make scrollbar invisible */
 }
 
 .solr-search-results ul li ul {
@@ -106,7 +111,7 @@ svg.search-icon {
 }
 
 .popBox {
-  position: fixed;
+  position: absolute;
   background-color: rgb(255, 255, 255);
   border: solid #ddd 1px;
   width: 400px;
@@ -181,4 +186,14 @@ td {
 .fieldsSelect{
   padding: 10px;
   color: #666666;
+}
+
+.scroll-to-top {
+  position: fixed;
+  bottom: 0px;
+  right: 20px;
+  animation: fadeIn 700ms ease-in-out 1s both;
+  cursor: pointer;
+  font-size: 40px;
+  padding: 4px;
 }

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from "react";
 import cx from "classnames";
-import PopUp from './popup';
+import PopUp from '../components/popup';
 
 
 class TextSearch extends React.Component {
@@ -49,9 +49,11 @@ class TextSearch extends React.Component {
   }
 
   render() {
-    const { label, bootstrapCss, collapse } = this.props;
+    const { label, bootstrapCss, collapse, type } = this.props;
 
-    return (
+    return (type === "non-search" ?
+      null
+      :
       <li className={cx({ "list-group-item": bootstrapCss })}>
         <header onClick={this.toggleExpand.bind(this)}>
           <h5>
