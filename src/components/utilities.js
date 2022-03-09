@@ -23,3 +23,17 @@ export function ResultWrapper(props) {
   return field.field === 'id' ? <a href={"https://n2t.net/" + value}>{parse(text)}</a> : parse(text)
 }
 
+// default function to convert field names to well format one
+export function wellFormatField(field) {
+  let name = "";
+  // check if '_' in the string
+  if (field.includes('_')) {
+    name = field.split('_')
+  } else {
+    name = field.split(/(?=[A-Z])/);
+  }
+  name = name.map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+  name = name.join(' ');
+  return name
+}
+
