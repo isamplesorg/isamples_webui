@@ -7,7 +7,7 @@
 
 export const settings = {
     // The main API service endpoint
-    serviceEndpoint: 'https://mars.cyverse.org',
+    serviceEndpoint: 'https://mars.cyverse.org/isamples-central',
     //serviceEndpoint: 'http://localhost:8000',
 
     // Default Solr query
