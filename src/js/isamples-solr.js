@@ -108,7 +108,7 @@ export class ISamplesSolr {
         Q = Q ?? "*:*";
         FQ = FQ ?? [];
         const TOTAL = "Total";
-        let _url = new URL("/thing/select", this.service_endpoint);
+        let _url = new URL("/isamples_central/thing/select", this.service_endpoint);
         let params = _url.searchParams;
         params.append("q", Q);
         params.append("df", this._dqf);
@@ -210,7 +210,7 @@ export class ISamplesSolr {
      * @returns Promise of fetch response
      */
     async getRecordsQuery(Q="*:*", FQ=[], start=0, rows=10, fields="*") {
-        let _url = new URL("/thing/select", this.service_endpoint);
+        let _url = new URL("/isamples_central/thing/select", this.service_endpoint);
         let params = _url.searchParams;
         params.append("q", Q);
         for (let i=0; i< FQ.length; i++) {
