@@ -64,7 +64,7 @@ var ISamplesAPI = class {
     }
   }
   thingStatus() {
-    const url = new URL(`/thing`, this.serviceEndpoint);
+    const url = new URL(`/isamples_central/thing`, this.serviceEndpoint);
     return this._fetchPromise(url);
   }
   things(offset = 0, limit = 1e3, status = 200, authority = null) {
@@ -78,7 +78,7 @@ var ISamplesAPI = class {
     return this._fetchPromise(url);
   }
   thing(identifier, format = "core") {
-    const url = new URL(`/thing/${encodeURIComponent(identifier)}`, this.serviceEndpoint);
+    const url = new URL(`/isamples_central/thing/${encodeURIComponent(identifier)}`, this.serviceEndpoint);
     format = format.toLowerCase();
     if (!["core", "original", "solr"].includes(format)) {
       throw `Invalid format: ${format}`;
@@ -87,7 +87,7 @@ var ISamplesAPI = class {
     return this._fetchPromise(url);
   }
   select(params = {}) {
-    let _url = new URL("/thing/select", this.serviceEndpoint);
+    let _url = new URL("/isamples_central/thing/select", this.serviceEndpoint);
     const fields = params["fields"] ?? ["*"];
     delete params["fields"];
     const fq = params["fq"] ?? [];
@@ -128,7 +128,7 @@ var ISamplesAPI = class {
     if (params["q"] == "") {
       params["q"] = this.defaultQuery;
     }
-    let _url = new URL("/thing/stream", this.serviceEndpoint);
+    let _url = new URL("/isamples_central/thing/stream", this.serviceEndpoint);
     let _params = _url.searchParams;
     for (let key in params) {
       _params.append(key, params[key]);
