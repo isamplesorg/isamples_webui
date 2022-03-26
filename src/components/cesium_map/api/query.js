@@ -107,7 +107,6 @@ const facetSorts = (fields) => fields
 
 const solrQuery = (Q="q=*:*", searchFields = default_searchFields, rows = 1000, format = { wt: "json" }) => {
 
-
   const facetedReturnParam = requestField(searchFields);
   const fieldsParams = buildQuery(searchFields);
   const queryParams = fieldsParams.length > 0 ? fieldsParams.slice(1) : fieldsParams;
@@ -115,7 +114,8 @@ const solrQuery = (Q="q=*:*", searchFields = default_searchFields, rows = 1000, 
   const facetSortParams = facetSorts(searchFields);
   // const mainQuery = queryParams.length > 0 ? "" : "q=*:*";
 
-  return "q=" + Q +
+  return config.solr_stream + "?" +
+    "q=" + Q +
     `${facetedReturnParam.length > 0 ? `&fl=${facetedReturnParam}` : ""}` +
     `${queryParams.length > 0 ? `&${queryParams}` : ""}` +
     `${facetFieldParam.length > 0 ? `&${facetFieldParam}` : ""}` +
@@ -124,36 +124,6 @@ const solrQuery = (Q="q=*:*", searchFields = default_searchFields, rows = 1000, 
     `&${buildFormat(format)}`;
 };
 
-/**
- * This is fetch function of Oboe
- *
- * See oboe link for more information
- * https://github.com/jimhigson/oboe.js-website/blob/master/content/examples.md
- * @param {*} params the url parameters
- *
- * @todo abort the fetch process
- */
-function pointStream(params, perdoc_cb = null, finaldoc_cb = null, error_cb = null) {
-  window.oboe(config.solr_stream + "?" + solrQuery(params.Q, params.searchFields, params.rows))
-    .node('docs.*', (doc) => {
-      if (perdoc_cb !== null) {
-        perdoc_cb(doc);
-      }
-      return window.oboe.drop;
-    })
-    .done((finalJson) => {
-      if (finaldoc_cb !== null) {
-        finaldoc_cb(finalJson);
-      }
-    })
-    .fail((err) => {
-      if (error_cb !== null) {
-        error_cb(err)
-      } else {
-        console.error(err);
-      }
-    })
-}
 
 export {
   rangeFacetToQueryFilter,
@@ -164,6 +134,5 @@ export {
   buildQuery,
   facetFields,
   facetSorts,
-  solrQuery,
-  pointStream
+  solrQuery
 };

@@ -34,7 +34,7 @@ function clearBoundingBox(){
   document.getElementById("clear-bb").style.display = "none";
 }
 
-async function selectedBoxCallbox(bb) {
+function selectedBoxCallbox(bb) {
   countRecordsInBB(bb)
   let text =  `Record count`;
 
@@ -42,7 +42,7 @@ async function selectedBoxCallbox(bb) {
   bbox = viewer.addRectangle(bb, text)
 
   const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
-  setPoints.loadApi({Q: Q, searchFields: searchFields, rows: 10000 })
+  setPoints.loadApi({Q: Q, searchFields: searchFields, rows: 5000 })
 
   const btn = document.getElementById("clear-bb");
   btn.style.display = "block";
@@ -84,8 +84,6 @@ class CesiumMap extends React.Component {
     // return false to force react not to rerender
     return false;
   }
-
-
 
   visitLocation(location) {
     viewer.visit(location)

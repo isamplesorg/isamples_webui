@@ -10,7 +10,8 @@
 
 import * as Cesium from 'cesium';
 import { html, render } from "lit";
-import { pointStream } from './query';
+import { pointStream } from './server';
+import { solrQuery } from "./query";
 
 /**
  * Describes a camera viewpoint for Cesium.
@@ -87,17 +88,17 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
     // pins are used for labelling point clusters
     const pinBuilder = new Cesium.PinBuilder();
     this.pins = {
-      pin200: pinBuilder
-        .fromText("200+", Cesium.Color.RED, 48)
-        .toDataURL(),
-      pin150: pinBuilder
-        .fromText("150+", Cesium.Color.ORANGE, 48)
-        .toDataURL(),
-      pin100: pinBuilder
-        .fromText("100+", Cesium.Color.YELLOW, 48)
-        .toDataURL(),
       pin50: pinBuilder
-        .fromText("50+", Cesium.Color.GREEN, 48)
+        .fromText("50+", Cesium.Color.RED, 48)
+        .toDataURL(),
+      pin40: pinBuilder
+        .fromText("40+", Cesium.Color.ORANGE, 48)
+        .toDataURL(),
+      pin30: pinBuilder
+        .fromText("30+", Cesium.Color.YELLOW, 48)
+        .toDataURL(),
+      pin20: pinBuilder
+        .fromText("20+", Cesium.Color.GREEN, 48)
         .toDataURL(),
       pin10: pinBuilder
         .fromText("10+", Cesium.Color.BLUE, 48)
@@ -130,14 +131,14 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
             Cesium.VerticalOrigin.BOTTOM;
           cluster.billboard.heightReference = Cesium.HeightReference.CLAMP_TO_GROUND;
 
-          if (clusteredEntities.length >= 200) {
-            cluster.billboard.image = _this.pins.pin200;
-          } else if (clusteredEntities.length >= 150) {
-            cluster.billboard.image = _this.pins.pin150;
-          } else if (clusteredEntities.length >= 100) {
-            cluster.billboard.image = _this.pins.pin100;
-          } else if (clusteredEntities.length >= 50) {
+          if (clusteredEntities.length >= 50) {
             cluster.billboard.image = _this.pins.pin50;
+          } else if (clusteredEntities.length >= 40) {
+            cluster.billboard.image = _this.pins.pin40;
+          } else if (clusteredEntities.length >= 30) {
+            cluster.billboard.image = _this.pins.pin30;
+          } else if (clusteredEntities.length >= 20) {
+            cluster.billboard.image = _this.pins.pin20;
           } else if (clusteredEntities.length >= 10) {
             cluster.billboard.image = _this.pins.pin10;
           } else {
@@ -214,13 +215,15 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
     const _color = Cesium.Color.GREEN.withAlpha(0.5);
 
     pointStream(
-      params,
+      solrQuery(params.Q, params.searchFields, params.rows),
       (doc) => {
         // Handle the data records, e.g. response.docs[0].doc
         if (doc.hasOwnProperty('x')) {
           const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, 1);
           this.entities.add({
             position: p0,
+            name: doc.id,
+            description: doc.searchText,
             point: {
               color: _color,
               pixelSize: 5,
@@ -342,7 +345,7 @@ export class ISamplesSpatial {
     });
 
     this.viewer = new Cesium.Viewer(element, {
-      infoBox: false,
+      // infoBox:false,
       timeline: false,
       animation: false,
       sceneModePicker: false,
@@ -550,7 +553,7 @@ export class ISamplesSpatial {
     }
   }
 
-  removeAll(){
+  removeAll() {
     this.viewer.entities.removeAll();
   }
 
@@ -569,6 +572,7 @@ export class ISamplesSpatial {
         outlineColor: Cesium.Color.YELLOW,
         outlineWidth: 3,
         heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+        show: false
       },
       label: {
         text: text,
