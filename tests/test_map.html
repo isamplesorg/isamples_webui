@@ -150,6 +150,9 @@
                 appName: settings.appName ?? "isamplesapp",
                 // Address of the iSamples API service
                 serviceEndpoint: settings.serviceEndpoint || null,
+            
+                //Cesium pointcloud asset id
+                pointcloudAssetId: settings.pointcloudAssetId || 642092,
 
                 // Configuration for the records view
                 records: {
@@ -183,7 +186,7 @@
 
 
         viewer = new ISamplesSpatial("cesiumContainer");
-        viewer.addPointsBySource(642092);
+        viewer.addPointsBySource(options.pointcloudAssetId);
         viewer.visit(moorea);
         viewer.addDataSource( new PointStreamDatasource("BB Points") ).then((res) => {selPoints = res});
 
