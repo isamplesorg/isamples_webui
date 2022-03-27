@@ -10,6 +10,18 @@ import oboe from "./oboe-browser.js";
 
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwNzk3NjkyMy1iNGI1LTRkN2UtODRiMy04OTYwYWE0N2M3ZTkiLCJpZCI6Njk1MTcsImlhdCI6MTYzMzU0MTQ3N30.e70dpNzOCDRLDGxRguQCC-tRzGzA-23Xgno5lNgCeB4';
 
+/* 
+    Some color constants for pointcloud
+*/
+const _colors = {
+  0: "color('purple')",
+  1: "color('brown')",
+  2: "color('cyan')",
+  3: "color('orange')",
+  4: "color('green')",
+  5: "color('white')"
+};
+
 
 /**
  * Describes a camera viewpoint for Cesium.
@@ -472,11 +484,16 @@ export class ISamplesSpatial {
         tileset.style = new Cesium.Cesium3DTileStyle({
             color: {
                 conditions: [
-                    ["${Classification} === 0", "color('purple')"],
-                    ["${Classification} === 1", "color('brown')"],
-                    ["${Classification} === 2", "color('cyan')"],
-                    ["${Classification} === 3", "color('orange')"],
-                    ["true", "color('white')"]
+                  ["${Classification} === 0", _colors[5]],
+                  ["${Classification} === 1", _colors[3]],  //geome
+                  ["${Classification} === 2", _colors[1]],  //sesar
+                  ["${Classification} === 3", _colors[2]],  //opencontext
+                  ["${Classification} === 4", _colors[0]],  //smithsonian    
+                  //  ["${Classification} === 0", "color('purple')"],
+                  //  ["${Classification} === 1", "color('brown')"],
+                  //  ["${Classification} === 2", "color('cyan')"],
+                  //  ["${Classification} === 3", "color('orange')"],
+                  ["true", "color('white')"]
                 ]
             },
             pointSize: 5,
