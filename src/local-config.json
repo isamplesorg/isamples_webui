@@ -1,3 +1,4 @@
 {
-  "serviceEndpoint":"https://hyde.cyverse.org/"
+  "serviceEndpoint":"https://hyde.cyverse.org/",
+  "pointcloudAssetId":898300
 }
