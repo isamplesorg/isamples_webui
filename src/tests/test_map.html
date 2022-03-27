@@ -144,7 +144,7 @@
         btn.onclick = clearBoundingBox;
     }
 
-    loadConfig("/local-config.js")
+    loadConfig("/local-config.json")
     .then((settings) => {
         const options = {
                 appName: settings.appName ?? "isamplesapp",
