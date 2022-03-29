@@ -27,6 +27,7 @@ import { encode, decode } from "plantuml-encoder"
 import iSamplesResult from './extension/iSamples_results';
 import TextSearch from './extension/iSamples_textSearch';
 import ResultList from './extension/iSamples_resultList';
+import ResultPagination from './extension/iSamples_pagination';
 import iSamples_RangeFacet from './extension/iSamples_rangeFacet';
 import SearchFieldContainer from './extension/iSamples_containers';
 import { fields } from './fields';
@@ -45,6 +46,7 @@ const sortFields = [
   { label: "Material", field: "hasMaterialCategory" },
   { label: "Specimen", field: "hasSpecimenCategory" },
   { label: "Registrant", field: "registrant" },
+  { label: "Collection Time", field: "producedBy_resultTime"}
 ];
 
 // Create a cutom component pack from the default component pack
@@ -53,7 +55,8 @@ const iSamples_componentPack = {
   results: {
     ...defaultComponentPack.results,
     result: iSamplesResult,
-    list: ResultList
+    list: ResultList,
+    paginate: ResultPagination,
   },
   searchFields: {
     ...defaultComponentPack.searchFields,
@@ -74,6 +77,7 @@ const solrClient = new SolrClient({
   sortFields: sortFields,
   rows: 20,
   pageStrategy: "paginate",
+  view: "Map",
 
   // Delegate change callback to redux dispatcher
   onChange: (state) => store.dispatch({ type: "SET_SOLR_STATE", state: state })

@@ -42,30 +42,30 @@ const ButGroup = (props) => {
 };
 
 class ResultList extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { facet: "Map" }
-  }
+  // constructor(props) {
+  //   super(props);
+  //   this.state = { facet: "Map" }
+  // }
 
-  switchFormat(format) {
-    this.setState({ facet: format })
-  }
+  // switchFormat(format) {
+  //   this.setState({ facet: format })
+  // }
 
   render() {
-    const { bootstrapCss } = this.props;
-
+    const { bootstrapCss, query, onSetView } = this.props;
+    console.log(query.view)
     const doc = this.props.children[0].length !== 0 ? this.props.children[0].map((record) => (record['props']['doc'])) : [];
     const fields = this.props.children[0].length !== 0 ? this.props.children[0][0]['props']['fields'] : [];
     const searchFields = fields.filter((field) => field.type !== "non-search").map(({ collapse, hiddne, ...rest }) => rest)
 
     // conditional rendering.
-    switch (this.state.facet) {
+    switch (query.view) {
       case 'List':
         return (
           <ButGroup
             bootstrapCss={bootstrapCss}
-            switchFormat={this.switchFormat.bind(this)}
-            active={this.state.facet}
+            switchFormat={onSetView}
+            active={query.view}
             children={
               <ul className={cx({ "list-group": bootstrapCss })}>
                 {this.props.children}
@@ -76,8 +76,8 @@ class ResultList extends React.Component {
         return (
           <ButGroup
             bootstrapCss={bootstrapCss}
-            switchFormat={this.switchFormat.bind(this)}
-            active={this.state.facet}
+            switchFormat={onSetView}
+            active={query.view}
             children={
               <Table
                 docs={doc}
@@ -89,8 +89,8 @@ class ResultList extends React.Component {
         return (
           <ButGroup
             bootstrapCss={bootstrapCss}
-            switchFormat={this.switchFormat.bind(this)}
-            active={this.state.facet}
+            switchFormat={onSetView}
+            active={query.view}
             children={
               // if there is no searchFields, don't render cesium.
               searchFields.length > 0
