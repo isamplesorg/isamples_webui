@@ -11,7 +11,7 @@
 import * as Cesium from 'cesium';
 import { html, render } from "lit";
 import { pointStream } from './server';
-import { solrQuery } from "./query";
+
 
 /**
  * Describes a camera viewpoint for Cesium.
@@ -159,7 +159,7 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
       this.clustering.clusterEvent.removeEventListener(this.removeListener);
       this.removeListener = null;
     }
-    this.entities.removeAll()
+    this.entities.removeAll();
   }
 
   /**
@@ -215,11 +215,11 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
     const _color = Cesium.Color.GREEN.withAlpha(0.5);
 
     pointStream(
-      solrQuery(params.Q, params.searchFields, params.rows),
+      params,
       (doc) => {
         // Handle the data records, e.g. response.docs[0].doc
         if (doc.hasOwnProperty('x')) {
-          const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, 1);
+          const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, 10);
           this.entities.add({
             position: p0,
             name: doc.id,
@@ -277,14 +277,16 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
   outlineStyle(locations, name) {
     let n = locations[name];
 
-    if (n > 100) {
+    if (n > 50) {
       return Cesium.Color.RED;
-    } else if (n > 50) {
-      return Cesium.Color.PURPLE;
-    } else if (n > 10) {
-      return Cesium.Color.GREEN;
-    } else {
+    } else if (n > 40) {
+      return Cesium.Color.ORANGE;
+    } else if (n > 30) {
       return Cesium.Color.YELLOW;
+    } else if (n > 30) {
+      return Cesium.Color.GREEN;
+    } else if (n > 10) {
+      return Cesium.Color.BLUE;
     }
   }
 
@@ -303,7 +305,7 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
           } else {
             locations[location] = 1;
           }
-          const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, 20);
+          const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, 10);
           this.add({
             position: p0,
             color: this.outlineStyle(locations, location),
@@ -313,7 +315,7 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
       },
       (final) => {
         this.isLoading = false;
-        console.log("Point stream complete");
+        console.log("Point primitive stream complete");
       },
       (err) => {
         this.isLoading = false;
@@ -517,9 +519,6 @@ export class ISamplesSpatial {
     return asDRectangle(bb);
   }
 
-  addPointPrimitives(primitivesCollection) {
-    this.viewer.scene.primitives.add(primitivesCollection);
-  }
 
   addPointsBySource(assetId) {
     const tileset = this.viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
@@ -592,6 +591,10 @@ export class ISamplesSpatial {
 
   async addDataSource(dataSource) {
     return await this.viewer.dataSources.add(dataSource);
+  }
+
+  addPointPrimitives(primitivesCollection) {
+    return this.viewer.scene.primitives.add(primitivesCollection);
   }
 
   removeDataSource(dataSource, destroy = false) {

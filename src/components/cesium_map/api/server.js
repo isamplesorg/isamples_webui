@@ -1,16 +1,20 @@
+import { solrQueryThing, solrQueryStream } from "./query";
+
+const config = require("../../../config.json")
+
 export class ISamplesAPI {
 
   constructor(options = {}) {
-      // this.serviceEndpoint = options.serviceEndpoint || "https://dev.isample.xyz/";
-      // if (options.records !== undefined) {
-      //     this.solrColumns = options.records.columns || _default_solr_columns;
-      // } else {
-      //     this.solrColumns = _default_solr_columns;
-      // }
-      this.headers = options["headers"] || {"Accept":"application/json"};
-      this.defaultQuery = options["defaultQuery"] || "*:*";
-      this.defaultSearchField = options["defaultSearchField"] || "searchText";
-      this._eventBus = options["eventBus"] || null;
+    // this.serviceEndpoint = options.serviceEndpoint || "https://dev.isample.xyz/";
+    // if (options.records !== undefined) {
+    //     this.solrColumns = options.records.columns || _default_solr_columns;
+    // } else {
+    //     this.solrColumns = _default_solr_columns;
+    // }
+    this.headers = options["headers"] || { "Accept": "application/json" };
+    this.defaultQuery = options["defaultQuery"] || "*:*";
+    this.defaultSearchField = options["defaultSearchField"] || "searchText";
+    this._eventBus = options["eventBus"] || null;
   }
 
   /**
@@ -19,19 +23,21 @@ export class ISamplesAPI {
    * @param {string or URL} url
    * @returns
    */
-  _fetchPromise(url, method="GET") {
-      return (async() => {
-          try {
-              let response = await fetch(url, {
-                  method:method,
-                  headers: this.headers,
-              });
-              return response.json();
-          } catch(e) {
-              this.emitStatusMessage("error", e);
-              return null;
-          }
-      })();
+  async _fetchPromise(url, method = "GET") {
+
+    return (await fetch(url, {
+      method: method,
+      headers: this.headers
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Success:', data);
+        return data
+      })
+      .catch((error) => {
+        this.emitStatusMessage("error", error);
+        return null;
+      }));
   }
 
   /**
@@ -44,157 +50,108 @@ export class ISamplesAPI {
    * @param {*} msg  The message to deliver, e.g. an exception or string
    */
   emitStatusMessage(level, msg) {
-      if (this.eventBus !== null) {
-          this.eventBus.emit(
-              'status',
-              null,
-              {source: "ISamplesAPI", level:level, value: msg}
-          );
-      }
+    if (this.eventBus !== null) {
+      this.eventBus.emit(
+        'status',
+        null,
+        { source: "ISamplesAPI", level: level, value: msg }
+      );
+    }
   }
 
-  thingStatus() {
-      const url = new URL(`/thing`, this.serviceEndpoint);
-      return this._fetchPromise(url);
-  }
+  // thingStatus() {
+  //   const url = new URL(`/thing`, this.serviceEndpoint);
+  //   return this._fetchPromise(url);
+  // }
 
-  things(offset=0, limit=1000, status=200, authority=null){
-      const url = new URL(`/thing/`, this.serviceEndpoint);
-      url.searchParams.append("offset", offset);
-      url.searchParams.append("limit", limit);
-      url.searchParams.append("status", status);
-      if (authority !== null) {
-          url.searchParams.append("authority", authority)
-      }
-      return this._fetchPromise(url);
-  }
+  // things(offset = 0, limit = 1000, status = 200, authority = null) {
+  //   const url = new URL(`/thing/`, this.serviceEndpoint);
+  //   url.searchParams.append("offset", offset);
+  //   url.searchParams.append("limit", limit);
+  //   url.searchParams.append("status", status);
+  //   if (authority !== null) {
+  //     url.searchParams.append("authority", authority)
+  //   }
+  //   return this._fetchPromise(url);
+  // }
 
-  /**
-   * Return a single record given its identifier.
-   *
-   * The identifier is the primary identifier for the object. No
-   * reconcilliation of alternate identifiers is performed by
-   * this method.
-   *
-   * "original" format is the record as retrieved from the source
-   * "core" format is the isamples core record structure
-   * "solr" is the representation of the record stored in solr
-   *
-   * Note that for the solr record, the complete set of fields is returned. A
-   * more restriced set of fields may be retrieved using the select endpoint.
-   *
-   * @param {string} identifier The identifier of the thing to return
-   * @param {string} format The record structure to retrieve, original, isamples, or solr
-   * @returns Promise to JSON response
-   */
-  thing(identifier, format="core") {
-      const url = new URL(`/thing/${encodeURIComponent(identifier)}`, this.serviceEndpoint);
-      format = format.toLowerCase();
-      if (!["core", "original", "solr"].includes(format)) {
-          throw `Invalid format: ${format}`;
-      }
-      url.searchParams.append("format",format);
-      return this._fetchPromise(url);
-  }
+  // /**
+  //  * Return a single record given its identifier.
+  //  *
+  //  * The identifier is the primary identifier for the object. No
+  //  * reconcilliation of alternate identifiers is performed by
+  //  * this method.
+  //  *
+  //  * "original" format is the record as retrieved from the source
+  //  * "core" format is the isamples core record structure
+  //  * "solr" is the representation of the record stored in solr
+  //  *
+  //  * Note that for the solr record, the complete set of fields is returned. A
+  //  * more restriced set of fields may be retrieved using the select endpoint.
+  //  *
+  //  * @param {string} identifier The identifier of the thing to return
+  //  * @param {string} format The record structure to retrieve, original, isamples, or solr
+  //  * @returns Promise to JSON response
+  //  */
+  // thing(identifier, format = "core") {
+  //   const url = new URL(`/thing/${encodeURIComponent(identifier)}`, this.serviceEndpoint);
+  //   format = format.toLowerCase();
+  //   if (!["core", "original", "solr"].includes(format)) {
+  //     throw `Invalid format: ${format}`;
+  //   }
+  //   url.searchParams.append("format", format);
+  //   return this._fetchPromise(url);
+  // }
 
-  select(params={}) {
-      let _url = new URL("/thing/select", this.serviceEndpoint);
-      const fields = params["fields"] ?? ["*", ];
-      delete params["fields"];
-      const fq = params["fq"] ?? [];
-      delete params["fq"];
-      const sorters = params["sorters"] ?? [];
-      delete params["sorters"];
-      const method = params["method"] ?? "GET";
-      const facet_fields = params["facet.field"] ?? [];
-      delete params["facet.field"];
-      const facet_pivot = params["facet.pivot"] ?? [];
-      params["q"] = params["q"] ?? this.defaultQuery;
-      params["wt"] = params["wt"] ?? "json";
-      params["df"] = params["df"] ?? this.defaultSearchField;
-      if (params["q"] == "") {
-          params["q"] = this.defaultQuery;
-      }
-      let _params = _url.searchParams;
-      for (let key in params) {
-          _params.append(key, params[key]);
-      }
-      fq.forEach(_fq => _params.append("fq", _fq));
+  // select(params = {}) {
+  //   let _url = new URL("/thing/select", this.serviceEndpoint);
+  //   const fields = params["fields"] ?? ["*",];
+  //   delete params["fields"];
+  //   const fq = params["fq"] ?? [];
+  //   delete params["fq"];
+  //   const sorters = params["sorters"] ?? [];
+  //   delete params["sorters"];
+  //   const method = params["method"] ?? "GET";
+  //   const facet_fields = params["facet.field"] ?? [];
+  //   delete params["facet.field"];
+  //   const facet_pivot = params["facet.pivot"] ?? [];
+  //   params["q"] = params["q"] ?? this.defaultQuery;
+  //   params["wt"] = params["wt"] ?? "json";
+  //   params["df"] = params["df"] ?? this.defaultSearchField;
+  //   if (params["q"] === "") {
+  //     params["q"] = this.defaultQuery;
+  //   }
+  //   let _params = _url.searchParams;
+  //   for (let key in params) {
+  //     _params.append(key, params[key]);
+  //   }
+  //   fq.forEach(_fq => _params.append("fq", _fq));
 
-      _params.append("fl", fields.join(","));
+  //   _params.append("fl", fields.join(","));
 
-      sorters.forEach(_srt => _params.append("sort", _srt.field+" "+_srt.dir));
+  //   sorters.forEach(_srt => _params.append("sort", _srt.field + " " + _srt.dir));
 
-      facet_fields.forEach(_ff => _params.append("facet.field", _ff));
-      facet_pivot.forEach(_fp => _params.append("facet.pivot", _fp));
+  //   facet_fields.forEach(_ff => _params.append("facet.field", _ff));
+  //   facet_pivot.forEach(_fp => _params.append("facet.pivot", _fp));
 
-      return this._fetchPromise(_url, method);
-  }
+  //   return this._fetchPromise(_url, method);
+  // }
 
-  stream(params={}, perdoc_cb=null, finaldoc_cb=null, error_cb=null) {
-      const fields = params["fields"] || [ ];
-      delete params["fields"];
-      const fq = params["fq"] || [];
-      delete params["fq"];
-      const sorters = params["sorters"] || [];
-      delete params["sorters"];
-      params["q"] = params["q"] || this.defaultQuery;
-      params["wt"] = params["wt"] || "json";
-      params["df"] = params["df"] || this.defaultSearchField;
-      if (params["q"] == "") {
-          params["q"] = this.defaultQuery;
-      }
-
-      let _url = new URL("/thing/stream", this.serviceEndpoint);
-      let _params = _url.searchParams;
-      for (let key in params) {
-          _params.append(key, params[key]);
-      }
-      fq.forEach(_fq => _params.append("fq", _fq));
-      _params.append("fl", fields.join(","));
-      sorters.forEach(_srt => _params.append("sort", _srt.field+" "+_srt.dir))
-      window.oboe( _url.toString() )
-          .node('docs.*', (doc) => {
-              if (perdoc_cb !== null) {
-                  perdoc_cb(doc);
-              }
-              return window.oboe.drop;
-          })
-          .done( (finalJson) => {
-              if (finaldoc_cb !== null) {
-                  finaldoc_cb(finalJson);
-              }
-          })
-          .fail( (err) => {
-              if (error_cb !=null) {
-                  error_cb(err)
-              } else {
-                  console.error(err);
-              }
-          })
-  }
 
   /** Convenience methods */
 
   /**
    * Number of records matching Q and FQs
-   * @param {*} Q
-   * @param {*} FQ
+   * @param {*} query the string of solr query parameter
    * @returns integer
    */
-  async countRecordsQuery(Q="*:*", FQ=[]) {
-      const params = {
-          q: Q,
-          fq: FQ,
-          fields: ["id"],
-          rows: 0,
-      }
-      try {
-          let data = await this.select(params);
-          return data.response.numFound;
-      } catch (e) {
-          console.error(e)
-      }
+  async countRecordsQuery(params) {
+    try {
+      let data = await this._fetchPromise(config.solr_url + "?" + solrQueryThing(params.Q, params.searchFields, params.rows));
+      return data.response.numFound;
+    } catch (e) {
+      console.error(e)
+    }
   }
 }
 
@@ -207,8 +164,9 @@ export class ISamplesAPI {
  *
  * @todo abort the fetch process
  */
- function pointStream(url, perdoc_cb = null, finaldoc_cb = null, error_cb = null) {
-  window.oboe(url)
+function pointStream(params, perdoc_cb = null, finaldoc_cb = null, error_cb = null) {
+  const query = solrQueryStream(params.Q, params.searchFields, params.rows);
+  window.oboe(config.solr_stream + "?" + query)
     .node('docs.*', (doc) => {
       if (perdoc_cb !== null) {
         perdoc_cb(doc);
