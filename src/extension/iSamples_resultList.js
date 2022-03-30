@@ -42,30 +42,38 @@ const ButGroup = (props) => {
 };
 
 class ResultList extends React.Component {
-  // constructor(props) {
-  //   super(props);
-  //   this.state = { facet: "Map" }
-  // }
+  constructor(props) {
+    super(props);
+    this.state = { facet: "Map" }
+  }
 
-  // switchFormat(format) {
-  //   this.setState({ facet: format })
-  // }
+  switchFormat(format) {
+    let paginateButton = document.getElementsByClassName('pagDisplay');
+
+    // hide the pagination button by display property
+    if (format === "List") {
+      [...paginateButton].forEach((paginate) => paginate.style.display = "none");
+    }else{
+      [...paginateButton].forEach((paginate) => paginate.style.removeProperty("display"));
+    }
+    this.setState({ facet: format })
+  }
 
   render() {
-    const { bootstrapCss, query, onSetView } = this.props;
-    console.log(query.view)
+    const { bootstrapCss } = this.props;
+
     const doc = this.props.children[0].length !== 0 ? this.props.children[0].map((record) => (record['props']['doc'])) : [];
     const fields = this.props.children[0].length !== 0 ? this.props.children[0][0]['props']['fields'] : [];
     const searchFields = fields.filter((field) => field.type !== "non-search").map(({ collapse, hiddne, ...rest }) => rest)
 
     // conditional rendering.
-    switch (query.view) {
+    switch (this.state.facet) {
       case 'List':
         return (
           <ButGroup
             bootstrapCss={bootstrapCss}
-            switchFormat={onSetView}
-            active={query.view}
+            switchFormat={this.switchFormat.bind(this)}
+            active={this.state.facet}
             children={
               <ul className={cx({ "list-group": bootstrapCss })}>
                 {this.props.children}
@@ -76,8 +84,8 @@ class ResultList extends React.Component {
         return (
           <ButGroup
             bootstrapCss={bootstrapCss}
-            switchFormat={onSetView}
-            active={query.view}
+            switchFormat={this.switchFormat.bind(this)}
+            active={this.state.facet}
             children={
               <Table
                 docs={doc}
@@ -89,8 +97,8 @@ class ResultList extends React.Component {
         return (
           <ButGroup
             bootstrapCss={bootstrapCss}
-            switchFormat={onSetView}
-            active={query.view}
+            switchFormat={this.switchFormat.bind(this)}
+            active={this.state.facet}
             children={
               // if there is no searchFields, don't render cesium.
               searchFields.length > 0

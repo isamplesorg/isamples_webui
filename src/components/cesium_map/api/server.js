@@ -5,16 +5,7 @@ const config = require("../../../config.json")
 export class ISamplesAPI {
 
   constructor(options = {}) {
-    // this.serviceEndpoint = options.serviceEndpoint || "https://dev.isample.xyz/";
-    // if (options.records !== undefined) {
-    //     this.solrColumns = options.records.columns || _default_solr_columns;
-    // } else {
-    //     this.solrColumns = _default_solr_columns;
-    // }
     this.headers = options["headers"] || { "Accept": "application/json" };
-    this.defaultQuery = options["defaultQuery"] || "*:*";
-    this.defaultSearchField = options["defaultSearchField"] || "searchText";
-    this._eventBus = options["eventBus"] || null;
   }
 
   /**
@@ -24,7 +15,6 @@ export class ISamplesAPI {
    * @returns
    */
   async _fetchPromise(url, method = "GET") {
-
     return (await fetch(url, {
       method: method,
       headers: this.headers
@@ -58,87 +48,6 @@ export class ISamplesAPI {
       );
     }
   }
-
-  // thingStatus() {
-  //   const url = new URL(`/thing`, this.serviceEndpoint);
-  //   return this._fetchPromise(url);
-  // }
-
-  // things(offset = 0, limit = 1000, status = 200, authority = null) {
-  //   const url = new URL(`/thing/`, this.serviceEndpoint);
-  //   url.searchParams.append("offset", offset);
-  //   url.searchParams.append("limit", limit);
-  //   url.searchParams.append("status", status);
-  //   if (authority !== null) {
-  //     url.searchParams.append("authority", authority)
-  //   }
-  //   return this._fetchPromise(url);
-  // }
-
-  // /**
-  //  * Return a single record given its identifier.
-  //  *
-  //  * The identifier is the primary identifier for the object. No
-  //  * reconcilliation of alternate identifiers is performed by
-  //  * this method.
-  //  *
-  //  * "original" format is the record as retrieved from the source
-  //  * "core" format is the isamples core record structure
-  //  * "solr" is the representation of the record stored in solr
-  //  *
-  //  * Note that for the solr record, the complete set of fields is returned. A
-  //  * more restriced set of fields may be retrieved using the select endpoint.
-  //  *
-  //  * @param {string} identifier The identifier of the thing to return
-  //  * @param {string} format The record structure to retrieve, original, isamples, or solr
-  //  * @returns Promise to JSON response
-  //  */
-  // thing(identifier, format = "core") {
-  //   const url = new URL(`/thing/${encodeURIComponent(identifier)}`, this.serviceEndpoint);
-  //   format = format.toLowerCase();
-  //   if (!["core", "original", "solr"].includes(format)) {
-  //     throw `Invalid format: ${format}`;
-  //   }
-  //   url.searchParams.append("format", format);
-  //   return this._fetchPromise(url);
-  // }
-
-  // select(params = {}) {
-  //   let _url = new URL("/thing/select", this.serviceEndpoint);
-  //   const fields = params["fields"] ?? ["*",];
-  //   delete params["fields"];
-  //   const fq = params["fq"] ?? [];
-  //   delete params["fq"];
-  //   const sorters = params["sorters"] ?? [];
-  //   delete params["sorters"];
-  //   const method = params["method"] ?? "GET";
-  //   const facet_fields = params["facet.field"] ?? [];
-  //   delete params["facet.field"];
-  //   const facet_pivot = params["facet.pivot"] ?? [];
-  //   params["q"] = params["q"] ?? this.defaultQuery;
-  //   params["wt"] = params["wt"] ?? "json";
-  //   params["df"] = params["df"] ?? this.defaultSearchField;
-  //   if (params["q"] === "") {
-  //     params["q"] = this.defaultQuery;
-  //   }
-  //   let _params = _url.searchParams;
-  //   for (let key in params) {
-  //     _params.append(key, params[key]);
-  //   }
-  //   fq.forEach(_fq => _params.append("fq", _fq));
-
-  //   _params.append("fl", fields.join(","));
-
-  //   sorters.forEach(_srt => _params.append("sort", _srt.field + " " + _srt.dir));
-
-  //   facet_fields.forEach(_ff => _params.append("facet.field", _ff));
-  //   facet_pivot.forEach(_fp => _params.append("facet.pivot", _fp));
-
-  //   return this._fetchPromise(_url, method);
-  // }
-
-
-  /** Convenience methods */
 
   /**
    * Number of records matching Q and FQs

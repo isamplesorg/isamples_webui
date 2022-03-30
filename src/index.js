@@ -77,7 +77,6 @@ const solrClient = new SolrClient({
   sortFields: sortFields,
   rows: 20,
   pageStrategy: "paginate",
-  view: "Map",
 
   // Delegate change callback to redux dispatcher
   onChange: (state) => store.dispatch({ type: "SET_SOLR_STATE", state: state })

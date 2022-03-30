@@ -28,9 +28,6 @@ class Pagination extends React.Component {
     const pageAmt = Math.ceil(numFound / rows);
     const currentPage = start / rows;
 
-    // check the default view
-    const view = this.props.query.view || "List";
-
     let rangeStart = currentPage - 2 < 0 ? 0 : currentPage - 2;
     let rangeEnd = rangeStart + 5 > pageAmt ? pageAmt : rangeStart + 5;
 
@@ -49,26 +46,22 @@ class Pagination extends React.Component {
     }
 
     return (
-      <div className={cx({ "panel-body": bootstrapCss, "text-center": bootstrapCss})}>
-        {view !== "Map" ?
-          <ul className={cx("pagination", { "pagination-sm": bootstrapCss })}>
-            <li className={cx({ "disabled": currentPage === 0 })} key="start">
-              <a href="/#" onClick={this.onPageChange.bind(this, 0)}>&lt;&lt;</a>
-            </li>
-            <li className={cx({ "disabled": currentPage - 1 < 0 })} key="prev">
-              <a href="/#" onClick={this.onPageChange.bind(this, currentPage - 1)}>&lt;</a>
-            </li>
-            {pages.map((page, idx) => this.renderPage(page, currentPage, idx))}
-            <li className={cx({ "disabled": currentPage + 1 >= pageAmt })} key="next">
-              <a href="/#" onClick={this.onPageChange.bind(this, currentPage + 1, pageAmt)}>&gt;</a>
-            </li>
-            <li className={cx({ "disabled": currentPage === pageAmt - 1 })} key="end">
-              <a href="/#" onClick={this.onPageChange.bind(this, pageAmt - 1)}>&gt;&gt;</a>
-            </li>
-          </ul>
-          :
-          null
-        }
+      <div className={cx({ "panel-body": bootstrapCss, "text-center": bootstrapCss })}>
+        <ul className={cx("pagination", "pagDisplay", { "pagination-sm": bootstrapCss })}>
+          <li className={cx({ "disabled": currentPage === 0 })} key="start">
+            <a href="/#" onClick={this.onPageChange.bind(this, 0)}>&lt;&lt;</a>
+          </li>
+          <li className={cx({ "disabled": currentPage - 1 < 0 })} key="prev">
+            <a href="/#" onClick={this.onPageChange.bind(this, currentPage - 1)}>&lt;</a>
+          </li>
+          {pages.map((page, idx) => this.renderPage(page, currentPage, idx))}
+          <li className={cx({ "disabled": currentPage + 1 >= pageAmt })} key="next">
+            <a href="/#" onClick={this.onPageChange.bind(this, currentPage + 1, pageAmt)}>&gt;</a>
+          </li>
+          <li className={cx({ "disabled": currentPage === pageAmt - 1 })} key="end">
+            <a href="/#" onClick={this.onPageChange.bind(this, pageAmt - 1)}>&gt;&gt;</a>
+          </li>
+        </ul>
       </div>
     );
   }

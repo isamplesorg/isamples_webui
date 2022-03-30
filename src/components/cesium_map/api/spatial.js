@@ -622,4 +622,6 @@ export class ISamplesSpatial {
     let position = Cesium.Cartesian3.fromDegrees(longitude, latitude);
     return Cesium.SceneTransforms.wgs84ToWindowCoordinates(this.viewer.scene, position);
   }
+
+
 }
