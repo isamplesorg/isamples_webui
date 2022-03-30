@@ -516,7 +516,7 @@ export class ISamplesSpatial {
   }
 
   // This is a function to add cesium tileset
-  // The string with curly will throw an error
+  // The string with curly will throw a warning
   // addPointsBySource(assetId) {
   //   const tileset = this.viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
   //     url: Cesium.IonResource.fromAssetId(assetId),
