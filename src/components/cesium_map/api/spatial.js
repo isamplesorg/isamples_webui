@@ -355,10 +355,6 @@ export class ISamplesSpatial {
     });
     this.buildingTileset = this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
     this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
-    this.viewer.clock.onTick.addEventListener(() => {
-      let rect = this.currentBounds;
-      let view = this.currentView;
-    });
     this.viewer.scene.globe.depthTestAgainstTerrain = true;
     this.mouseCoordinateCallback = null;
     this.selectBoxCallback = null;
@@ -519,30 +515,31 @@ export class ISamplesSpatial {
     return asDRectangle(bb);
   }
 
-
-  addPointsBySource(assetId) {
-    const tileset = this.viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
-      url: Cesium.IonResource.fromAssetId(assetId),
-      depthFailMaterial: new Cesium.PolylineOutlineMaterialProperty(
-        {
-          color: Cesium.Color.RED,
-        }
-      ),
-    }));
-    tileset.style = new Cesium.Cesium3DTileStyle({
-      color: {
-        conditions: [
-          ["${Classification} === 0", "color('purple')"],
-          ["${Classification} === 1", "color('brown')"],
-          ["${Classification} === 2", "color('cyan')"],
-          ["${Classification} === 3", "color('orange')"],
-          ["true", "color('white')"]
-        ]
-      },
-      pointSize: 5,
-      zIndex: 100,
-    });
-  }
+  // This is a function to add cesium tileset
+  // The string with curly will throw an error
+  // addPointsBySource(assetId) {
+  //   const tileset = this.viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
+  //     url: Cesium.IonResource.fromAssetId(assetId),
+  //     depthFailMaterial: new Cesium.PolylineOutlineMaterialProperty(
+  //       {
+  //         color: Cesium.Color.RED,
+  //       }
+  //     ),
+  //   }));
+  //   tileset.style = new Cesium.Cesium3DTileStyle({
+  //     color: {
+  //       conditions: [
+  //         ["${Classification} === 0", "color('purple')"],
+  //         ["${Classification} === 1", "color('brown')"],
+  //         ["${Classification} === 2", "color('cyan')"],
+  //         ["${Classification} === 3", "color('orange')"],
+  //         ["true", "color('white')"]
+  //       ]
+  //     },
+  //     pointSize: 5,
+  //     zIndex: 100,
+  //   });
+  // }
 
   removeEntity(e) {
     try {
