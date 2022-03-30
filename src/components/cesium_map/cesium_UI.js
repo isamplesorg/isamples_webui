@@ -49,10 +49,10 @@ async function selectedBoxCallbox(bb) {
   let text = `Record count : ${await countRecordsInBB(bb)}`;
 
   viewer.removeEntity(bbox);
-  bbox = viewer.addRectangle(bb, text)
+  bbox = viewer.addRectangle(bb, text);
 
   const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
-  setPoints.loadApi({ Q: Q, searchFields: searchFields, rows: 5000 })
+  setPoints.loadApi({ Q: Q, searchFields: searchFields, rows: 5000 });
 
   const btn = document.getElementById("clear-bb");
   btn.style.display = "block";
@@ -78,7 +78,7 @@ class CesiumMap extends React.Component {
     viewer.trackMouseCoordinates(showCoordinates);
     viewer.enableTracking(selectedBoxCallbox);
     setPrimitive = new PointStreamPrimitiveCollection("Primitive Points");
-    viewer.addPointPrimitives(setPrimitive)
+    viewer.addPointPrimitives(setPrimitive);
     viewer.addDataSource(new PointStreamDatasource("BB points")).then((res) => { setPoints = res });
     setPrimitive.load({ searchFields: this.props.searchFields, rows: 50000 });
   }
@@ -110,7 +110,7 @@ class CesiumMap extends React.Component {
 
     if (longitude.value !== "" && latitude !== "") {
       const location = new SpatialView(parseFloat(latitude.value), parseFloat(longitude.value), 150000, 90.0, -90);
-      this.visitLocation(location)
+      this.visitLocation(location);
     }
 
   }

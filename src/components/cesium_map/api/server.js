@@ -22,7 +22,7 @@ export class ISamplesAPI {
       .then(response => response.json())
       .then(data => {
         console.log('Success:', data);
-        return data
+        return data;
       })
       .catch((error) => {
         this.emitStatusMessage("error", error);
@@ -59,7 +59,7 @@ export class ISamplesAPI {
       let data = await this._fetchPromise(config.solr_url + "?" + solrQueryThing(params.Q, params.searchFields, params.rows));
       return data.response.numFound;
     } catch (e) {
-      console.error(e)
+      console.error(e);
     }
   }
 }

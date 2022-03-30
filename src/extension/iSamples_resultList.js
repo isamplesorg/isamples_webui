@@ -44,7 +44,7 @@ const ButGroup = (props) => {
 class ResultList extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { facet: "List" }
+    this.state = { facet: "List" };
   }
 
   switchFormat(format) {
@@ -56,7 +56,7 @@ class ResultList extends React.Component {
     } else {
       [...paginateButton].forEach((paginate) => paginate.style.removeProperty("display"));
     }
-    this.setState({ facet: format })
+    this.setState({ facet: format });
   }
 
   render() {
@@ -64,7 +64,7 @@ class ResultList extends React.Component {
 
     const doc = this.props.children[0].length !== 0 ? this.props.children[0].map((record) => (record['props']['doc'])) : [];
     const fields = this.props.children[0].length !== 0 ? this.props.children[0][0]['props']['fields'] : [];
-    const searchFields = fields.filter((field) => field.type !== "non-search").map(({ collapse, hiddne, ...rest }) => rest)
+    const searchFields = fields.filter((field) => field.type !== "non-search").map(({ collapse, hiddne, ...rest }) => rest);
 
     // conditional rendering.
     switch (this.state.facet) {
@@ -79,7 +79,7 @@ class ResultList extends React.Component {
                 {this.props.children}
               </ul>}
           />
-        )
+        );
       case 'Table':
         return (
           <ButGroup
@@ -92,7 +92,7 @@ class ResultList extends React.Component {
                 fields={fields}
               />
             } />
-        )
+        );
       case 'Map':
         return (
           <ButGroup
@@ -106,9 +106,9 @@ class ResultList extends React.Component {
                 <CesiumMap searchFields={searchFields} />
                 : null
             } />
-        )
+        );
       default:
-        return 'Facet type error!'
+        return 'Facet type error!';
     }
   }
 }
