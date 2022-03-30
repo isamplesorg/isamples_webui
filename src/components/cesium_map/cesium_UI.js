@@ -110,7 +110,7 @@ class CesiumMap extends React.Component {
 
     if (longitude.value !== "" && latitude !== "") {
       const location = new SpatialView(parseFloat(latitude.value), parseFloat(longitude.value), 150000, 90.0, -90);
-      viewer.visit(location)
+      this.visitLocation(location)
     }
 
   }
