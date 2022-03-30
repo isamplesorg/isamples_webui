@@ -59,7 +59,6 @@ async function selectedBoxCallbox(bb) {
   btn.onclick = clearBoundingBox;
 }
 
-
 class CesiumMap extends React.Component {
 
   // https://reactjs.org/docs/refs-and-the-dom.html
@@ -81,7 +80,7 @@ class CesiumMap extends React.Component {
     setPrimitive = new PointStreamPrimitiveCollection("Primitive Points");
     viewer.addPointPrimitives(setPrimitive)
     viewer.addDataSource(new PointStreamDatasource("BB points")).then((res) => { setPoints = res });
-    setPrimitive.load({ searchFields: this.props.searchFields, rows: 10000 });
+    setPrimitive.load({ searchFields: this.props.searchFields, rows: 50000 });
   }
 
   // https://medium.com/@garrettmac/reactjs-how-to-safely-manipulate-the-dom-when-reactjs-cant-the-right-way-8a20928e8a6
@@ -94,7 +93,7 @@ class CesiumMap extends React.Component {
       viewer.removeAll();
       clearBoundingBox();
       setPrimitive.clear();
-      setPrimitive.load({ searchFields: nextProps.searchFields, rows: 10000 });
+      setPrimitive.load({ searchFields: nextProps.searchFields, rows: 50000 });
     }
 
     // return false to force react not to rerender
@@ -105,13 +104,12 @@ class CesiumMap extends React.Component {
     viewer.visit(location)
   }
 
-  submitLL(){
+  submitLL() {
     const longitude = document.getElementById("longtitudeInput");
     const latitude = document.getElementById("latitudeInput");
 
-    if(longitude.value !== "" && latitude !== ""){
-      console.log(latitude.value)
-      const location = new SpatialView(parseFloat(latitude.value), parseFloat(longitude.value), 25000, 201.84408760864753, -20.853642866175978);
+    if (longitude.value !== "" && latitude !== "") {
+      const location = new SpatialView(parseFloat(latitude.value), parseFloat(longitude.value), 150000, 90.0, -90);
       viewer.visit(location)
     }
 
@@ -138,7 +136,7 @@ class CesiumMap extends React.Component {
           <label className="margin-right-xs">Latitude: </label>
           <input id="latitudeInput" className="margin-right-xs" type="number" step="any" ></input>
           <button className="btn btn-default btn-sm"
-            onClick={ this.submitLL.bind(this)}>
+            onClick={this.submitLL.bind(this)}>
             <span className="glyphicon glyphicon-search" />
           </button>
         </div>

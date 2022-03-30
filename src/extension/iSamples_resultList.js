@@ -44,16 +44,16 @@ const ButGroup = (props) => {
 class ResultList extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { facet: "Map" }
+    this.state = { facet: "List" }
   }
 
   switchFormat(format) {
     let paginateButton = document.getElementsByClassName('pagDisplay');
 
     // hide the pagination button by display property
-    if (format === "List") {
+    if (format === "Map") {
       [...paginateButton].forEach((paginate) => paginate.style.display = "none");
-    }else{
+    } else {
       [...paginateButton].forEach((paginate) => paginate.style.removeProperty("display"));
     }
     this.setState({ facet: format })
