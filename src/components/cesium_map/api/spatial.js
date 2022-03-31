@@ -12,7 +12,6 @@ import * as Cesium from 'cesium';
 import { html, render } from "lit";
 import { pointStream } from './server';
 
-
 /**
  * Describes a camera viewpoint for Cesium.
  * All units are degrees.
@@ -162,49 +161,6 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
     this.entities.removeAll();
   }
 
-  /**
-   * Load the data from the streaming data source.
-   *
-   * @param {*} url providing a Solr streaming response with x, y, n values.
-   */
-  load(url) {
-    this.isLoading = true;
-    this.clear()
-    this.clustering.enabled = true;
-    this.clustering.clusterPoints = true;
-    this.clustering.minimumClusterSize = 3;
-    this.clustering.pixelRange = 15;
-    const _color = Cesium.Color.GREEN.withAlpha(0.5);
-    window.oboe(url)
-      .node('docs.*', (doc) => {
-        // Handle the data records, e.g. response.docs[0].doc
-        if (doc.hasOwnProperty('x')) {
-          const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, 1);
-          this.entities.add({
-            position: p0,
-            point: {
-              color: _color,
-              pixelSize: 5,
-              outlineColor: Cesium.Color.YELLOW,
-              outlineWidth: 3,
-              heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
-            },
-          })
-        }
-        // Drop the entity to reduce memory use
-        return window.oboe.drop;
-      })
-      .done((finalJson) => {
-        this.isLoading = false;
-        this.pointsClusterStyle();
-        console.log("Point stream complete");
-      })
-      .fail((err) => {
-        this.isLoading = false;
-        console.error(err);
-      })
-  }
-
   loadApi(params) {
     this.isLoading = true;
     this.clear()
@@ -214,7 +170,7 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
     this.clustering.pixelRange = 15;
     const _color = Cesium.Color.GREEN.withAlpha(0.5);
 
-    pointStream(
+    return pointStream(
       params,
       (doc) => {
         // Handle the data records, e.g. response.docs[0].doc
@@ -283,7 +239,7 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
       return Cesium.Color.ORANGE;
     } else if (n > 30) {
       return Cesium.Color.YELLOW;
-    } else if (n > 30) {
+    } else if (n > 20) {
       return Cesium.Color.GREEN;
     } else if (n > 10) {
       return Cesium.Color.BLUE;
@@ -294,12 +250,12 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
   load(params) {
     let locations = {}
 
-    pointStream(
+    return pointStream(
       params,
       (doc) => {
         // Handle the data records, e.g. response.docs[0].doc
         if (doc.hasOwnProperty('x')) {
-          let location = doc.x.toString() + doc.y.toString();
+          let location = doc.x.toString() + ":" + doc.y.toString();
           if (location in locations) {
             locations[location] = locations[location] + 1;
           } else {

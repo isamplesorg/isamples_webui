@@ -1,4 +1,5 @@
 import { solrQueryThing, solrQueryStream } from "./query";
+import oboe from "oboe";
 
 const config = require("../../../config.json")
 
@@ -75,12 +76,17 @@ export class ISamplesAPI {
  */
 function pointStream(params, perdoc_cb = null, finaldoc_cb = null, error_cb = null) {
   const query = solrQueryStream(params.Q, params.searchFields, params.rows);
-  window.oboe(config.solr_stream + "?" + query)
+
+  // There is no documantation about it.
+  // See the source code:
+  //    https://github.com/jimhigson/oboe.js/blob/52d150dd78b20205bd26d63c807ac170c03f0f64/dist/oboe-browser.js#L2040
+  // reture oboe instance so we could abort fetch
+  return oboe(config.solr_stream + "?" + query)
     .node('docs.*', (doc) => {
       if (perdoc_cb !== null) {
         perdoc_cb(doc);
       }
-      return window.oboe.drop;
+      return oboe.drop;
     })
     .done((finalJson) => {
       if (finaldoc_cb !== null) {

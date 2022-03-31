@@ -14,6 +14,7 @@ import {
 } from "./api/spatial";
 import { ISamplesAPI } from "./api/server";
 
+
 // Defined ceisum access token
 // Current one is Dave's token
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwNzk3NjkyMy1iNGI1LTRkN2UtODRiMy04OTYwYWE0N2M3ZTkiLCJpZCI6Njk1MTcsImlhdCI6MTYzMzU0MTQ3N30.e70dpNzOCDRLDGxRguQCC-tRzGzA-23Xgno5lNgCeB4';
@@ -24,6 +25,8 @@ let bbox = null;
 let setPoints = null;
 let setPrimitive = null;
 let searchFields = null;
+let oboePrimitive = null;
+let oboeEntities = null;
 const api = new ISamplesAPI();
 const moorea = new SpatialView(-149.8169236266867, -17.451466233002286, 2004.7347996772614, 201.84408760864753, -20.853642866175978);
 const patagonia = new SpatialView(-69.60169132023925, -54.315990127766646, 1781.4560051617016, 173.54573250470798, -15.85292472305027);
@@ -52,7 +55,7 @@ async function selectedBoxCallbox(bb) {
   bbox = viewer.addRectangle(bb, text);
 
   const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
-  setPoints.loadApi({ Q: Q, searchFields: searchFields, rows: 5000 });
+  oboeEntities = setPoints.loadApi({ Q: Q, searchFields: searchFields, rows: 5000 });
 
   const btn = document.getElementById("clear-bb");
   btn.style.display = "block";
@@ -61,16 +64,9 @@ async function selectedBoxCallbox(bb) {
 
 class CesiumMap extends React.Component {
 
-  // https://reactjs.org/docs/refs-and-the-dom.html
-  // Use react ref to manipulate DOM directly
-  // constructor(props) {
-  //   super(props);
-  // }
-
   // This is a initial function in react liftcycle.
   // Only call once when this component first render
   componentDidMount() {
-    searchFields = this.props.searchFields;
     viewer = new ISamplesSpatial("cesiumContainer");
     // viewer.addPointsBySource(642092);
     viewer.visit(moorea);
@@ -80,7 +76,8 @@ class CesiumMap extends React.Component {
     setPrimitive = new PointStreamPrimitiveCollection("Primitive Points");
     viewer.addPointPrimitives(setPrimitive);
     viewer.addDataSource(new PointStreamDatasource("BB points")).then((res) => { setPoints = res });
-    setPrimitive.load({ searchFields: this.props.searchFields, rows: 50000 });
+    searchFields = this.props.searchFields;
+    oboePrimitive = setPrimitive.load({ searchFields: this.props.searchFields, rows: 100000 });
   }
 
   // https://medium.com/@garrettmac/reactjs-how-to-safely-manipulate-the-dom-when-reactjs-cant-the-right-way-8a20928e8a6
@@ -93,7 +90,15 @@ class CesiumMap extends React.Component {
       viewer.removeAll();
       clearBoundingBox();
       setPrimitive.clear();
-      setPrimitive.load({ searchFields: nextProps.searchFields, rows: 50000 });
+      if (oboePrimitive) {
+        oboePrimitive.abort();
+      }
+
+      if (oboeEntities) {
+        oboeEntities.abort();
+      }
+      searchFields = nextProps.searchFields
+      oboePrimitive = setPrimitive.load({ searchFields: nextProps.searchFields, rows: 100000 });
     }
 
     // return false to force react not to rerender
@@ -130,7 +135,7 @@ class CesiumMap extends React.Component {
             className="btn btn-default btm-sm  margin-right-xs "
             onClick={this.visitLocation.bind(this, Global)}>Visit Global</button>
         </div>
-        <div class="geoSearchGroup">
+        <div className="geoSearchGroup">
           <label className="margin-right-xs">Longitude: </label>
           <input id="longtitudeInput" className="margin-right-xs" type="number" step="any" ></input>
           <label className="margin-right-xs">Latitude: </label>

@@ -64,7 +64,7 @@ class ResultList extends React.Component {
 
     const doc = this.props.children[0].length !== 0 ? this.props.children[0].map((record) => (record['props']['doc'])) : [];
     const fields = this.props.children[0].length !== 0 ? this.props.children[0][0]['props']['fields'] : [];
-    const searchFields = fields.filter((field) => field.type !== "non-search").map(({ collapse, hiddne, ...rest }) => rest);
+    const searchFields = fields.filter((field) => field.type !== "non-search").map(({ collapse, hidden, ...rest }) => rest);
 
     // conditional rendering.
     switch (this.state.facet) {
