@@ -17,6 +17,9 @@ import { ISamplesAPI } from "./api/server";
 
 // Defined ceisum access token
 // Current one is Dave's token
+// How to generate Cesium token
+// See link:
+//  https://cesium.com/learn/ion/cesium-ion-access-tokens/
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwNzk3NjkyMy1iNGI1LTRkN2UtODRiMy04OTYwYWE0N2M3ZTkiLCJpZCI6Njk1MTcsImlhdCI6MTYzMzU0MTQ3N30.e70dpNzOCDRLDGxRguQCC-tRzGzA-23Xgno5lNgCeB4';
 
 
