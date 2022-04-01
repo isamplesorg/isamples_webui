@@ -15,7 +15,7 @@ class Pagination extends React.Component {
   renderPage(page, currentPage, key) {
     return (
       <li className={cx({ "active": page === currentPage })} key={key}>
-        <a href="/#" onClick={this.onPageChange.bind(this, page)}>{page + 1}</a>
+        <span onClick={this.onPageChange.bind(this, page)}>{page + 1}</span>
       </li>
     );
   }
@@ -49,17 +49,17 @@ class Pagination extends React.Component {
       <div className={cx({ "panel-body": bootstrapCss, "text-center": bootstrapCss })}>
         <ul className={cx("pagination", "pagDisplay", { "pagination-sm": bootstrapCss })}>
           <li className={cx({ "disabled": currentPage === 0 })} key="start">
-            <a href="/#" onClick={this.onPageChange.bind(this, 0)}>&lt;&lt;</a>
+            <span onClick={this.onPageChange.bind(this, 0)}>&lt;&lt;</span>
           </li>
           <li className={cx({ "disabled": currentPage - 1 < 0 })} key="prev">
-            <a href="/#" onClick={this.onPageChange.bind(this, currentPage - 1)}>&lt;</a>
+            <span onClick={this.onPageChange.bind(this, currentPage - 1)}>&lt;</span>
           </li>
           {pages.map((page, idx) => this.renderPage(page, currentPage, idx))}
           <li className={cx({ "disabled": currentPage + 1 >= pageAmt })} key="next">
-            <a href="/#" onClick={this.onPageChange.bind(this, currentPage + 1, pageAmt)}>&gt;</a>
+            <span onClick={this.onPageChange.bind(this, currentPage + 1, pageAmt)}>&gt;</span>
           </li>
           <li className={cx({ "disabled": currentPage === pageAmt - 1 })} key="end">
-            <a href="/#" onClick={this.onPageChange.bind(this, pageAmt - 1)}>&gt;&gt;</a>
+            <span onClick={this.onPageChange.bind(this, pageAmt - 1)}>&gt;&gt;</span>
           </li>
         </ul>
       </div>

@@ -168,7 +168,7 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
     this.clustering.clusterPoints = true;
     this.clustering.minimumClusterSize = 10;
     this.clustering.pixelRange = 15;
-    const _color = Cesium.Color.GREEN.withAlpha(0.5);
+    // const _color = Cesium.Color.GREEN.withAlpha(0.5);
 
     return pointStream(
       params,
@@ -178,13 +178,11 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
           const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, 10);
           this.entities.add({
             position: p0,
-            name: doc.id,
-            description: doc.searchText,
             point: {
-              color: _color,
-              pixelSize: 5,
-              outlineColor: Cesium.Color.YELLOW,
-              outlineWidth: 3,
+              color: Cesium.Color.WHITE,
+              pixelSize: 10,
+              // outlineColor: Cesium.Color.YELLOW,
+              // outlineWidth: 3,
               heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
             },
           })
@@ -248,7 +246,8 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
 
   // function to query results and add point into cesium
   load(params) {
-    let locations = {}
+    let locations = {};
+    this.isLoading = true;
 
     return pointStream(
       params,
@@ -266,6 +265,7 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
             position: p0,
             color: this.outlineStyle(locations, location),
             pixelSize: 10,
+            heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
           })
         }
       },
@@ -303,7 +303,7 @@ export class ISamplesSpatial {
     });
 
     this.viewer = new Cesium.Viewer(element, {
-      // infoBox:false,
+      infoBox:false,
       timeline: false,
       animation: false,
       sceneModePicker: false,
@@ -406,7 +406,6 @@ export class ISamplesSpatial {
     if (this.tracking_info.tracking) {
       console.log("stop tracking");
       const bb = this.stopTracking();
-      console.log(bb);
       if (this.selectedBox !== null) {
         this.viewer.entities.remove(this.selectedBox);
       }
