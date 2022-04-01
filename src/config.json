@@ -1,5 +1,6 @@
 {
-  "solr_url": "https://mars.cyverse.org/thing/select",
+  "solr_url": "https://hyde.cyverse.org/isamples_central/thing/select",
+  "solr_stream": "https://hyde.cyverse.org/isamples_central/thing/stream",
   "analytics_src": "https://metrics.isample.xyz/js/plausible.js",
   "analytics_domain": "isamples.org"
 }

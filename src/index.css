@@ -125,16 +125,16 @@ svg.search-icon {
   overflow: scroll;
 }
 
+
 .paginationBox {
   position: relative;
 }
 
 .swithButtonBox {
   position: absolute;
-  top: -40px;
+  top: -30px;
   bottom: 0;
   height: 30px;
-  margin-left: 10px;
 }
 
 .margin-right-xs {
@@ -157,7 +157,7 @@ td {
 
 .field_select_group {
   position: absolute;
-  top: -35px;
+  top: -30px;
   right: 10px;
   color: #666666;
 }
@@ -196,4 +196,8 @@ td {
   cursor: pointer;
   font-size: 40px;
   padding: 4px;
+}
+
+.geoSearchGroup{
+  margin: 5px;
 }
