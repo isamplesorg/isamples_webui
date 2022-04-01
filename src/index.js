@@ -23,6 +23,10 @@ import {
 // encode and decode parameter
 import { encode, decode } from "plantuml-encoder"
 
+// import config
+import config from "./config";
+
+
 // iSamples results react component
 import iSamplesResult from './extension/iSamples_results';
 import TextSearch from './extension/iSamples_textSearch';
@@ -34,7 +38,6 @@ import { fields } from './fields';
 import ScrollToTop from "./components/scrollTop"
 import { wellFormatField } from './components/utilities';
 
-const config = require("./config.json")
 // Create a store for the reducer.
 const store = createStore(solrReducer);
 

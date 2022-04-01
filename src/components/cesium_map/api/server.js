@@ -1,7 +1,6 @@
 import { solrQueryThing, solrQueryStream } from "./query";
 import oboe from "oboe";
-
-const config = require("../../../config.json")
+import config from "../../../config";
 
 export class ISamplesAPI {
 
