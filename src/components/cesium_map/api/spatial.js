@@ -189,6 +189,8 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
         }
       },
       (final) => {
+        // check if there are points in the map
+        console.log(this.entities._entities);
         this.isLoading = false;
         this.pointsClusterStyle();
         console.log("Point stream complete");
