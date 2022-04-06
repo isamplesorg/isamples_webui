@@ -1,4 +1,4 @@
-import { solrQueryThing, solrQueryStream } from "./query";
+import { solrQueryThing } from "./query";
 import oboe from "oboe";
 import config from "../../../config";
 
@@ -74,8 +74,8 @@ export class ISamplesAPI {
  * @todo abort the fetch process
  */
 function pointStream(params, perdoc_cb = null, finaldoc_cb = null, error_cb = null) {
-  const query = solrQueryStream(params.Q, params.searchFields, params.rows);
-
+  const query = solrQueryThing(params.Q, params.searchFields, params.rows);
+  console.log(query);
   // There is no documantation about it.
   // See the source code:
   //    https://github.com/jimhigson/oboe.js/blob/52d150dd78b20205bd26d63c807ac170c03f0f64/dist/oboe-browser.js#L2040
