@@ -1,4 +1,4 @@
-const _solr_base = "https://hyde.cyverse.org/isamples_central/thing/";
+const _solr_base = "https://mars.cyverse.org/isamples_central/thing/";
 
 const config = {
   "solr_url": _solr_base + "select",
