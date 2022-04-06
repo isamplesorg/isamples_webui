@@ -108,10 +108,11 @@ class CesiumMap extends React.Component {
       if (oboeEntities) {
         oboeEntities.abort();
       }
+      console.log(viewer.currentView === currentView)
       searchFields = nextProps.searchFields
       setTimeout(function() {
         currentView = viewer.currentView;
-        oboePrimitive = setPrimitive.load(solrQueryCenter(currentView.longitude, currentView.latitude, searchFields, 5000));
+        oboePrimitive = setPrimitive.load(solrQueryCenter(currentView.latitude, currentView.longitude, searchFields, 5000));
       }, 3000);
     }
 
