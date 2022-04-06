@@ -13,6 +13,7 @@ import {
   PointStreamPrimitiveCollection
 } from "./api/spatial";
 import { ISamplesAPI } from "./api/server";
+import { solrQueryBounding, solrQueryCenter } from "./api/query";
 
 
 // Defined ceisum access token
@@ -30,6 +31,7 @@ let setPrimitive = null;
 let searchFields = null;
 let oboePrimitive = null;
 let oboeEntities = null;
+let currentView = null;
 const api = new ISamplesAPI();
 const moorea = new SpatialView(-149.8169236266867, -17.451466233002286, 2004.7347996772614, 201.84408760864753, -20.853642866175978);
 const patagonia = new SpatialView(-69.60169132023925, -54.315990127766646, 1781.4560051617016, 173.54573250470798, -15.85292472305027);
@@ -37,7 +39,7 @@ const Global = new SpatialView(-149.8169236266867, -17.451466233002286, 15000000
 
 async function countRecordsInBB(bb) {
   const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
-  return await api.countRecordsQuery({ Q: Q, searchFields: searchFields, rows: 0 });
+  return await api.countRecordsQuery(solrQueryBounding(Q, searchFields, 0));
 }
 
 function showCoordinates(lon, lat, height) {
@@ -58,12 +60,13 @@ async function selectedBoxCallbox(bb) {
   bbox = viewer.addRectangle(bb, text);
 
   const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
-  oboeEntities = setPoints.loadApi({ Q: Q, searchFields: searchFields, rows: 5000 });
+  oboeEntities = setPoints.loadApi(solrQueryBounding(Q, searchFields, 5000));
 
   const btn = document.getElementById("clear-bb");
   btn.style.display = "block";
   btn.onclick = clearBoundingBox;
 }
+
 
 class CesiumMap extends React.Component {
 
@@ -80,7 +83,11 @@ class CesiumMap extends React.Component {
     viewer.addPointPrimitives(setPrimitive);
     viewer.addDataSource(new PointStreamDatasource("BB points")).then((res) => { setPoints = res });
     searchFields = this.props.searchFields;
-    oboePrimitive = setPrimitive.load({ searchFields: this.props.searchFields, rows: 100000 });
+
+    setTimeout(function() {
+      currentView = viewer.currentView;
+      oboePrimitive = setPrimitive.load(solrQueryCenter(currentView.longitude, currentView.latitude, searchFields, 5000));
+    }, 3000);
   }
 
   // https://medium.com/@garrettmac/reactjs-how-to-safely-manipulate-the-dom-when-reactjs-cant-the-right-way-8a20928e8a6
@@ -89,6 +96,7 @@ class CesiumMap extends React.Component {
     const key1 = JSON.stringify(nextProps.searchFields)
     const key2 = JSON.stringify(this.props.searchFields)
     if (key1 !== key2) {
+      console.log(viewer.currentView);
       // clear all element in cesium
       viewer.removeAll();
       clearBoundingBox();
@@ -101,7 +109,10 @@ class CesiumMap extends React.Component {
         oboeEntities.abort();
       }
       searchFields = nextProps.searchFields
-      oboePrimitive = setPrimitive.load({ searchFields: nextProps.searchFields, rows: 100000 });
+      setTimeout(function() {
+        currentView = viewer.currentView;
+        oboePrimitive = setPrimitive.load(solrQueryCenter(currentView.longitude, currentView.latitude, searchFields, 5000));
+      }, 3000);
     }
 
     // return false to force react not to rerender
