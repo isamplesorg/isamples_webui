@@ -13,7 +13,6 @@ import {
   PointStreamPrimitiveCollection
 } from "./api/spatial";
 import { ISamplesAPI } from "./api/server";
-import { solrQueryBounding, solrQueryCenter } from "./api/query";
 
 
 // Defined ceisum access token
@@ -31,14 +30,16 @@ let setPrimitive = null;
 let searchFields = null;
 let oboePrimitive = null;
 let oboeEntities = null;
+let lat = -17.451466233002286;
+let long = -149.8169236266867;
 const api = new ISamplesAPI();
 const moorea = new SpatialView(-149.8169236266867, -17.451466233002286, 2004.7347996772614, 201.84408760864753, -20.853642866175978);
 const patagonia = new SpatialView(-69.60169132023925, -54.315990127766646, 1781.4560051617016, 173.54573250470798, -15.85292472305027);
-const Global = new SpatialView(-149.8169236266867, -17.451466233002286, 15000000, 90.0, -90);
 
 async function countRecordsInBB(bb) {
   const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
-  return await api.countRecordsQuery(solrQueryBounding(Q, searchFields, 0));
+  console.log(Q);
+  return await api.countRecordsQuery({Q:Q, searchFields: searchFields, rows:0 });
 }
 
 function showCoordinates(lon, lat, height) {
@@ -59,11 +60,28 @@ async function selectedBoxCallbox(bb) {
   bbox = viewer.addRectangle(bb, text);
 
   const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
-  oboeEntities = setPoints.loadApi(solrQueryBounding(Q, searchFields, 5000));
+  oboeEntities = setPoints.loadApi({Q:Q, searchFields:searchFields, rows:5000});
 
   const btn = document.getElementById("clear-bb");
   btn.style.display = "block";
   btn.onclick = clearBoundingBox;
+}
+
+function updatePrimitive(latitude, longitude){
+  viewer.removeAll();
+  clearBoundingBox();
+  setPrimitive.clear();
+  if (oboePrimitive) {
+    oboePrimitive.abort();
+  }
+
+  if (oboeEntities) {
+    oboeEntities.abort();
+  }
+
+  oboePrimitive = setPrimitive.load({lat:latitude, long:longitude, searchFields:searchFields, rows:100000});
+  lat = latitude;
+  long = longitude;
 }
 
 
@@ -82,7 +100,13 @@ class CesiumMap extends React.Component {
     viewer.addPointPrimitives(setPrimitive);
     viewer.addDataSource(new PointStreamDatasource("BB points")).then((res) => { setPoints = res });
     searchFields = this.props.searchFields;
-    oboePrimitive = setPrimitive.load(solrQueryCenter(-17.451466233002286, -149.8169236266867, searchFields, 100000));
+    oboePrimitive = setPrimitive.load({lat:-17.451466233002286, long:-149.8169236266867, searchFields:searchFields, rows:100000});
+
+    setInterval(() => {
+      if (Math.abs(viewer.currentView.latitude - lat) > 5 || Math.abs(viewer.currentView.longitude - long) > 5){
+        updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude)
+      }
+    }, 3000)
   }
 
   // https://medium.com/@garrettmac/reactjs-how-to-safely-manipulate-the-dom-when-reactjs-cant-the-right-way-8a20928e8a6
@@ -91,21 +115,9 @@ class CesiumMap extends React.Component {
     const key1 = JSON.stringify(nextProps.searchFields)
     const key2 = JSON.stringify(this.props.searchFields)
     if (key1 !== key2) {
-      console.log(viewer.currentView);
       // clear all element in cesium
-      viewer.removeAll();
-      clearBoundingBox();
-      setPrimitive.clear();
-      if (oboePrimitive) {
-        oboePrimitive.abort();
-      }
-
-      if (oboeEntities) {
-        oboeEntities.abort();
-      }
-
-      searchFields = nextProps.searchFields
-      oboePrimitive = setPrimitive.load(solrQueryCenter(viewer.currentView.latitude, viewer.currentView.longitude, searchFields, 100000));
+      searchFields = nextProps.searchFields;
+      updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
     }
 
     // return false to force react not to rerender
@@ -113,7 +125,20 @@ class CesiumMap extends React.Component {
   }
 
   visitLocation(location) {
-    viewer.visit(location)
+    lat = location.latitude;
+    long = location.longitude;
+    viewer.visit(location);
+    updatePrimitive(lat, long);
+  }
+
+  visitGlobal(){
+    viewer.visit(new SpatialView(long, lat, 15000000, 90.0, -90));
+    updatePrimitive(lat, long);
+  }
+
+  visitHorizon(){
+    viewer.visit(new SpatialView(long, lat, 2004.7347996772614, 201.84408760864753, -20.853642866175978));
+    updatePrimitive(lat, long);
   }
 
   submitLL() {
@@ -140,7 +165,10 @@ class CesiumMap extends React.Component {
             onClick={this.visitLocation.bind(this, patagonia)}>Visit Patagonia</button>
           <button
             className="btn btn-default btm-sm  margin-right-xs "
-            onClick={this.visitLocation.bind(this, Global)}>Visit Global</button>
+            onClick={this.visitGlobal.bind(this)}>Visit Global</button>
+          <button
+            className="btn btn-default btm-sm  margin-right-xs "
+            onClick={this.visitHorizon.bind(this)}>Visit horizon</button>
         </div>
         <div className="geoSearchGroup">
           <label className="margin-right-xs">Longitude: </label>

@@ -1,12 +1,6 @@
-import { fields } from "../../../fields";
 import { solrQuery } from "solr-faceted-search-react";
 
-const {
-  fieldToQueryFilter,
-  buildFormat,
-  facetFields,
-  facetSorts
-} = solrQuery;
+const { fieldToQueryFilter } = solrQuery;
 
 const buildQuery = (fields) => fields
   .map(fieldToQueryFilter)
@@ -22,40 +16,25 @@ const geodist = (lat, long) => {
   return geoDistance;
 }
 
-// The method to generate query string for bounding box
-const solrQueryBounding = (Q = "*:*", searchFields, rows = 1000, format = { wt: "json" }) => {
-  const facetedReturnParam = "id,searchText,x:producedBy_samplingSite_location_longitude,y:producedBy_samplingSite_location_latitude";
-  const fieldsParams = buildQuery(searchFields);
-  const facetFieldParam = facetFields(searchFields);
-  const facetSortParams = facetSorts(searchFields);
+const setSolrQuery = (param) => {
+  const fieldsParams = buildQuery(param.searchFields);
+  let baseQuery = `rows=${param.rows}` +
+                  `${fieldsParams.length > 0 ? `&${fieldsParams}` : ""}`;
 
-  return "q=" + Q +
-    `&fl=${facetedReturnParam}` +
-    `${fieldsParams.length > 0 ? `&${fieldsParams}` : ""}` +
-    `${facetFieldParam.length > 0 ? `&${facetFieldParam}` : ""}` +
-    `${facetSortParams.length > 0 ? `&${facetSortParams}` : ""}` +
-    `&rows=${rows}` +
-    `&${buildFormat(format)}`;
-};
+  const baseReturnParam = `id,x:producedBy_samplingSite_location_longitude,y:producedBy_samplingSite_location_latitude`;
+  // build query for primitive
+  if (param.lat && param.long){
+      const geoDistParams = geodist(param.lat, param.long);
+      return baseQuery +
+        `&fl=${baseReturnParam}` +
+        geoDistParams +
+        `&sort=$${encodeURIComponent("gdfunc asc")}`;
+  }
 
-// The method to generate query string for center position
-const solrQueryCenter = (lat, long, searchFields, rows = 1000) => {
-  const geoDistParams = geodist(lat, long);
-  const facetedReturnParam = "id,x:producedBy_samplingSite_location_longitude,y:producedBy_samplingSite_location_latitude" + geoDistParams;
-  const fieldsParams = buildQuery(searchFields);
-  // const facetFieldParam = facetFields(searchFields);
-  // const facetSortParams = facetSorts(searchFields);
-
-
-  return `rows=${rows}` +
-  `&fl=${facetedReturnParam}` +
-  `${fieldsParams.length > 0 ? `&${fieldsParams}` : ""}` +
-  // `${facetFieldParam.length > 0 ? `&${facetFieldParam}` : ""}` +
-  // `${facetSortParams.length > 0 ? `&${facetSortParams}` : ""}` +
-  `&sort=$${encodeURIComponent("gdfunc asc")}`;
+  return `q=${param.Q}&` + baseQuery +
+    `&fl=${baseReturnParam},searchText`;
 };
 
 export {
-  solrQueryBounding,
-  solrQueryCenter
+  setSolrQuery
 };
