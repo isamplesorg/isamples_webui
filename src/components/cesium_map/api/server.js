@@ -73,7 +73,6 @@ export class ISamplesAPI {
  * @todo abort the fetch process
  */
 function pointStream(query, perdoc_cb = null, finaldoc_cb = null, error_cb = null) {
-  console.log(query)
   // There is no documantation about it.
   // See the source code:
   //    https://github.com/jimhigson/oboe.js/blob/52d150dd78b20205bd26d63c807ac170c03f0f64/dist/oboe-browser.js#L2040

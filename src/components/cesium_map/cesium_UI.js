@@ -31,7 +31,6 @@ let setPrimitive = null;
 let searchFields = null;
 let oboePrimitive = null;
 let oboeEntities = null;
-let currentView = null;
 const api = new ISamplesAPI();
 const moorea = new SpatialView(-149.8169236266867, -17.451466233002286, 2004.7347996772614, 201.84408760864753, -20.853642866175978);
 const patagonia = new SpatialView(-69.60169132023925, -54.315990127766646, 1781.4560051617016, 173.54573250470798, -15.85292472305027);
@@ -83,11 +82,7 @@ class CesiumMap extends React.Component {
     viewer.addPointPrimitives(setPrimitive);
     viewer.addDataSource(new PointStreamDatasource("BB points")).then((res) => { setPoints = res });
     searchFields = this.props.searchFields;
-
-    setTimeout(function() {
-      currentView = viewer.currentView;
-      oboePrimitive = setPrimitive.load(solrQueryCenter(currentView.longitude, currentView.latitude, searchFields, 5000));
-    }, 3000);
+    oboePrimitive = setPrimitive.load(solrQueryCenter(-17.451466233002286, -149.8169236266867, searchFields, 100000));
   }
 
   // https://medium.com/@garrettmac/reactjs-how-to-safely-manipulate-the-dom-when-reactjs-cant-the-right-way-8a20928e8a6
@@ -108,12 +103,9 @@ class CesiumMap extends React.Component {
       if (oboeEntities) {
         oboeEntities.abort();
       }
-      console.log(viewer.currentView === currentView)
+
       searchFields = nextProps.searchFields
-      setTimeout(function() {
-        currentView = viewer.currentView;
-        oboePrimitive = setPrimitive.load(solrQueryCenter(currentView.latitude, currentView.longitude, searchFields, 5000));
-      }, 3000);
+      oboePrimitive = setPrimitive.load(solrQueryCenter(viewer.currentView.latitude, viewer.currentView.longitude, searchFields, 100000));
     }
 
     // return false to force react not to rerender
@@ -129,7 +121,7 @@ class CesiumMap extends React.Component {
     const latitude = document.getElementById("latitudeInput");
 
     if (longitude.value !== "" && latitude !== "") {
-      const location = new SpatialView(parseFloat(latitude.value), parseFloat(longitude.value), 150000, 90.0, -90);
+      const location = new SpatialView(parseFloat(longitude.value), parseFloat(latitude.value), 150000, 90.0, -90);
       this.visitLocation(location);
     }
 

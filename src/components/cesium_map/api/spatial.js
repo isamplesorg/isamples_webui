@@ -178,13 +178,13 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
           const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, 10);
           this.entities.add({
             position: p0,
-            description: doc.keywords,
+            description: doc.searchText,
             name: doc.id,
             point: {
               color: Cesium.Color.WHITE,
               pixelSize: 10,
-              // outlineColor: Cesium.Color.YELLOW,
-              // outlineWidth: 3,
+              outlineColor: Cesium.Color.YELLOW,
+              outlineWidth: 3,
               heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
             },
           })
