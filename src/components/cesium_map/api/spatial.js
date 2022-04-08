@@ -308,6 +308,7 @@ export class ISamplesSpatial {
       animation: false,
       sceneModePicker: false,
       terrainProvider: worldTerrain,
+      fullscreenElement : element
     });
     this.buildingTileset = this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
     this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
