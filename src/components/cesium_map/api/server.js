@@ -6,6 +6,7 @@ export class ISamplesAPI {
 
   constructor(options = {}) {
     this.headers = options["headers"] || { "Accept": "application/json" };
+    this._eventBus = options["eventBus"] || null;
   }
 
   /**

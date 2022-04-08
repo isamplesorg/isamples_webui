@@ -167,7 +167,6 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
     this.clustering.clusterPoints = true;
     this.clustering.minimumClusterSize = 10;
     this.clustering.pixelRange = 15;
-    // const _color = Cesium.Color.GREEN.withAlpha(0.5);
 
     return pointStream(
       params,
@@ -297,18 +296,14 @@ export class ISamplesSpatial {
       polyline: null,
       positions: [],
     };
-    let worldTerrain = Cesium.createWorldTerrain({
-      //requestWaterMask: true,
-      //requestVertexNormals: true,
-    });
+    let worldTerrain = Cesium.createWorldTerrain({});
 
     this.viewer = new Cesium.Viewer(element, {
-      // infoBox:false,
       timeline: false,
       animation: false,
       sceneModePicker: false,
       terrainProvider: worldTerrain,
-      fullscreenElement : element
+      fullscreenElement: element
     });
     this.buildingTileset = this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
     this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
@@ -326,7 +321,8 @@ export class ISamplesSpatial {
         horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
         verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
         pixelOffset: new Cesium.Cartesian2(15, 0),
-        disableDepthTestDistance: 1.2742018 * 10 ** 7
+        // this attribute will prevent this entity clipped by the terrain
+        disableDepthTestDistance: Number.POSITIVE_INFINITY,
       },
     });
   }
@@ -377,16 +373,6 @@ export class ISamplesSpatial {
     let scratchRectangle = new Cesium.Rectangle();
     let rect = this.viewer.camera.computeViewRectangle(this.viewer.scene.globe.ellipsoid, scratchRectangle);
     return asDRectangle(rect);
-    // if (rect) {
-    //     return new Dectangle(rect.west, rect.south, rect.east, rect.north);
-    //     return {
-    //         min_lat: Cesium.Math.toDegrees(rect.south),
-    //         min_lon: Cesium.Math.toDegrees(rect.west),
-    //         max_lat: Cesium.Math.toDegrees(rect.north),
-    //         max_lon: Cesium.Math.toDegrees(rect.east),
-    //     }
-    // }
-    // return null;
   }
 
   /**
@@ -496,32 +482,6 @@ export class ISamplesSpatial {
     this.tracking_info.positions = [];
     return asDRectangle(bb);
   }
-
-  // This is a function to add cesium tileset
-  // The string with curly will throw a warning
-  // addPointsBySource(assetId) {
-  //   const tileset = this.viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
-  //     url: Cesium.IonResource.fromAssetId(assetId),
-  //     depthFailMaterial: new Cesium.PolylineOutlineMaterialProperty(
-  //       {
-  //         color: Cesium.Color.RED,
-  //       }
-  //     ),
-  //   }));
-  //   tileset.style = new Cesium.Cesium3DTileStyle({
-  //     color: {
-  //       conditions: [
-  //         ["${Classification} === 0", "color('purple')"],
-  //         ["${Classification} === 1", "color('brown')"],
-  //         ["${Classification} === 2", "color('cyan')"],
-  //         ["${Classification} === 3", "color('orange')"],
-  //         ["true", "color('white')"]
-  //       ]
-  //     },
-  //     pointSize: 5,
-  //     zIndex: 100,
-  //   });
-  // }
 
   removeEntity(e) {
     try {

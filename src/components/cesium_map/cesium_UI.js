@@ -21,35 +21,64 @@ import { ISamplesAPI } from "./api/server";
 //  https://cesium.com/learn/ion/cesium-ion-access-tokens/
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwNzk3NjkyMy1iNGI1LTRkN2UtODRiMy04OTYwYWE0N2M3ZTkiLCJpZCI6Njk1MTcsImlhdCI6MTYzMzU0MTQ3N30.e70dpNzOCDRLDGxRguQCC-tRzGzA-23Xgno5lNgCeB4';
 
-let viewer = null;
-let bbox = null;
-let setPoints = null;
-let setPrimitive = null;
-let searchFields = null;
-let oboePrimitive = null;
-let oboeEntities = null;
+// the initial map setup
 let lat = -17.451466233002286;
 let long = -149.8169236266867;
+let bbox = null;
+let viewer = null;
+let searchFields = null;
+
+// these two represent the pritimive and entity class to handle data query.
+let setPoints = null;
+let setPrimitive = null;
+
+// these two represent the oboe stream callback.
+// we might abort the stream fetch
+let oboePrimitive = null;
+let oboeEntities = null;
+
 const api = new ISamplesAPI();
 const moorea = new SpatialView(-149.8169236266867, -17.451466233002286, 2004.7347996772614, 201.84408760864753, -20.853642866175978);
 const patagonia = new SpatialView(-69.60169132023925, -54.315990127766646, 1781.4560051617016, 173.54573250470798, -15.85292472305027);
 
+/**
+ * This method queries the record amount in the bbox
+ *
+ * @param {*} bb, a DRectangle instance to return bbox info
+ * @returns
+ */
 async function countRecordsInBB(bb) {
   const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
   return await api.countRecordsQuery({ Q: Q, searchFields: searchFields, rows: 0 });
 }
 
+/**
+ * A callback to track the mouse position in the map,
+ * when use alt + left click
+ * @param {*} lon
+ * @param {*} lat
+ * @param {*} height
+ */
 function showCoordinates(lon, lat, height) {
   let e = document.getElementById("position");
   e.innerText = `${lat.toFixed(4)}, ${lon.toFixed(4)}, ${height.toFixed(1)}`;
 }
 
+/**
+ * clear bounding box and clear buttom
+ */
 function clearBoundingBox() {
   viewer.removeEntity(bbox);
   setPoints.clear();
   document.getElementById("clear-bb").style.display = "none";
 }
 
+/**
+ * This method queries records based on the bbox,
+ * and renders point entities in the map
+ *
+ * @param {*} bb a DRectangle instance
+ */
 async function selectedBoxCallbox(bb) {
   let text = `Record count : ${await countRecordsInBB(bb)}`;
 
@@ -64,6 +93,13 @@ async function selectedBoxCallbox(bb) {
   btn.onclick = clearBoundingBox;
 }
 
+/**
+ * This method clear all objects in the map
+ * and render new point primitive based on new position
+ *
+ * @param {*} latitude
+ * @param {*} longitude
+ */
 function updatePrimitive(latitude, longitude) {
   if (setPoints) {
     viewer.removeAll();
@@ -125,12 +161,21 @@ class CesiumMap extends React.Component {
     return false;
   }
 
+  /**
+   * The map view flies to new position
+   * @param {*} location, a SpatialView instance
+   */
   visitLocation(location) {
     viewer.visit(location);
     updatePrimitive(location.latitude, location.longitude);
   }
 
-  visitHeight(direct) {
+  /**
+   * The function to change the viewpoint
+   *
+   * @param {*} direct, a bool. true go to global, false go to horizon
+   */
+  changeView(direct) {
     if (direct) {
       viewer.visit(new SpatialView(long, lat, 15000000, 90.0, -90));
     } else {
@@ -138,6 +183,9 @@ class CesiumMap extends React.Component {
     }
   }
 
+  /**
+   * Change viewpoint based on users' input
+   */
   submitLL() {
     const longitude = document.getElementById("longtitudeInput");
     const latitude = document.getElementById("latitudeInput");
@@ -146,7 +194,6 @@ class CesiumMap extends React.Component {
       const location = new SpatialView(parseFloat(longitude.value), parseFloat(latitude.value), 150000, 90.0, -90);
       this.visitLocation(location);
     }
-
   }
 
   render() {
@@ -162,10 +209,10 @@ class CesiumMap extends React.Component {
             onClick={this.visitLocation.bind(this, patagonia)}>Visit Patagonia</button>
           <button
             className="btn btn-default btm-sm  margin-right-xs "
-            onClick={this.visitHeight.bind(this, true)}>Visit Global</button>
+            onClick={this.changeView.bind(this, true)}>Visit Global</button>
           <button
             className="btn btn-default btm-sm  margin-right-xs "
-            onClick={this.visitHeight.bind(this, false)}>Visit horizon</button>
+            onClick={this.changeView.bind(this, false)}>Visit horizon</button>
         </div>
         <div className="geoSearchGroup">
           <label className="margin-right-xs">Longitude: </label>
