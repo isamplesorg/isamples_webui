@@ -1,16 +1,6 @@
-import { fields } from "../../../fields";
 import { solrQuery } from "solr-faceted-search-react";
 
-const {
-  fieldToQueryFilter,
-  buildFormat,
-  requestField,
-  facetFields,
-  facetSorts
-} = solrQuery;
-
-// default setup
-const default_searchFields = fields.filter((field) => !field.hasOwnProperty('hidden'));
+const { fieldToQueryFilter } = solrQuery;
 
 const buildQuery = (fields) => fields
   .map(fieldToQueryFilter)
@@ -18,25 +8,33 @@ const buildQuery = (fields) => fields
   .map((queryFilter) => `fq=${queryFilter}`)
   .join("&");
 
+const geodist = (lat, long) => {
+  let geoDistance = ",$gdfunc&gdfunc=geodist" + encodeURIComponent(`(producedBy_samplingSite_location_ll,${lat},${long})`);
+  // encodeURIComponent doesn't encode "(", and ")";
+  geoDistance = geoDistance.replace("(", "%28");
+  geoDistance = geoDistance.replace(")", "%29");
+  return geoDistance;
+}
 
-// this two method will change after fixing stream API bug.
-const solrQueryThing = (Q = "*:*", searchFields = default_searchFields, rows = 1000, format = { wt: "json" }) => {
-  const facetedReturnParam = requestField(searchFields) + " x:producedBy_samplingSite_location_longitude y:producedBy_samplingSite_location_latitude";
-  const fieldsParams = buildQuery(searchFields);
-  const facetFieldParam = facetFields(searchFields);
-  const facetSortParams = facetSorts(searchFields);
-  // const mainQuery = queryParams.length > 0 ? "" : "q=*:*";
+const setSolrQuery = (param) => {
+  const fieldsParams = buildQuery(param.searchFields);
+  let baseQuery = `rows=${param.rows}` +
+    `${fieldsParams.length > 0 ? `&${fieldsParams}` : ""}`;
 
-  return "q=" + Q +
-    `&fl=${facetedReturnParam}` +
-    `${fieldsParams.length > 0 ? `&${fieldsParams}` : ""}` +
-    `${facetFieldParam.length > 0 ? `&${facetFieldParam}` : ""}` +
-    `${facetSortParams.length > 0 ? `&${facetSortParams}` : ""}` +
-    `&rows=${rows}` +
-    `&${buildFormat(format)}`;
+  const baseReturnParam = `id,x:producedBy_samplingSite_location_longitude,y:producedBy_samplingSite_location_latitude`;
+  // build query for primitive
+  if (param.lat && param.long) {
+    const geoDistParams = geodist(param.lat, param.long);
+    return baseQuery +
+      `&fl=${baseReturnParam}` +
+      geoDistParams +
+      `&sort=$${encodeURIComponent("gdfunc asc")}`;
+  }
+
+  return `q=${param.Q}&` + baseQuery +
+    `&fl=${baseReturnParam},searchText`;
 };
 
-
 export {
-  solrQueryThing
+  setSolrQuery
 };

@@ -53,7 +53,6 @@ class DRectangle extends Cesium.Rectangle {
     };
   }
 
-
   // /**
   //  * Return a Solr query for the rectangle.
   //  *
@@ -168,7 +167,6 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
     this.clustering.clusterPoints = true;
     this.clustering.minimumClusterSize = 10;
     this.clustering.pixelRange = 15;
-    // const _color = Cesium.Color.GREEN.withAlpha(0.5);
 
     return pointStream(
       params,
@@ -178,12 +176,14 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
           const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, 10);
           this.entities.add({
             position: p0,
+            description: `<h4>Identifier: ${doc.id}</h4><span><b>All text fields</b>: ${doc.searchText}</span>`,
+            name: doc.id,
             point: {
               color: Cesium.Color.WHITE,
               pixelSize: 10,
-              // outlineColor: Cesium.Color.YELLOW,
-              // outlineWidth: 3,
-              heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
+              outlineColor: Cesium.Color.YELLOW,
+              outlineWidth: 3,
+              heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND
             },
           })
         }
@@ -198,7 +198,6 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
         console.error(err);
       })
   }
-
 }
 
 /**
@@ -262,10 +261,10 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
           }
           const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, 10);
           this.add({
+            id: doc.id,
             position: p0,
             color: this.outlineStyle(locations, location),
-            pixelSize: 10,
-            heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND,
+            pixelSize: 10
           })
         }
       },
@@ -297,17 +296,14 @@ export class ISamplesSpatial {
       polyline: null,
       positions: [],
     };
-    let worldTerrain = Cesium.createWorldTerrain({
-      //requestWaterMask: true,
-      //requestVertexNormals: true,
-    });
+    let worldTerrain = Cesium.createWorldTerrain({});
 
     this.viewer = new Cesium.Viewer(element, {
-      infoBox:false,
       timeline: false,
       animation: false,
       sceneModePicker: false,
       terrainProvider: worldTerrain,
+      fullscreenElement: element
     });
     this.buildingTileset = this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
     this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
@@ -315,6 +311,20 @@ export class ISamplesSpatial {
     this.mouseCoordinateCallback = null;
     this.selectBoxCallback = null;
     this.selectedBox = null;
+
+    // entity label for point primitive identifier
+    this.pointLabel = this.viewer.entities.add({
+      label: {
+        show: false,
+        showBackground: true,
+        font: "14px monospace",
+        horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
+        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+        pixelOffset: new Cesium.Cartesian2(15, 0),
+        // this attribute will prevent this entity clipped by the terrain
+        disableDepthTestDistance: Number.POSITIVE_INFINITY,
+      },
+    });
   }
 
   get canvas() {
@@ -363,18 +373,7 @@ export class ISamplesSpatial {
     let scratchRectangle = new Cesium.Rectangle();
     let rect = this.viewer.camera.computeViewRectangle(this.viewer.scene.globe.ellipsoid, scratchRectangle);
     return asDRectangle(rect);
-    // if (rect) {
-    //     return new Dectangle(rect.west, rect.south, rect.east, rect.north);
-    //     return {
-    //         min_lat: Cesium.Math.toDegrees(rect.south),
-    //         min_lon: Cesium.Math.toDegrees(rect.west),
-    //         max_lat: Cesium.Math.toDegrees(rect.north),
-    //         max_lon: Cesium.Math.toDegrees(rect.east),
-    //     }
-    // }
-    // return null;
   }
-
 
   /**
    * Draw a region by holding down ALT, click to start, drag, click to finish.
@@ -388,6 +387,9 @@ export class ISamplesSpatial {
     this.handler.setInputAction((movement) => {
       this._trackMovement(movement)
     }, Cesium.ScreenSpaceEventType.MOUSE_MOVE, Cesium.KeyboardEventModifier.ALT);
+    this.handler.setInputAction((movement) => {
+      this.showPrimitiveId(movement);
+    }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
     if (selectBoxCallback !== undefined) {
       this.selectBoxCallback = selectBoxCallback;
     }
@@ -399,6 +401,17 @@ export class ISamplesSpatial {
 
   clearTrackMouseCoordinates() {
     this.mouseCoordinateCallback = null;
+  }
+
+  showPrimitiveId(movement) {
+    const selectPoint = this.viewer.scene.pick(movement.endPosition);
+    if (Cesium.defined(selectPoint) && selectPoint.hasOwnProperty("primitive") && typeof selectPoint.id === 'string') {
+      this.pointLabel.position = selectPoint.primitive.position;
+      this.pointLabel.label.show = true;
+      this.pointLabel.label.text = selectPoint.id;
+    } else {
+      this.pointLabel.label.show = false;
+    }
   }
 
   startTracking(click) {
@@ -470,32 +483,6 @@ export class ISamplesSpatial {
     return asDRectangle(bb);
   }
 
-  // This is a function to add cesium tileset
-  // The string with curly will throw a warning
-  // addPointsBySource(assetId) {
-  //   const tileset = this.viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
-  //     url: Cesium.IonResource.fromAssetId(assetId),
-  //     depthFailMaterial: new Cesium.PolylineOutlineMaterialProperty(
-  //       {
-  //         color: Cesium.Color.RED,
-  //       }
-  //     ),
-  //   }));
-  //   tileset.style = new Cesium.Cesium3DTileStyle({
-  //     color: {
-  //       conditions: [
-  //         ["${Classification} === 0", "color('purple')"],
-  //         ["${Classification} === 1", "color('brown')"],
-  //         ["${Classification} === 2", "color('cyan')"],
-  //         ["${Classification} === 3", "color('orange')"],
-  //         ["true", "color('white')"]
-  //       ]
-  //     },
-  //     pointSize: 5,
-  //     zIndex: 100,
-  //   });
-  // }
-
   removeEntity(e) {
     try {
       this.viewer.entities.remove(e);
@@ -506,6 +493,8 @@ export class ISamplesSpatial {
 
   removeAll() {
     this.viewer.entities.removeAll();
+    //add point label
+    this.viewer.entities.add(this.pointLabel);
   }
 
   addRectangle(rect, text) {
@@ -517,14 +506,6 @@ export class ISamplesSpatial {
         material: Cesium.Color.GOLD.withAlpha(0.25),
       },
       position: Cesium.Cartesian3.fromRadians(center.longitude, center.latitude),
-      point: {
-        color: Cesium.Color.SKYBLUE,
-        pixelSize: 10,
-        outlineColor: Cesium.Color.YELLOW,
-        outlineWidth: 3,
-        heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
-        show: false
-      },
       label: {
         text: text,
         font: "14pt sans-serif",
@@ -574,6 +555,4 @@ export class ISamplesSpatial {
     let position = Cesium.Cartesian3.fromDegrees(longitude, latitude);
     return Cesium.SceneTransforms.wgs84ToWindowCoordinates(this.viewer.scene, position);
   }
-
-
 }

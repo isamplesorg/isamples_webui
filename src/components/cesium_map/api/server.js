@@ -1,11 +1,12 @@
-import { solrQueryThing } from "./query";
 import oboe from "oboe";
 import config from "../../../config";
+import { setSolrQuery } from "../api/query";
 
 export class ISamplesAPI {
 
   constructor(options = {}) {
     this.headers = options["headers"] || { "Accept": "application/json" };
+    this._eventBus = options["eventBus"] || null;
   }
 
   /**
@@ -54,9 +55,9 @@ export class ISamplesAPI {
    * @param {*} query the string of solr query parameter
    * @returns integer
    */
-  async countRecordsQuery(params) {
+  async countRecordsQuery(query) {
     try {
-      let data = await this._fetchPromise(config.solr_url + "?" + solrQueryThing(params.Q, params.searchFields, params.rows));
+      let data = await this._fetchPromise(config.solr_url + "?" + setSolrQuery(query));
       return data.response.numFound;
     } catch (e) {
       console.error(e);
@@ -73,14 +74,12 @@ export class ISamplesAPI {
  *
  * @todo abort the fetch process
  */
-function pointStream(params, perdoc_cb = null, finaldoc_cb = null, error_cb = null) {
-  const query = solrQueryThing(params.Q, params.searchFields, params.rows);
-  console.log(query);
+function pointStream(query, perdoc_cb = null, finaldoc_cb = null, error_cb = null) {
   // There is no documantation about it.
   // See the source code:
   //    https://github.com/jimhigson/oboe.js/blob/52d150dd78b20205bd26d63c807ac170c03f0f64/dist/oboe-browser.js#L2040
   // reture oboe instance so we could abort fetch
-  return oboe(config.solr_stream + "?" + query)
+  return oboe(config.solr_stream + "?" + setSolrQuery(query))
     .node('docs.*', (doc) => {
       if (perdoc_cb !== null) {
         perdoc_cb(doc);
