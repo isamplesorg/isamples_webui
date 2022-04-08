@@ -14,14 +14,12 @@ import {
 } from "./api/spatial";
 import { ISamplesAPI } from "./api/server";
 
-
 // Defined ceisum access token
 // Current one is Dave's token
 // How to generate Cesium token
 // See link:
 //  https://cesium.com/learn/ion/cesium-ion-access-tokens/
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwNzk3NjkyMy1iNGI1LTRkN2UtODRiMy04OTYwYWE0N2M3ZTkiLCJpZCI6Njk1MTcsImlhdCI6MTYzMzU0MTQ3N30.e70dpNzOCDRLDGxRguQCC-tRzGzA-23Xgno5lNgCeB4';
-
 
 let viewer = null;
 let bbox = null;
@@ -88,9 +86,7 @@ function updatePrimitive(latitude, longitude) {
 
 }
 
-
 class CesiumMap extends React.Component {
-
   // This is a initial function in react liftcycle.
   // Only call once when this component first render
   componentDidMount() {
@@ -141,7 +137,6 @@ class CesiumMap extends React.Component {
       viewer.visit(new SpatialView(long, lat, 2004.7347996772614, 201.84408760864753, -20.853642866175978));
     }
   }
-
 
   submitLL() {
     const longitude = document.getElementById("longtitudeInput");

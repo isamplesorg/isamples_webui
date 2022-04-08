@@ -53,7 +53,6 @@ class DRectangle extends Cesium.Rectangle {
     };
   }
 
-
   // /**
   //  * Return a Solr query for the rectangle.
   //  *
@@ -200,7 +199,6 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
         console.error(err);
       })
   }
-
 }
 
 /**
@@ -330,7 +328,6 @@ export class ISamplesSpatial {
         disableDepthTestDistance: 1.2742018 * 10 ** 7
       },
     });
-
   }
 
   get canvas() {
@@ -390,7 +387,6 @@ export class ISamplesSpatial {
     // }
     // return null;
   }
-
 
   /**
    * Draw a region by holding down ALT, click to start, drag, click to finish.
@@ -598,6 +594,4 @@ export class ISamplesSpatial {
     let position = Cesium.Cartesian3.fromDegrees(longitude, latitude);
     return Cesium.SceneTransforms.wgs84ToWindowCoordinates(this.viewer.scene, position);
   }
-
-
 }
