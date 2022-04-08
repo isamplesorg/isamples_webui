@@ -60,7 +60,7 @@ async function selectedBoxCallbox(bb) {
   bbox = viewer.addRectangle(bb, text);
 
   const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
-  oboeEntities = setPoints.loadApi({Q:Q, searchFields:searchFields, rows:5000});
+  oboeEntities = setPoints.loadApi({Q:Q, searchFields:searchFields, rows:10000});
 
   const btn = document.getElementById("clear-bb");
   btn.style.display = "block";
@@ -68,9 +68,13 @@ async function selectedBoxCallbox(bb) {
 }
 
 function updatePrimitive(latitude, longitude){
-  viewer.removeAll();
-  clearBoundingBox();
-  setPrimitive.clear();
+  if (setPoints){
+    viewer.removeAll();
+    clearBoundingBox();
+  }
+  if (setPrimitive){
+    setPrimitive.clear();
+  }
   if (oboePrimitive) {
     oboePrimitive.abort();
   }
@@ -82,6 +86,7 @@ function updatePrimitive(latitude, longitude){
   oboePrimitive = setPrimitive.load({lat:latitude, long:longitude, searchFields:searchFields, rows:100000});
   lat = latitude;
   long = longitude;
+
 }
 
 
@@ -100,8 +105,9 @@ class CesiumMap extends React.Component {
     viewer.addPointPrimitives(setPrimitive);
     viewer.addDataSource(new PointStreamDatasource("BB points")).then((res) => { setPoints = res });
     searchFields = this.props.searchFields;
-    oboePrimitive = setPrimitive.load({lat:-17.451466233002286, long:-149.8169236266867, searchFields:searchFields, rows:100000});
+    updatePrimitive(lat, long)
 
+    // set time interval to check the current view every 3 seconds and update points
     setInterval(() => {
       if (Math.abs(viewer.currentView.latitude - lat) > 5 || Math.abs(viewer.currentView.longitude - long) > 5){
         updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude)
@@ -125,21 +131,18 @@ class CesiumMap extends React.Component {
   }
 
   visitLocation(location) {
-    lat = location.latitude;
-    long = location.longitude;
     viewer.visit(location);
-    updatePrimitive(lat, long);
+    updatePrimitive(location.latitude, location.longitude);
   }
 
-  visitGlobal(){
-    viewer.visit(new SpatialView(long, lat, 15000000, 90.0, -90));
-    updatePrimitive(lat, long);
+  visitHeight(direct){
+    if(direct){
+      viewer.visit(new SpatialView(long, lat, 15000000, 90.0, -90));
+    }else{
+      viewer.visit(new SpatialView(long, lat, 2004.7347996772614, 201.84408760864753, -20.853642866175978));
+    }
   }
 
-  visitHorizon(){
-    viewer.visit(new SpatialView(long, lat, 2004.7347996772614, 201.84408760864753, -20.853642866175978));
-    updatePrimitive(lat, long);
-  }
 
   submitLL() {
     const longitude = document.getElementById("longtitudeInput");
@@ -165,10 +168,10 @@ class CesiumMap extends React.Component {
             onClick={this.visitLocation.bind(this, patagonia)}>Visit Patagonia</button>
           <button
             className="btn btn-default btm-sm  margin-right-xs "
-            onClick={this.visitGlobal.bind(this)}>Visit Global</button>
+            onClick={this.visitHeight.bind(this, true)}>Visit Global</button>
           <button
             className="btn btn-default btm-sm  margin-right-xs "
-            onClick={this.visitHorizon.bind(this)}>Visit horizon</button>
+            onClick={this.visitHeight.bind(this, false)}>Visit horizon</button>
         </div>
         <div className="geoSearchGroup">
           <label className="margin-right-xs">Longitude: </label>
