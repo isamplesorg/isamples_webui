@@ -327,7 +327,7 @@ export class ISamplesSpatial {
         horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
         verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
         pixelOffset: new Cesium.Cartesian2(15, 0),
-        disableDepthTestDistance: 1.2742018*10**7
+        disableDepthTestDistance: 1.2742018 * 10 ** 7
       },
     });
 
@@ -406,7 +406,7 @@ export class ISamplesSpatial {
     }, Cesium.ScreenSpaceEventType.MOUSE_MOVE, Cesium.KeyboardEventModifier.ALT);
     this.handler.setInputAction((movement) => {
       this.showPrimitiveId(movement);
-    },Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+    }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
     if (selectBoxCallback !== undefined) {
       this.selectBoxCallback = selectBoxCallback;
     }
@@ -420,16 +420,15 @@ export class ISamplesSpatial {
     this.mouseCoordinateCallback = null;
   }
 
-  showPrimitiveId(movement){
+  showPrimitiveId(movement) {
     const selectPoint = this.viewer.scene.pick(movement.endPosition);
-    if (Cesium.defined(selectPoint) && selectPoint.hasOwnProperty("primitive") && typeof selectPoint.id === 'string'){
+    if (Cesium.defined(selectPoint) && selectPoint.hasOwnProperty("primitive") && typeof selectPoint.id === 'string') {
       this.pointLabel.position = selectPoint.primitive.position;
       this.pointLabel.label.show = true;
       this.pointLabel.label.text = selectPoint.id;
-    }else{
+    } else {
       this.pointLabel.label.show = false;
     }
-
   }
 
   startTracking(click) {

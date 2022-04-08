@@ -38,8 +38,7 @@ const patagonia = new SpatialView(-69.60169132023925, -54.315990127766646, 1781.
 
 async function countRecordsInBB(bb) {
   const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
-  console.log(Q);
-  return await api.countRecordsQuery({Q:Q, searchFields: searchFields, rows:0 });
+  return await api.countRecordsQuery({ Q: Q, searchFields: searchFields, rows: 0 });
 }
 
 function showCoordinates(lon, lat, height) {
@@ -60,19 +59,19 @@ async function selectedBoxCallbox(bb) {
   bbox = viewer.addRectangle(bb, text);
 
   const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
-  oboeEntities = setPoints.loadApi({Q:Q, searchFields:searchFields, rows:10000});
+  oboeEntities = setPoints.loadApi({ Q: Q, searchFields: searchFields, rows: 10000 });
 
   const btn = document.getElementById("clear-bb");
   btn.style.display = "block";
   btn.onclick = clearBoundingBox;
 }
 
-function updatePrimitive(latitude, longitude){
-  if (setPoints){
+function updatePrimitive(latitude, longitude) {
+  if (setPoints) {
     viewer.removeAll();
     clearBoundingBox();
   }
-  if (setPrimitive){
+  if (setPrimitive) {
     setPrimitive.clear();
   }
   if (oboePrimitive) {
@@ -83,7 +82,7 @@ function updatePrimitive(latitude, longitude){
     oboeEntities.abort();
   }
 
-  oboePrimitive = setPrimitive.load({lat:latitude, long:longitude, searchFields:searchFields, rows:100000});
+  oboePrimitive = setPrimitive.load({ lat: latitude, long: longitude, searchFields: searchFields, rows: 100000 });
   lat = latitude;
   long = longitude;
 
@@ -109,7 +108,7 @@ class CesiumMap extends React.Component {
 
     // set time interval to check the current view every 3 seconds and update points
     setInterval(() => {
-      if (Math.abs(viewer.currentView.latitude - lat) > 5 || Math.abs(viewer.currentView.longitude - long) > 5){
+      if (Math.abs(viewer.currentView.latitude - lat) > 5 || Math.abs(viewer.currentView.longitude - long) > 5) {
         updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude)
       }
     }, 3000)
@@ -135,10 +134,10 @@ class CesiumMap extends React.Component {
     updatePrimitive(location.latitude, location.longitude);
   }
 
-  visitHeight(direct){
-    if(direct){
+  visitHeight(direct) {
+    if (direct) {
       viewer.visit(new SpatialView(long, lat, 15000000, 90.0, -90));
-    }else{
+    } else {
       viewer.visit(new SpatialView(long, lat, 2004.7347996772614, 201.84408760864753, -20.853642866175978));
     }
   }

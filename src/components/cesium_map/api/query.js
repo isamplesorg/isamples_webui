@@ -19,16 +19,16 @@ const geodist = (lat, long) => {
 const setSolrQuery = (param) => {
   const fieldsParams = buildQuery(param.searchFields);
   let baseQuery = `rows=${param.rows}` +
-                  `${fieldsParams.length > 0 ? `&${fieldsParams}` : ""}`;
+    `${fieldsParams.length > 0 ? `&${fieldsParams}` : ""}`;
 
   const baseReturnParam = `id,x:producedBy_samplingSite_location_longitude,y:producedBy_samplingSite_location_latitude`;
   // build query for primitive
-  if (param.lat && param.long){
-      const geoDistParams = geodist(param.lat, param.long);
-      return baseQuery +
-        `&fl=${baseReturnParam}` +
-        geoDistParams +
-        `&sort=$${encodeURIComponent("gdfunc asc")}`;
+  if (param.lat && param.long) {
+    const geoDistParams = geodist(param.lat, param.long);
+    return baseQuery +
+      `&fl=${baseReturnParam}` +
+      geoDistParams +
+      `&sort=$${encodeURIComponent("gdfunc asc")}`;
   }
 
   return `q=${param.Q}&` + baseQuery +

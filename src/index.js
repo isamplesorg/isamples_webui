@@ -49,7 +49,7 @@ const sortFields = [
   { label: "Material", field: "hasMaterialCategory" },
   { label: "Specimen", field: "hasSpecimenCategory" },
   { label: "Registrant", field: "registrant" },
-  { label: "Collection Time", field: "producedBy_resultTime"}
+  { label: "Collection Time", field: "producedBy_resultTime" }
 ];
 
 // Create a cutom component pack from the default component pack
