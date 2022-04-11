@@ -161,12 +161,14 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
   }
 
   loadApi(params) {
-    this.isLoading = true;
     this.clear()
     this.clustering.enabled = true;
     this.clustering.clusterPoints = true;
     this.clustering.minimumClusterSize = 10;
     this.clustering.pixelRange = 15;
+    // display loading spinner
+    this.loading = document.getElementById("loading");
+    this.loading.style.removeProperty("display");
 
     return pointStream(
       params,
@@ -189,12 +191,14 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
         }
       },
       (final) => {
-        this.isLoading = false;
         this.pointsClusterStyle();
+        // remove loading spinner
+        this.loading.style.display = "none";
         console.log("Point stream complete");
       },
       (err) => {
-        this.isLoading = false;
+        // remove loading spinner
+        this.loading.style.display = "none";
         console.error(err);
       })
   }
@@ -246,7 +250,9 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
   // function to query results and add point into cesium
   load(params) {
     let locations = {};
-    this.isLoading = true;
+    // display loading page
+    this.loading = document.getElementById("loading");
+    this.loading.style.removeProperty("display");
 
     return pointStream(
       params,
@@ -269,11 +275,13 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
         }
       },
       (final) => {
-        this.isLoading = false;
+        // remove loading spinner
+        this.loading.style.display = "none";
         console.log("Point primitive stream complete");
       },
       (err) => {
-        this.isLoading = false;
+        // remove loading spinner
+        this.loading.style.display = "none";
         console.error(err);
       })
   }
@@ -536,11 +544,21 @@ export class ISamplesSpatial {
 
   //TODO: This should be a separate class for managing the HUD
   addHud(canvas_id) {
+    // the first div contains mouce location
+    // the following divs contain loading spinner element
+    // see link:
+    //    https://loading.io/css/
     let hud = html`<div class="spatial-hud" style="position: absolute; top: 0px; left: 0;">
-          <p><code id='position'>0, 0, 0</code></p>
-          <p><button id='clear-bb' style='display:none'>Clear BB</button></p>
-          <div id="selected-record"></div>
-      </div>`;
+                    <p><code id='position'>0, 0, 0</code></p>
+                    <p><button id='clear-bb' style='display:none'>Clear BB</button></p>
+                    <div id="selected-record"></div>
+                  </div>
+                  <div id="loading" style="display: none;">
+                    <div class="background-spinner"></div>
+                    <div class="lds-spinner">
+                      <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                    </div>
+                  </div>`;
     const v = document.querySelector("div.cesium-viewer");
     render(hud, v);
     const cc = this.canvas;
@@ -556,3 +574,4 @@ export class ISamplesSpatial {
     return Cesium.SceneTransforms.wgs84ToWindowCoordinates(this.viewer.scene, position);
   }
 }
+

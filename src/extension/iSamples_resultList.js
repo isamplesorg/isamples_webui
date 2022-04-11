@@ -66,50 +66,37 @@ class ResultList extends React.Component {
     const fields = this.props.children[0].length !== 0 ? this.props.children[0][0]['props']['fields'] : [];
     const searchFields = fields.filter((field) => field.type !== "non-search").map(({ collapse, hidden, ...rest }) => rest);
 
-    // conditional rendering.
-    switch (this.state.facet) {
-      case 'List':
-        return (
-          <ButGroup
-            bootstrapCss={bootstrapCss}
-            switchFormat={this.switchFormat.bind(this)}
-            active={this.state.facet}
-            children={
+
+    return (
+      <ButGroup
+        bootstrapCss={bootstrapCss}
+        switchFormat={this.switchFormat.bind(this)}
+        active={this.state.facet}
+        children={
+          <>
+            <div style={{ display: this.state.facet === 'List' ? "block" : "none" }}>
               <ul className={cx({ "list-group": bootstrapCss })}>
                 {this.props.children}
-              </ul>}
-          />
-        );
-      case 'Table':
-        return (
-          <ButGroup
-            bootstrapCss={bootstrapCss}
-            switchFormat={this.switchFormat.bind(this)}
-            active={this.state.facet}
-            children={
+              </ul>
+            </div>
+            <div style={{ display: this.state.facet === 'Table' ? "block" : "none" }}>
               <Table
                 docs={doc}
                 fields={fields}
               />
-            } />
-        );
-      case 'Map':
-        return (
-          <ButGroup
-            bootstrapCss={bootstrapCss}
-            switchFormat={this.switchFormat.bind(this)}
-            active={this.state.facet}
-            children={
-              // if there is no searchFields, don't render cesium.
-              searchFields.length > 0
-                ?
-                <CesiumMap searchFields={searchFields} />
-                : null
-            } />
-        );
-      default:
-        return 'Facet type error!';
-    }
+            </div>
+            <div style={{ display: this.state.facet === 'Map' ? "block" : "none" }}>
+              {
+                // if there is no searchFields, don't render cesium.
+                searchFields.length > 0
+                  ?
+                  <CesiumMap searchFields={searchFields} />
+                  : null
+              }
+            </div>
+          </>}
+      />
+    );
   }
 }
 

@@ -6,6 +6,8 @@
 
 import React from "react";
 import * as Cesium from "cesium";
+import '../../CSS/loading_spinner.css';
+
 import {
   SpatialView,
   ISamplesSpatial,
@@ -130,6 +132,7 @@ class CesiumMap extends React.Component {
     // viewer.addPointsBySource(642092);
     viewer.visit(moorea);
     viewer.addHud("cesiumContainer");
+    // viewer.addLoading();
     viewer.trackMouseCoordinates(showCoordinates);
     viewer.enableTracking(selectedBoxCallbox);
     setPrimitive = new PointStreamPrimitiveCollection("Primitive Points");
