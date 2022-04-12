@@ -319,6 +319,7 @@ export class ISamplesSpatial {
     });
     // limit the map max height
     this.viewer.scene.screenSpaceCameraController.maximumZoomDistance = 20000000;
+    this.viewer.scene.screenSpaceCameraController.minimumZoomDistance = 10;
     this.buildingTileset = this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
     this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
     this.viewer.scene.globe.depthTestAgainstTerrain = true;

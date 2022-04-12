@@ -132,20 +132,12 @@ function updatePrimitive(latitude, longitude) {
  * @param {*} lon2 new position longtidue
  * @returns
  */
-function distance(lat1, lon1, lat2, lon2){
-  const R = 6371; // kilometer
-  const φ1 = lat1 * Math.PI/180; // φ, λ in radians
-  const φ2 = lat2 * Math.PI/180;
-  const Δφ = (lat2-lat1) * Math.PI/180;
-  const Δλ = (lon2-lon1) * Math.PI/180;
-
-  const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-          Math.cos(φ1) * Math.cos(φ2) *
-          Math.sin(Δλ/2) * Math.sin(Δλ/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-  return R * c ;
+function distance(lat1, long1, lat2, long2){
+  const p1 = Cesium.Cartographic.fromCartesian(Cesium.Cartesian3.fromDegrees(long1, lat1, 0))
+  const p2 = Cesium.Cartographic.fromCartesian(Cesium.Cartesian3.fromDegrees(long2, lat2, 0))
+  return new Cesium.EllipsoidGeodesic(p1, p2).surfaceDistance / 1000;
 }
+
 
 class CesiumMap extends React.Component {
   // This is a initial function in react liftcycle.
@@ -167,7 +159,7 @@ class CesiumMap extends React.Component {
     setInterval(() => {
       let diffDistance = distance(lat, long, viewer.currentView.latitude , viewer.currentView.longitude);
       // update the points every 5 seconds if two points differ in 50km + scale of height.
-      if (diffDistance > 50 + 3000  * viewer.currentView.height / 1500000) {
+      if (diffDistance > 50 + 4000  * viewer.currentView.height / 15000000) {
         updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude)
       }
     }, 5000)
