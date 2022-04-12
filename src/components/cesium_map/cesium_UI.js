@@ -130,7 +130,7 @@ function updatePrimitive(latitude, longitude) {
  * @param {*} lon1 old position longtitude
  * @param {*} lat2 new position latitude
  * @param {*} lon2 new position longtidue
- * @returns
+ * @returns distance in kilometer
  */
 function distance(lat1, long1, lat2, long2) {
   const p1 = Cesium.Cartographic.fromCartesian(Cesium.Cartesian3.fromDegrees(long1, lat1, 0))
