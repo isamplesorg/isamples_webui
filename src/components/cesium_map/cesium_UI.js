@@ -6,7 +6,7 @@
 
 import React from "react";
 import * as Cesium from "cesium";
-import '../../CSS/loading_spinner.css';
+import '../../css/loading_spinner.css';
 
 import {
   SpatialView,
