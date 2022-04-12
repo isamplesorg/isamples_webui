@@ -377,7 +377,7 @@ export class ISamplesSpatial {
   }
 
   /**
-   * get the map center
+   * This is the method to find the camera focus point position
    * https://stackoverflow.com/questions/33348761/get-center-in-cesium-map
    */
   get getMapCenter() {
