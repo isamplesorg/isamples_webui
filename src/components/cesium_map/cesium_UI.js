@@ -121,7 +121,30 @@ function updatePrimitive(latitude, longitude) {
   oboePrimitive = setPrimitive.load({ lat: latitude, long: longitude, searchFields: searchFields, rows: 100000 });
   lat = latitude;
   long = longitude;
+}
 
+/**
+ * This function calculate the distance between two camera positions
+ *
+ * @param {*} lat1 old position latitude
+ * @param {*} lon1 old position longtitude
+ * @param {*} lat2 new position latitude
+ * @param {*} lon2 new position longtidue
+ * @returns
+ */
+function distance(lat1, lon1, lat2, lon2){
+  const R = 6371; // kilometer
+  const φ1 = lat1 * Math.PI/180; // φ, λ in radians
+  const φ2 = lat2 * Math.PI/180;
+  const Δφ = (lat2-lat1) * Math.PI/180;
+  const Δλ = (lon2-lon1) * Math.PI/180;
+
+  const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+          Math.cos(φ1) * Math.cos(φ2) *
+          Math.sin(Δλ/2) * Math.sin(Δλ/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+  return R * c ;
 }
 
 class CesiumMap extends React.Component {
@@ -140,13 +163,14 @@ class CesiumMap extends React.Component {
     viewer.addDataSource(new PointStreamDatasource("BB points")).then((res) => { setPoints = res });
     searchFields = this.props.searchFields;
     updatePrimitive(lat, long)
-
     // set time interval to check the current view every 3 seconds and update points
     setInterval(() => {
-      if (Math.abs(viewer.currentView.latitude - lat) > 5 || Math.abs(viewer.currentView.longitude - long) > 5) {
+      let diffDistance = distance(lat, long, viewer.currentView.latitude , viewer.currentView.longitude);
+      // update the points every 5 seconds if two points differ in 50km + scale of height.
+      if (diffDistance > 50 + 3000  * viewer.currentView.height / 1500000) {
         updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude)
       }
-    }, 3000)
+    }, 5000)
   }
 
   // https://medium.com/@garrettmac/reactjs-how-to-safely-manipulate-the-dom-when-reactjs-cant-the-right-way-8a20928e8a6

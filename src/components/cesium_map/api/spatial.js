@@ -313,6 +313,8 @@ export class ISamplesSpatial {
       terrainProvider: worldTerrain,
       fullscreenElement: element
     });
+    // limit the map max height
+    this.viewer.scene.screenSpaceCameraController.maximumZoomDistance = 20000000;
     this.buildingTileset = this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
     this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
     this.viewer.scene.globe.depthTestAgainstTerrain = true;
@@ -367,6 +369,27 @@ export class ISamplesSpatial {
       Cesium.Math.toDegrees(this.viewer.camera.heading),
       Cesium.Math.toDegrees(this.viewer.camera.pitch),
     )
+  }
+
+  /**
+   * get the map center
+   * https://stackoverflow.com/questions/33348761/get-center-in-cesium-map
+   */
+  get getMapCenter() {
+    var windowPosition = new Cesium.Cartesian2(this.viewer.container.clientWidth / 2, this.viewer.container.clientHeight / 2);
+    var pickRay = this.viewer.scene.camera.getPickRay(windowPosition);
+    var pickPosition = this.viewer.scene.globe.pick(pickRay, this.viewer.scene);
+    if(pickPosition === undefined){
+      return undefined
+    };
+    var pickPositionCartographic = this.viewer.scene.globe.ellipsoid.cartesianToCartographic(pickPosition);
+    return new SpatialView(
+      pickPositionCartographic.longitude * (180/Math.PI),
+      pickPositionCartographic.latitude * (180/Math.PI),
+      pickPositionCartographic.height,
+      Cesium.Math.toDegrees(this.viewer.camera.heading),
+      Cesium.Math.toDegrees(this.viewer.camera.pitch),
+    );
   }
 
   /**
@@ -427,6 +450,7 @@ export class ISamplesSpatial {
     if (this.tracking_info.tracking) {
       console.log("stop tracking");
       const bb = this.stopTracking();
+      console.log(bb);
       if (this.selectedBox !== null) {
         this.viewer.entities.remove(this.selectedBox);
       }
