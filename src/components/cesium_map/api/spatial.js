@@ -175,6 +175,10 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
       (doc) => {
         // Handle the data records, e.g. response.docs[0].doc
         if (doc.hasOwnProperty('x')) {
+          if(!this.loading.style.display){
+            // remove loading spinner
+            this.loading.style.display = "none";
+          }
           const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, 10);
           this.entities.add({
             position: p0,
@@ -192,8 +196,6 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
       },
       (final) => {
         this.pointsClusterStyle();
-        // remove loading spinner
-        this.loading.style.display = "none";
         console.log("Point stream complete");
       },
       (err) => {
@@ -259,6 +261,10 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
       (doc) => {
         // Handle the data records, e.g. response.docs[0].doc
         if (doc.hasOwnProperty('x')) {
+          if(!this.loading.style.display){
+            // remove loading spinner
+            this.loading.style.display = "none";
+          }
           let location = doc.x.toString() + ":" + doc.y.toString();
           if (location in locations) {
             locations[location] = locations[location] + 1;
@@ -275,8 +281,6 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
         }
       },
       (final) => {
-        // remove loading spinner
-        this.loading.style.display = "none";
         console.log("Point primitive stream complete");
       },
       (err) => {
