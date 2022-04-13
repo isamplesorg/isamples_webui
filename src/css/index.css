@@ -201,3 +201,7 @@ td {
 .geoSearchGroup{
   margin: 5px;
 }
+
+#cesiumContainer {
+  height: 70vh;
+}

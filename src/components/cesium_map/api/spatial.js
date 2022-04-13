@@ -161,18 +161,24 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
   }
 
   loadApi(params) {
-    this.isLoading = true;
     this.clear()
     this.clustering.enabled = true;
     this.clustering.clusterPoints = true;
     this.clustering.minimumClusterSize = 10;
     this.clustering.pixelRange = 15;
+    // display loading spinner
+    this.loading = document.getElementById("loading");
+    this.loading.style.removeProperty("display");
 
     return pointStream(
       params,
       (doc) => {
         // Handle the data records, e.g. response.docs[0].doc
         if (doc.hasOwnProperty('x')) {
+          if (!this.loading.style.display) {
+            // remove loading spinner
+            this.loading.style.display = "none";
+          }
           const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, 10);
           this.entities.add({
             position: p0,
@@ -189,12 +195,12 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
         }
       },
       (final) => {
-        this.isLoading = false;
         this.pointsClusterStyle();
         console.log("Point stream complete");
       },
       (err) => {
-        this.isLoading = false;
+        // remove loading spinner
+        this.loading.style.display = "none";
         console.error(err);
       })
   }
@@ -246,13 +252,19 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
   // function to query results and add point into cesium
   load(params) {
     let locations = {};
-    this.isLoading = true;
+    // display loading page
+    this.loading = document.getElementById("loading");
+    this.loading.style.removeProperty("display");
 
     return pointStream(
       params,
       (doc) => {
         // Handle the data records, e.g. response.docs[0].doc
         if (doc.hasOwnProperty('x')) {
+          if (!this.loading.style.display) {
+            // remove loading spinner
+            this.loading.style.display = "none";
+          }
           let location = doc.x.toString() + ":" + doc.y.toString();
           if (location in locations) {
             locations[location] = locations[location] + 1;
@@ -269,11 +281,11 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
         }
       },
       (final) => {
-        this.isLoading = false;
         console.log("Point primitive stream complete");
       },
       (err) => {
-        this.isLoading = false;
+        // remove loading spinner
+        this.loading.style.display = "none";
         console.error(err);
       })
   }
@@ -305,6 +317,11 @@ export class ISamplesSpatial {
       terrainProvider: worldTerrain,
       fullscreenElement: element
     });
+    // limit the map max height
+    // 20000000 is the maxium zoom distance so the users wouldn't zoom too far way from earth
+    // 10 the minimum height for the points so the users wouldn't zoom to the ground.
+    this.viewer.scene.screenSpaceCameraController.maximumZoomDistance = 20000000;
+    this.viewer.scene.screenSpaceCameraController.minimumZoomDistance = 10;
     this.buildingTileset = this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
     this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
     this.viewer.scene.globe.depthTestAgainstTerrain = true;
@@ -359,6 +376,27 @@ export class ISamplesSpatial {
       Cesium.Math.toDegrees(this.viewer.camera.heading),
       Cesium.Math.toDegrees(this.viewer.camera.pitch),
     )
+  }
+
+  /**
+   * This is the method to find the camera focus point position
+   * https://stackoverflow.com/questions/33348761/get-center-in-cesium-map
+   */
+  get getMapCenter() {
+    var windowPosition = new Cesium.Cartesian2(this.viewer.container.clientWidth / 2, this.viewer.container.clientHeight / 2);
+    var pickRay = this.viewer.scene.camera.getPickRay(windowPosition);
+    var pickPosition = this.viewer.scene.globe.pick(pickRay, this.viewer.scene);
+    if (pickPosition === undefined) {
+      return undefined
+    };
+    var pickPositionCartographic = this.viewer.scene.globe.ellipsoid.cartesianToCartographic(pickPosition);
+    return new SpatialView(
+      pickPositionCartographic.longitude * (180 / Math.PI),
+      pickPositionCartographic.latitude * (180 / Math.PI),
+      pickPositionCartographic.height,
+      Cesium.Math.toDegrees(this.viewer.camera.heading),
+      Cesium.Math.toDegrees(this.viewer.camera.pitch),
+    );
   }
 
   /**
@@ -419,6 +457,7 @@ export class ISamplesSpatial {
     if (this.tracking_info.tracking) {
       console.log("stop tracking");
       const bb = this.stopTracking();
+      console.log(bb);
       if (this.selectedBox !== null) {
         this.viewer.entities.remove(this.selectedBox);
       }
@@ -536,11 +575,21 @@ export class ISamplesSpatial {
 
   //TODO: This should be a separate class for managing the HUD
   addHud(canvas_id) {
+    // the first div contains mouse location
+    // the following divs contain loading spinner element
+    // see link:
+    //    https://loading.io/css/
     let hud = html`<div class="spatial-hud" style="position: absolute; top: 0px; left: 0;">
-          <p><code id='position'>0, 0, 0</code></p>
-          <p><button id='clear-bb' style='display:none'>Clear BB</button></p>
-          <div id="selected-record"></div>
-      </div>`;
+                    <p><code id='position'>0, 0, 0</code></p>
+                    <p><button id='clear-bb' style='display:none'>Clear BB</button></p>
+                    <div id="selected-record"></div>
+                  </div>
+                  <div id="loading" style="display: none;">
+                    <div class="background-spinner"></div>
+                    <div class="lds-spinner">
+                      <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                    </div>
+                  </div>`;
     const v = document.querySelector("div.cesium-viewer");
     render(hud, v);
     const cc = this.canvas;
@@ -556,3 +605,4 @@ export class ISamplesSpatial {
     return Cesium.SceneTransforms.wgs84ToWindowCoordinates(this.viewer.scene, position);
   }
 }
+

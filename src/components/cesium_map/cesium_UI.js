@@ -6,6 +6,8 @@
 
 import React from "react";
 import * as Cesium from "cesium";
+import '../../css/loading_spinner.css';
+
 import {
   SpatialView,
   ISamplesSpatial,
@@ -119,8 +121,23 @@ function updatePrimitive(latitude, longitude) {
   oboePrimitive = setPrimitive.load({ lat: latitude, long: longitude, searchFields: searchFields, rows: 100000 });
   lat = latitude;
   long = longitude;
-
 }
+
+/**
+ * This function calculate the distance between two camera positions
+ *
+ * @param {*} lat1 old position latitude
+ * @param {*} lon1 old position longtitude
+ * @param {*} lat2 new position latitude
+ * @param {*} lon2 new position longtidue
+ * @returns distance in kilometer
+ */
+function distanceInKm(lat1, long1, lat2, long2) {
+  const p1 = Cesium.Cartographic.fromCartesian(Cesium.Cartesian3.fromDegrees(long1, lat1, 0))
+  const p2 = Cesium.Cartographic.fromCartesian(Cesium.Cartesian3.fromDegrees(long2, lat2, 0))
+  return new Cesium.EllipsoidGeodesic(p1, p2).surfaceDistance / 1000;
+}
+
 
 class CesiumMap extends React.Component {
   // This is a initial function in react liftcycle.
@@ -130,6 +147,7 @@ class CesiumMap extends React.Component {
     // viewer.addPointsBySource(642092);
     viewer.visit(moorea);
     viewer.addHud("cesiumContainer");
+    // viewer.addLoading();
     viewer.trackMouseCoordinates(showCoordinates);
     viewer.enableTracking(selectedBoxCallbox);
     setPrimitive = new PointStreamPrimitiveCollection("Primitive Points");
@@ -137,13 +155,16 @@ class CesiumMap extends React.Component {
     viewer.addDataSource(new PointStreamDatasource("BB points")).then((res) => { setPoints = res });
     searchFields = this.props.searchFields;
     updatePrimitive(lat, long)
-
     // set time interval to check the current view every 3 seconds and update points
     setInterval(() => {
-      if (Math.abs(viewer.currentView.latitude - lat) > 5 || Math.abs(viewer.currentView.longitude - long) > 5) {
+      let diffDistance = distanceInKm(lat, long, viewer.currentView.latitude, viewer.currentView.longitude);
+      // update the points every 5 seconds if two points differ in 50km + scale of height.
+      // I scale the current height by 15000000, the height of "View Global".
+      // 4000 km is the distance that rotate half earth map on the height 15000000.
+      if (diffDistance > 50 + 4000 * viewer.currentView.height / 15000000) {
         updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude)
       }
-    }, 3000)
+    }, 5000)
   }
 
   // https://medium.com/@garrettmac/reactjs-how-to-safely-manipulate-the-dom-when-reactjs-cant-the-right-way-8a20928e8a6
