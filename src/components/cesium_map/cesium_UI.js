@@ -15,6 +15,7 @@ import {
   PointStreamPrimitiveCollection
 } from "./api/spatial";
 import { ISamplesAPI } from "./api/server";
+import { addButton } from "./elements/navigationButton";
 
 // Defined ceisum access token
 // Current one is Dave's token
@@ -144,6 +145,7 @@ class CesiumMap extends React.Component {
   // Only call once when this component first render
   componentDidMount() {
     viewer = new ISamplesSpatial("cesiumContainer");
+    addButton();
     // viewer.addPointsBySource(642092);
     viewer.visit(moorea);
     viewer.addHud("cesiumContainer");
@@ -154,7 +156,7 @@ class CesiumMap extends React.Component {
     viewer.addPointPrimitives(setPrimitive);
     viewer.addDataSource(new PointStreamDatasource("BB points")).then((res) => { setPoints = res });
     searchFields = this.props.searchFields;
-    updatePrimitive(lat, long)
+    updatePrimitive(lat, long);
     // set time interval to check the current view every 3 seconds and update points
     setInterval(() => {
       let diffDistance = distanceInKm(lat, long, viewer.currentView.latitude, viewer.currentView.longitude);
