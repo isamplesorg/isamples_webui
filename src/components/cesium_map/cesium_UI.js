@@ -132,7 +132,7 @@ function updatePrimitive(latitude, longitude) {
  * @param {*} lon2 new position longtidue
  * @returns distance in kilometer
  */
-function distance(lat1, long1, lat2, long2) {
+function distanceInKm(lat1, long1, lat2, long2) {
   const p1 = Cesium.Cartographic.fromCartesian(Cesium.Cartesian3.fromDegrees(long1, lat1, 0))
   const p2 = Cesium.Cartographic.fromCartesian(Cesium.Cartesian3.fromDegrees(long2, lat2, 0))
   return new Cesium.EllipsoidGeodesic(p1, p2).surfaceDistance / 1000;
@@ -157,8 +157,10 @@ class CesiumMap extends React.Component {
     updatePrimitive(lat, long)
     // set time interval to check the current view every 3 seconds and update points
     setInterval(() => {
-      let diffDistance = distance(lat, long, viewer.currentView.latitude, viewer.currentView.longitude);
+      let diffDistance = distanceInKm(lat, long, viewer.currentView.latitude, viewer.currentView.longitude);
       // update the points every 5 seconds if two points differ in 50km + scale of height.
+      // I scale the current height by 15000000, the height of "View Global".
+      // 4000 km is the distance that rotate half earth map on the height 15000000.
       if (diffDistance > 50 + 4000 * viewer.currentView.height / 15000000) {
         updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude)
       }

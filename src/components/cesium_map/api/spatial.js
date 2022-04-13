@@ -318,6 +318,8 @@ export class ISamplesSpatial {
       fullscreenElement: element
     });
     // limit the map max height
+    // 20000000 is the maxium zoom distance so the users wouldn't zoom too far way from earth
+    // 10 the minimum height for the points so the users wouldn't zoom to the ground.
     this.viewer.scene.screenSpaceCameraController.maximumZoomDistance = 20000000;
     this.viewer.scene.screenSpaceCameraController.minimumZoomDistance = 10;
     this.buildingTileset = this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
@@ -573,7 +575,7 @@ export class ISamplesSpatial {
 
   //TODO: This should be a separate class for managing the HUD
   addHud(canvas_id) {
-    // the first div contains mouce location
+    // the first div contains mouse location
     // the following divs contain loading spinner element
     // see link:
     //    https://loading.io/css/
