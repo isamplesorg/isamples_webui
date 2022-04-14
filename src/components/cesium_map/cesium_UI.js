@@ -28,6 +28,7 @@ Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
 let lat = -17.451466233002286;
 let long = -149.8169236266867;
 let bbox = null;
+let bboxLoc = null;
 let viewer = null;
 let searchFields = null;
 let onChange = null;
@@ -93,6 +94,7 @@ async function selectedBoxCallbox(bb) {
   const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
   oboeEntities = setPoints.loadApi({ Q: Q, searchFields: searchFields, rows: 10000 });
   onChange("producedBy_samplingSite_location_rpt", {...bb.toDegrees(), error: ""})
+  bboxLoc = bb.toDegrees();
 
   const btn = document.getElementById("clear-bb");
   btn.style.display = "block";
@@ -196,7 +198,7 @@ class CesiumMap extends React.Component {
     // update bounding box based on bbox
     const bb1 = JSON.stringify(nextProps.bbox);
     const bb2 = JSON.stringify(this.props.bbox);
-    if(bb1 !== bb2){
+    if(bb1 !== bb2 && bb1 !== JSON.stringify({...bboxLoc, error:""})){
       if(!Array.isArray(nextProps.bbox.value)){
         try {
           selectedBoxCallbox(viewer.generateRactByLL(nextProps.bbox.value));
