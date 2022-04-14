@@ -60,7 +60,7 @@ class ResultList extends React.Component {
   }
 
   render() {
-    const { bootstrapCss } = this.props;
+    const { bootstrapCss, onChange } = this.props;
 
     const doc = this.props.children[0].length !== 0 ? this.props.children[0].map((record) => (record['props']['doc'])) : [];
     const fields = this.props.children[0].length !== 0 ? this.props.children[0][0]['props']['fields'] : [];
@@ -97,7 +97,8 @@ class ResultList extends React.Component {
                   ?
                   <CesiumMap
                     searchFields={searchFields}
-                    bbox={bbox} />
+                    bbox={bbox}
+                    onChange={onChange} />
                   : null
               }
             </div>

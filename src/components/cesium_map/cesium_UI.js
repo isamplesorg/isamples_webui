@@ -30,6 +30,7 @@ let long = -149.8169236266867;
 let bbox = null;
 let viewer = null;
 let searchFields = null;
+let onChange = null;
 
 // these two represent the pritimive and entity class to handle data query.
 let setPoints = null;
@@ -73,6 +74,7 @@ function showCoordinates(lon, lat, height) {
 function clearBoundingBox() {
   viewer.removeEntity(bbox);
   setPoints.clear();
+  onChange("producedBy_samplingSite_location_rpt", []);
   document.getElementById("clear-bb").style.display = "none";
 }
 
@@ -90,6 +92,7 @@ async function selectedBoxCallbox(bb) {
 
   const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
   oboeEntities = setPoints.loadApi({ Q: Q, searchFields: searchFields, rows: 10000 });
+  onChange("producedBy_samplingSite_location_rpt", {...bb.toDegrees(), error: ""})
 
   const btn = document.getElementById("clear-bb");
   btn.style.display = "block";
@@ -155,6 +158,8 @@ class CesiumMap extends React.Component {
     viewer.addPointPrimitives(setPrimitive);
     viewer.addDataSource(new PointStreamDatasource("BB points")).then((res) => { setPoints = res });
     searchFields = this.props.searchFields;
+    onChange = this.props.onChange;
+    updatePrimitive(lat, long)
 
     // initial bbox
     if(this.props.bbox.value){
