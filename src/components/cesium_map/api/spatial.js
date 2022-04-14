@@ -522,6 +522,17 @@ export class ISamplesSpatial {
     return asDRectangle(bb);
   }
 
+  // generate rectangle based on degrees of longtitude and latitude
+  generateRactByLL(bb){
+    if(!bb){return undefined};
+    const min_lat = Cesium.Math.toRadians(bb.min_lat);
+    const min_lon = Cesium.Math.toRadians(bb.min_lon);
+    const max_lat = Cesium.Math.toRadians(bb.max_lat);
+    const max_lon = Cesium.Math.toRadians(bb.max_lon);
+
+    return asDRectangle(new Cesium.Rectangle(min_lon,min_lat, max_lon, max_lat));
+  }
+
   removeEntity(e) {
     try {
       this.viewer.entities.remove(e);

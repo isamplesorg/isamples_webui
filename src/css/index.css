@@ -110,6 +110,20 @@ svg.search-icon {
   width: calc(100% - 125px)
 }
 
+.list-group-item div form label {
+  display: inline-block;
+  margin: 0 20px 0 0;
+  width: 108px;
+  color: #666;
+  overflow-y: scroll;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+input[type=number]{
+  width: 164px;
+}
+
 .popBox {
   position: absolute;
   background-color: rgb(255, 255, 255);

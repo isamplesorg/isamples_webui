@@ -139,7 +139,6 @@ function distanceInKm(lat1, long1, lat2, long2) {
   return new Cesium.EllipsoidGeodesic(p1, p2).surfaceDistance / 1000;
 }
 
-
 class CesiumMap extends React.Component {
   // This is a initial function in react liftcycle.
   // Only call once when this component first render
@@ -157,6 +156,15 @@ class CesiumMap extends React.Component {
     viewer.addDataSource(new PointStreamDatasource("BB points")).then((res) => { setPoints = res });
     searchFields = this.props.searchFields;
     updatePrimitive(lat, long);
+
+    // initial bbox
+    if(this.props.bbox.value){
+      try {
+        selectedBoxCallbox(viewer.generateRactByLL(this.props.bbox.value));
+      } catch (e) {
+        console.warn("Adding bbox failed.");
+      }
+    }
     // set time interval to check the current view every 3 seconds and update points
     setInterval(() => {
       let diffDistance = distanceInKm(lat, long, viewer.currentView.latitude, viewer.currentView.longitude);
@@ -172,14 +180,30 @@ class CesiumMap extends React.Component {
   // https://medium.com/@garrettmac/reactjs-how-to-safely-manipulate-the-dom-when-reactjs-cant-the-right-way-8a20928e8a6
   // manipulate Dom outside the react model
   shouldComponentUpdate(nextProps) {
-    const key1 = JSON.stringify(nextProps.searchFields)
-    const key2 = JSON.stringify(this.props.searchFields)
-    if (key1 !== key2) {
+    // update point primitive based on searchFields
+    const sf1 = JSON.stringify(nextProps.searchFields)
+    const sf2 = JSON.stringify(this.props.searchFields)
+    if (sf1 !== sf2) {
       // clear all element in cesium
       searchFields = nextProps.searchFields;
       updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
     }
 
+    // update bounding box based on bbox
+    const bb1 = JSON.stringify(nextProps.bbox);
+    const bb2 = JSON.stringify(this.props.bbox);
+    if(bb1 !== bb2){
+      console.log(nextProps.bbox.value)
+      if(!Array.isArray(nextProps.bbox.value)){
+        try {
+          selectedBoxCallbox(viewer.generateRactByLL(nextProps.bbox.value));
+        } catch (e) {
+          console.warn("Adding bbox failed.");
+        }
+      }else{
+        clearBoundingBox();
+      }
+    }
     // return false to force react not to rerender
     return false;
   }
