@@ -155,7 +155,6 @@ class CesiumMap extends React.Component {
     viewer.addPointPrimitives(setPrimitive);
     viewer.addDataSource(new PointStreamDatasource("BB points")).then((res) => { setPoints = res });
     searchFields = this.props.searchFields;
-    updatePrimitive(lat, long);
 
     // initial bbox
     if(this.props.bbox.value){
@@ -193,7 +192,6 @@ class CesiumMap extends React.Component {
     const bb1 = JSON.stringify(nextProps.bbox);
     const bb2 = JSON.stringify(this.props.bbox);
     if(bb1 !== bb2){
-      console.log(nextProps.bbox.value)
       if(!Array.isArray(nextProps.bbox.value)){
         try {
           selectedBoxCallbox(viewer.generateRactByLL(nextProps.bbox.value));
