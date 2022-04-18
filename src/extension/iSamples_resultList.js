@@ -72,8 +72,8 @@ class ResultList extends React.Component {
     // filter the fields to only include the spatial information
     const spatialQuery = fields.filter((field) => field.type === "spatialquery")[0];
     const bbox = spatialQuery && spatialQuery.hasOwnProperty('value') ?
-                spatialQuery.value
-                : {}
+      spatialQuery.value
+      : {}
 
     delete bbox['error']
 
