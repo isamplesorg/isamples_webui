@@ -43,7 +43,7 @@ const InformationButton = () => {
               <tr>
                 <td>
                   <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-                    <rect width="32" height="32" style={{ fill: 'red' }} />
+                    <rect width="32" height="32" style={{ fill: '#D55E00' }} />
                   </svg>
                 </td>
                 <td>
@@ -53,7 +53,7 @@ const InformationButton = () => {
               <tr>
                 <td>
                   <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-                    <rect width="32" height="32" style={{ fill: 'orange' }} />
+                    <rect width="32" height="32" style={{ fill: '#CC79A7' }} />
                   </svg>
                 </td>
                 <td>
@@ -63,7 +63,7 @@ const InformationButton = () => {
               <tr>
                 <td>
                   <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-                    <rect width="32" height="32" style={{ fill: 'yellow' }} />
+                    <rect width="32" height="32" style={{ fill: '#F0E442' }} />
                   </svg>
                 </td>
                 <td>
@@ -73,7 +73,7 @@ const InformationButton = () => {
               <tr>
                 <td>
                   <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-                    <rect width="32" height="32" style={{ fill: 'green' }} />
+                    <rect width="32" height="32" style={{ fill: '#009E73' }} />
                   </svg>
                 </td>
                 <td>
@@ -83,7 +83,7 @@ const InformationButton = () => {
               <tr>
                 <td>
                   <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-                    <rect width="32" height="32" style={{ fill: 'blue' }} />
+                    <rect width="32" height="32" style={{ fill: '#56B4E9' }} />
                   </svg>
                 </td>
                 <td>

@@ -70,7 +70,12 @@ class ResultList extends React.Component {
       .map(({ collapse, hidden, ...rest }) => rest);
 
     // filter the fields to only include the spatial information
-    const bbox = fields.filter((field) => field.type === "spatialquery")[0];
+    const spatialQuery = fields.filter((field) => field.type === "spatialquery")[0];
+    const bbox = spatialQuery && spatialQuery.hasOwnProperty('value') ?
+                spatialQuery.value
+                : {}
+
+    delete bbox['error']
 
     return (
       <ButGroup
@@ -113,4 +118,4 @@ ResultList.propTypes = {
   children: PropTypes.array
 };
 
-export default ResultList;
+export default React.memo(ResultList);

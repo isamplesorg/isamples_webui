@@ -93,8 +93,8 @@ async function selectedBoxCallbox(bb) {
 
   const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
   oboeEntities = setPoints.loadApi({ Q: Q, searchFields: searchFields, rows: 10000 });
-  onChange("producedBy_samplingSite_location_rpt", {...bb.toDegrees(), error: ""})
-  bboxLoc = bb.toDegrees();
+  bboxLoc = bb.toDegrees()
+  onChange("producedBy_samplingSite_location_rpt", { ...bb.toDegrees(), error: "" })
 
   const btn = document.getElementById("clear-bb");
   btn.style.display = "block";
@@ -150,10 +150,7 @@ class CesiumMap extends React.Component {
   componentDidMount() {
     viewer = new ISamplesSpatial("cesiumContainer");
     addButton();
-    // viewer.addPointsBySource(642092);
-    viewer.visit(moorea);
     viewer.addHud("cesiumContainer");
-    // viewer.addLoading();
     viewer.trackMouseCoordinates(showCoordinates);
     viewer.enableTracking(selectedBoxCallbox);
     setPrimitive = new PointStreamPrimitiveCollection("Primitive Points");
@@ -161,17 +158,19 @@ class CesiumMap extends React.Component {
     viewer.addDataSource(new PointStreamDatasource("BB points")).then((res) => { setPoints = res });
     searchFields = this.props.searchFields;
     onChange = this.props.onChange;
-    updatePrimitive(lat, long)
+    if (searchFields) {
+      updatePrimitive(lat, long)
+    }
 
     // initial bbox
-    if(this.props.bbox.value){
+    if (Object.keys(this.props.bbox).length > 0) {
       try {
-        selectedBoxCallbox(viewer.generateRactByLL(this.props.bbox.value));
+        selectedBoxCallbox(viewer.generateRactByLL(this.props.bbox));
       } catch (e) {
         console.warn("Adding bbox failed.");
       }
     }
-    // set time interval to check the current view every 3 seconds and update points
+    // set time interval to check the current view every 5 seconds and update points
     setInterval(() => {
       let diffDistance = distanceInKm(lat, long, viewer.currentView.latitude, viewer.currentView.longitude);
       // update the points every 5 seconds if two points differ in 50km + scale of height.
@@ -198,14 +197,16 @@ class CesiumMap extends React.Component {
     // update bounding box based on bbox
     const bb1 = JSON.stringify(nextProps.bbox);
     const bb2 = JSON.stringify(this.props.bbox);
-    if(bb1 !== bb2 && bb1 !== JSON.stringify({...bboxLoc, error:""})){
-      if(!Array.isArray(nextProps.bbox.value)){
+
+    if (bb1 !== bb2 && bb1 !== JSON.stringify(bboxLoc)) {
+      // draw the bounding box or remove the bounding box
+      if (Object.keys(nextProps.bbox).length > 0) {
         try {
-          selectedBoxCallbox(viewer.generateRactByLL(nextProps.bbox.value));
+          selectedBoxCallbox(viewer.generateRactByLL(nextProps.bbox));
         } catch (e) {
           console.warn("Adding bbox failed.");
         }
-      }else{
+      } else {
         clearBoundingBox();
       }
     }

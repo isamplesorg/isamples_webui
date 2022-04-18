@@ -85,21 +85,22 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
 
     // pins are used for labelling point clusters
     const pinBuilder = new Cesium.PinBuilder();
+    // colorbind friendly schema
     this.pins = {
       pin50: pinBuilder
-        .fromText("50+", Cesium.Color.RED, 48)
+        .fromText("50+", Cesium.Color.fromCssColorString('#D55E00'), 48)
         .toDataURL(),
       pin40: pinBuilder
-        .fromText("40+", Cesium.Color.ORANGE, 48)
+        .fromText("40+", Cesium.Color.fromCssColorString('#CC79A7'), 48)
         .toDataURL(),
       pin30: pinBuilder
-        .fromText("30+", Cesium.Color.YELLOW, 48)
+        .fromText("30+", Cesium.Color.fromCssColorString('#F0E442'), 48)
         .toDataURL(),
       pin20: pinBuilder
-        .fromText("20+", Cesium.Color.GREEN, 48)
+        .fromText("20+", Cesium.Color.fromCssColorString('#009E73'), 48)
         .toDataURL(),
       pin10: pinBuilder
-        .fromText("10+", Cesium.Color.BLUE, 48)
+        .fromText("10+", Cesium.Color.fromCssColorString('#56B4E9'), 48)
         .toDataURL(),
     }
     var singleDigitPins = new Array(8);
@@ -237,15 +238,15 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
     let n = locations[name];
 
     if (n > 50) {
-      return Cesium.Color.RED;
+      return Cesium.Color.fromCssColorString('#D55E00');
     } else if (n > 40) {
-      return Cesium.Color.ORANGE;
+      return Cesium.Color.fromCssColorString('#CC79A7');
     } else if (n > 30) {
-      return Cesium.Color.YELLOW;
+      return Cesium.Color.fromCssColorString('#F0E442');
     } else if (n > 20) {
-      return Cesium.Color.GREEN;
+      return Cesium.Color.fromCssColorString('#009E73');
     } else if (n > 10) {
-      return Cesium.Color.BLUE;
+      return Cesium.Color.fromCssColorString('#56B4E9');
     }
   }
 
@@ -322,6 +323,14 @@ export class ISamplesSpatial {
     // 10 the minimum height for the points so the users wouldn't zoom to the ground.
     this.viewer.scene.screenSpaceCameraController.maximumZoomDistance = 20000000;
     this.viewer.scene.screenSpaceCameraController.minimumZoomDistance = 10;
+    // set camera inital position
+    this.viewer.camera.setView({
+      destination: Cesium.Cartesian3.fromDegrees(-149.8169236266867, -17.451466233002286, 2004.7347996772614),
+      orientation: {
+        heading: Cesium.Math.toRadians(201.84408760864753),
+        pitch: Cesium.Math.toRadians(-20.853642866175978),
+      }
+    });
     this.buildingTileset = this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
     this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
     this.viewer.scene.globe.depthTestAgainstTerrain = true;
@@ -357,6 +366,7 @@ export class ISamplesSpatial {
     this.viewer.camera.flyTo({
       destination: place.destination,
       orientation: place.orientation,
+      duration: 2
     });
   }
 
@@ -523,14 +533,14 @@ export class ISamplesSpatial {
   }
 
   // generate rectangle based on degrees of longtitude and latitude
-  generateRactByLL(bb){
-    if(!bb){return undefined};
+  generateRactByLL(bb) {
+    if (!bb) { return undefined };
     const min_lat = Cesium.Math.toRadians(bb.min_lat);
     const min_lon = Cesium.Math.toRadians(bb.min_lon);
     const max_lat = Cesium.Math.toRadians(bb.max_lat);
     const max_lon = Cesium.Math.toRadians(bb.max_lon);
 
-    return asDRectangle(new Cesium.Rectangle(min_lon,min_lat, max_lon, max_lat));
+    return asDRectangle(new Cesium.Rectangle(min_lon, min_lat, max_lon, max_lat));
   }
 
   removeEntity(e) {
