@@ -181,14 +181,14 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
             // remove loading spinner
             this.loading.style.display = "none";
           }
-          const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, 10);
+          const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, 1);
           this.entities.add({
             position: p0,
             description: `<h4>Identifier: ${doc.id}</h4><span><b>All text fields</b>: ${doc.searchText}</span>`,
             name: doc.id,
             point: {
               color: Cesium.Color.WHITE,
-              pixelSize: 10,
+              pixelSize: 8,
               outlineColor: Cesium.Color.YELLOW,
               outlineWidth: 3,
               heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND
@@ -229,6 +229,10 @@ function asDRectangle(rectangle) {
 * Requires that "oboe" is globally available.
 */
 export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollection {
+  constructor(terrain) {
+    super(terrain)
+    this.terrain = terrain;
+  }
 
   clear() {
     this.removeAll();
@@ -248,9 +252,41 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
       return Cesium.Color.fromCssColorString(colorbind[3]);
     } else if (n > 10) {
       return Cesium.Color.fromCssColorString(colorbind[4]);
-    } else{
+    } else {
       return Cesium.Color.fromCssColorString(colorbind[5])
     }
+  }
+
+  // function to update point elevation
+  /**
+   * See link:
+   *  https://cesium.com/learn/cesiumjs/ref-doc/sampleTerrainMostDetailed.html
+   * @param {*} collection, the stored cartographic position
+   * @param {*} primitive, the current class instance
+   */
+  updateElevation(collection, primitive){
+    let promise = Cesium.sampleTerrain(this.terrain, 11, collection)
+    Cesium.when(promise, function(updatedPosition) {
+      let positions = {};
+      for(let i = 0; i < collection.length; i++){
+        const point = primitive.get(i)
+        const Position = Cesium.Cartographic.toCartesian(updatedPosition[i]);
+        const origMagnitude = Cesium.Cartesian3.magnitude(Position);
+        const key = Position.y.toString() + ":" + Position.z.toString();
+        const newPosition = new Cesium.Cartesian3();
+        let newMagnitude = 0;
+        let scalar = 1;
+        if(key in positions){
+          newMagnitude += origMagnitude + 1 * positions[key];
+          positions[key] += 1;
+        }else{
+          positions[key] = 1;
+        }
+        scalar = newMagnitude / origMagnitude;
+        Cesium.Cartesian3.multiplyByScalar(Position, scalar, newPosition);
+        point.position = newPosition;
+      }
+    })
   }
 
   // function to query results and add point into cesium
@@ -259,6 +295,7 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
     // display loading page
     this.loading = document.getElementById("loading");
     this.loading.style.removeProperty("display");
+    this.collection = []
 
     return pointStream(
       params,
@@ -280,11 +317,14 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
             id: doc.id,
             position: p0,
             color: this.outlineStyle(locations, location),
-            pixelSize: 10
+            pixelSize: 8,
+            disableDepthTestDistance: 100
           })
+          this.collection.push(Cesium.Cartographic.fromDegrees(doc.x, doc.y))
         }
       },
       (final) => {
+        this.updateElevation(this.collection, this);
         console.log("Point primitive stream complete");
       },
       (err) => {
@@ -312,15 +352,16 @@ export class ISamplesSpatial {
       polyline: null,
       positions: [],
     };
-    let worldTerrain = Cesium.createWorldTerrain({});
+    this.worldTerrain = Cesium.createWorldTerrain({});
 
     this.viewer = new Cesium.Viewer(element, {
       timeline: false,
       animation: false,
       sceneModePicker: false,
-      terrainProvider: worldTerrain,
+      terrainProvider: this.worldTerrain,
       fullscreenElement: element
     });
+
     // limit the map max height
     // 20000000 is the maxium zoom distance so the users wouldn't zoom too far way from earth
     // 10 the minimum height for the points so the users wouldn't zoom to the ground.
@@ -358,6 +399,10 @@ export class ISamplesSpatial {
 
   get canvas() {
     return this.viewer.canvas;
+  }
+
+  get terrain() {
+    return this.worldTerrain;
   }
 
   /**

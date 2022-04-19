@@ -120,4 +120,6 @@ export function addButton() {
   const temp = document.createElement("span");
   toolbar.appendChild(temp);
   render(<InformationButton />, temp);
+  const viewButton = document.querySelector("div.cesium-viewer-bottom")
+  render("", viewButton);
 }

@@ -75,7 +75,7 @@ class ResultList extends React.Component {
       spatialQuery.value
       : {}
 
-    delete bbox['error']
+    if(bbox) {delete bbox['error']}
 
     return (
       <ButGroup
