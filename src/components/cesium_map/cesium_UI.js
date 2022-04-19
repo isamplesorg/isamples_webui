@@ -165,7 +165,7 @@ class CesiumMap extends React.Component {
     // initial bbox
     if (Object.keys(this.props.bbox).length > 0) {
       try {
-        selectedBoxCallbox(viewer.generateRactByLL(this.props.bbox));
+        selectedBoxCallbox(viewer.generateRectByLL(this.props.bbox));
       } catch (e) {
         console.warn("Adding bbox failed.");
       }

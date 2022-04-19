@@ -536,7 +536,7 @@ export class ISamplesSpatial {
   }
 
   // generate rectangle based on degrees of longtitude and latitude
-  generateRactByLL(bb) {
+  generateRectByLL(bb) {
     if (!bb) { return undefined };
     const min_lat = Cesium.Math.toRadians(bb.min_lat);
     const min_lon = Cesium.Math.toRadians(bb.min_lon);
