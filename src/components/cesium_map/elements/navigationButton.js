@@ -1,5 +1,6 @@
 import { render } from "react-dom";
 import info from "../../../images/NavigationHelp/info.svg";
+import colorbind from "../utilities";
 
 /**
  * A function component to return a new legend button.
@@ -43,7 +44,7 @@ const InformationButton = () => {
               <tr>
                 <td>
                   <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-                    <rect width="32" height="32" style={{ fill: '#D55E00' }} />
+                    <rect width="32" height="32" style={{ fill: colorbind[0] }} />
                   </svg>
                 </td>
                 <td>
@@ -53,7 +54,7 @@ const InformationButton = () => {
               <tr>
                 <td>
                   <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-                    <rect width="32" height="32" style={{ fill: '#CC79A7' }} />
+                    <rect width="32" height="32" style={{ fill: colorbind[1] }} />
                   </svg>
                 </td>
                 <td>
@@ -63,7 +64,7 @@ const InformationButton = () => {
               <tr>
                 <td>
                   <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-                    <rect width="32" height="32" style={{ fill: '#F0E442' }} />
+                    <rect width="32" height="32" style={{ fill: colorbind[2] }} />
                   </svg>
                 </td>
                 <td>
@@ -73,7 +74,7 @@ const InformationButton = () => {
               <tr>
                 <td>
                   <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-                    <rect width="32" height="32" style={{ fill: '#009E73' }} />
+                    <rect width="32" height="32" style={{ fill: colorbind[3] }} />
                   </svg>
                 </td>
                 <td>
@@ -83,7 +84,7 @@ const InformationButton = () => {
               <tr>
                 <td>
                   <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-                    <rect width="32" height="32" style={{ fill: '#56B4E9' }} />
+                    <rect width="32" height="32" style={{ fill: colorbind[4] }} />
                   </svg>
                 </td>
                 <td>

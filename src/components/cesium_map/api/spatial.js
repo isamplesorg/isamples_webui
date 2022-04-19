@@ -11,6 +11,7 @@
 import * as Cesium from 'cesium';
 import { html, render } from "lit";
 import { pointStream } from './server';
+import colorbind from '../utilities';
 
 /**
  * Describes a camera viewpoint for Cesium.
@@ -88,19 +89,19 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
     // colorbind friendly schema
     this.pins = {
       pin50: pinBuilder
-        .fromText("50+", Cesium.Color.fromCssColorString('#D55E00'), 48)
+        .fromText("50+", Cesium.Color.fromCssColorString(colorbind[0]), 48)
         .toDataURL(),
       pin40: pinBuilder
-        .fromText("40+", Cesium.Color.fromCssColorString('#CC79A7'), 48)
+        .fromText("40+", Cesium.Color.fromCssColorString(colorbind[1]), 48)
         .toDataURL(),
       pin30: pinBuilder
-        .fromText("30+", Cesium.Color.fromCssColorString('#F0E442'), 48)
+        .fromText("30+", Cesium.Color.fromCssColorString(colorbind[2]), 48)
         .toDataURL(),
       pin20: pinBuilder
-        .fromText("20+", Cesium.Color.fromCssColorString('#009E73'), 48)
+        .fromText("20+", Cesium.Color.fromCssColorString(colorbind[3]), 48)
         .toDataURL(),
       pin10: pinBuilder
-        .fromText("10+", Cesium.Color.fromCssColorString('#56B4E9'), 48)
+        .fromText("10+", Cesium.Color.fromCssColorString(colorbind[4]), 48)
         .toDataURL(),
     }
     var singleDigitPins = new Array(8);
@@ -238,15 +239,15 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
     let n = locations[name];
 
     if (n > 50) {
-      return Cesium.Color.fromCssColorString('#D55E00');
+      return Cesium.Color.fromCssColorString(colorbind[0]);
     } else if (n > 40) {
-      return Cesium.Color.fromCssColorString('#CC79A7');
+      return Cesium.Color.fromCssColorString(colorbind[1]);
     } else if (n > 30) {
-      return Cesium.Color.fromCssColorString('#F0E442');
+      return Cesium.Color.fromCssColorString(colorbind[2]);
     } else if (n > 20) {
-      return Cesium.Color.fromCssColorString('#009E73');
+      return Cesium.Color.fromCssColorString(colorbind[3]);
     } else if (n > 10) {
-      return Cesium.Color.fromCssColorString('#56B4E9');
+      return Cesium.Color.fromCssColorString(colorbind[4]);
     }
   }
 
