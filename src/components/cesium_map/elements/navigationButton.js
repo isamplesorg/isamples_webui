@@ -1,6 +1,6 @@
 import { render } from "react-dom";
 import info from "../../../images/NavigationHelp/info.svg";
-import colorbind from "../utilities";
+import { colorbind, source } from "../utilities";
 
 /**
  * A function component to return a new legend button.
@@ -41,6 +41,7 @@ const InformationButton = () => {
                   </div>
                 </td>
               </tr>
+              { source.map((e) => e)}
               <tr>
                 <td>
                   <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32">

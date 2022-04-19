@@ -11,7 +11,7 @@
 import * as Cesium from 'cesium';
 import { html, render } from "lit";
 import { pointStream } from './server';
-import colorbind from '../utilities';
+import { colorbind, source } from '../utilities';
 
 /**
  * Describes a camera viewpoint for Cesium.
@@ -316,7 +316,8 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
           this.add({
             id: doc.id,
             position: p0,
-            color: this.outlineStyle(locations, location),
+            // color: this.outlineStyle(locations, location),
+            color: Cesium.Color.fromCssColorString(colorbind[source.indexOf(doc.source) % colorbind.length]),
             pixelSize: 8,
             disableDepthTestDistance: 100
           })
