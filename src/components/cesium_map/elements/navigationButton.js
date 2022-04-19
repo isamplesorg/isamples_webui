@@ -94,7 +94,7 @@ const InformationButton = () => {
               <tr>
                 <td>
                   <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-                    <rect width="32" height="32" style={{ fill: 'white' }} />
+                    <rect width="32" height="32" style={{ fill: colorbind[5] }} />
                   </svg>
                 </td>
                 <td>

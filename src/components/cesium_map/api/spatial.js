@@ -107,7 +107,7 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
     var singleDigitPins = new Array(8);
     for (var i = 0; i < singleDigitPins.length; ++i) {
       singleDigitPins[i] = pinBuilder
-        .fromText("" + (i + 2), Cesium.Color.VIOLET, 48)
+        .fromText("" + (i + 2), Cesium.Color.fromCssColorString(colorbind[5]), 48)
         .toDataURL();
     }
     this.pins.sdp = singleDigitPins;
@@ -166,7 +166,7 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
     this.clear()
     this.clustering.enabled = true;
     this.clustering.clusterPoints = true;
-    this.clustering.minimumClusterSize = 10;
+    this.clustering.minimumClusterSize = 3;
     this.clustering.pixelRange = 15;
     // display loading spinner
     this.loading = document.getElementById("loading");
@@ -248,6 +248,8 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
       return Cesium.Color.fromCssColorString(colorbind[3]);
     } else if (n > 10) {
       return Cesium.Color.fromCssColorString(colorbind[4]);
+    } else{
+      return Cesium.Color.fromCssColorString(colorbind[5])
     }
   }
 
