@@ -26,9 +26,14 @@ import { addButton } from "./elements/navigationButton";
 //  https://cesium.com/learn/ion/cesium-ion-access-tokens/
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwNzk3NjkyMy1iNGI1LTRkN2UtODRiMy04OTYwYWE0N2M3ZTkiLCJpZCI6Njk1MTcsImlhdCI6MTYzMzU0MTQ3N30.e70dpNzOCDRLDGxRguQCC-tRzGzA-23Xgno5lNgCeB4';
 
+const api = new ISamplesAPI();
+const moorea = new SpatialView(-149.8169236266867, -17.451466233002286, 2004.7347996772614, 201.84408760864753, -20.853642866175978);
+const patagonia = new SpatialView(-69.60169132023925, -54.315990127766646, 1781.4560051617016, 173.54573250470798, -15.85292472305027);
+
 // the initial map setup
-let lat = -17.451466233002286;
-let long = -149.8169236266867;
+// keep track the camera location
+let cameraLat = moorea.latitude;
+let cameraLong = moorea.longitude;
 let bbox = null;
 let bboxLoc = null;
 let viewer = null;
@@ -43,10 +48,6 @@ let setPrimitive = null;
 // we might abort the stream fetch
 let oboePrimitive = null;
 let oboeEntities = null;
-
-const api = new ISamplesAPI();
-const moorea = new SpatialView(-149.8169236266867, -17.451466233002286, 2004.7347996772614, 201.84408760864753, -20.853642866175978);
-const patagonia = new SpatialView(-69.60169132023925, -54.315990127766646, 1781.4560051617016, 173.54573250470798, -15.85292472305027);
 
 /**
  * This method queries the record amount in the bbox
@@ -127,8 +128,8 @@ function updatePrimitive(latitude, longitude) {
   }
 
   oboePrimitive = setPrimitive.load({ lat: latitude, long: longitude, searchFields: searchFields, rows: 100000 });
-  lat = latitude;
-  long = longitude;
+  cameraLat = latitude;
+  cameraLong = longitude;
 }
 
 /**
@@ -209,7 +210,7 @@ class CesiumMap extends React.Component {
   // This is a initial function in react liftcycle.
   // Only call once when this component first render
   componentDidMount() {
-    viewer = new ISamplesSpatial("cesiumContainer");
+    viewer = new ISamplesSpatial("cesiumContainer", moorea);
     addButton();
     viewer.addHud("cesiumContainer");
     viewer.trackMouseCoordinates(showCoordinates);
@@ -223,20 +224,20 @@ class CesiumMap extends React.Component {
     const viewButton = document.querySelector("div.cesium-viewer-bottom")
     render(this.dropdown, viewButton);
     if (searchFields) {
-      updatePrimitive(lat, long);
-    };
+      updatePrimitive(cameraLat, cameraLong)
+    }
 
     // initial bbox
     if (this.props.bbox && Object.keys(this.props.bbox).length > 0) {
       try {
-        selectedBoxCallbox(viewer.generateRactByLL(this.props.bbox));
+        selectedBoxCallbox(viewer.generateRectByLL(this.props.bbox));
       } catch (e) {
         console.warn("Adding bbox failed.");
       };
     };
     // set time interval to check the current view every 5 seconds and update points
     setInterval(() => {
-      let diffDistance = distanceInKm(lat, long, viewer.currentView.latitude, viewer.currentView.longitude);
+      let diffDistance = distanceInKm(cameraLat, cameraLong, viewer.currentView.latitude, viewer.currentView.longitude);
       // update the points every 5 seconds if two points differ in 50km + scale of height.
       // I scale the current height by 15000000, the height of "View Global".
       // 4000 km is the distance that rotate half earth map on the height 15000000.
@@ -294,11 +295,11 @@ class CesiumMap extends React.Component {
    */
   changeView(direct) {
     if (direct) {
-      viewer.visit(new SpatialView(long, lat, 15000000, 90.0, -90));
+      viewer.visit(new SpatialView(cameraLong, cameraLat, 15000000, 90.0, -90));
     } else {
-      viewer.visit(new SpatialView(long, lat, 2004.7347996772614, 201.84408760864753, -20.853642866175978));
-    };
-  };
+      viewer.visit(new SpatialView(cameraLong, cameraLat, 2004.7347996772614, 201.84408760864753, -20.853642866175978));
+    }
+  }
 
   /**
    * Change viewpoint based on users' input
