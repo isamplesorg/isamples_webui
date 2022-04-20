@@ -366,6 +366,7 @@ export class ISamplesSpatial {
     this.worldTerrain = Cesium.createWorldTerrain({});
 
     this.viewer = new Cesium.Viewer(element, {
+      infoBox: false,
       timeline: false,
       animation: false,
       sceneModePicker: false,
@@ -528,7 +529,7 @@ export class ISamplesSpatial {
   copyPrimitiveId(movement){
     const selectPoint = this.viewer.scene.pick(movement.position);
     if(selectPoint){
-      this.textToClipboard(selectPoint.id);
+      this.textToClipboard(`"${selectPoint.id}"`);
     };
   }
 
@@ -557,7 +558,6 @@ export class ISamplesSpatial {
     if (this.tracking_info.tracking) {
       console.log("stop tracking");
       const bb = this.stopTracking();
-      console.log(bb);
       if (this.selectedBox !== null) {
         this.viewer.entities.remove(this.selectedBox);
       }

@@ -21,11 +21,11 @@
   transition: transform 0.25s ease-out;
 }
 
-.Cesium-popBox > div > table {
+#viewerChange > div > table {
   margin: auto;
 }
 
-.Cesium-popBox > div > table > tr > td{
+#viewerChange > div > table > tbody > tr > td{
   padding: 10px;
 }
 

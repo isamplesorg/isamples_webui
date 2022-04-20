@@ -13,7 +13,6 @@ import '../../css/cesiumMap.css';
 import {
   SpatialView,
   ISamplesSpatial,
-  PointStreamDatasource,
   PointStreamPrimitiveCollection
 } from "./api/spatial";
 import { ISamplesAPI } from "./api/server";
@@ -40,14 +39,12 @@ let viewer = null;
 let searchFields = null;
 let onChange = null;
 
-// these two represent the pritimive and entity class to handle data query.
-let setPoints = null;
+// this represents the pritimive class to handle data query.
 let setPrimitive = null;
 
-// these two represent the oboe stream callback.
+// this represent the oboe stream callback.
 // we might abort the stream fetch
 let oboePrimitive = null;
-let oboeEntities = null;
 
 /**
  * This method queries the record amount in the bbox
@@ -77,7 +74,6 @@ function showCoordinates(lon, lat, height) {
  */
 function clearBoundingBox() {
   viewer.removeEntity(bbox);
-  setPoints.clear();
   onChange("producedBy_samplingSite_location_rpt", []);
   document.getElementById("clear-bb").style.display = "none";
 }
@@ -94,8 +90,6 @@ async function selectedBoxCallbox(bb) {
   viewer.removeEntity(bbox);
   bbox = viewer.addRectangle(bb, text);
 
-  const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
-  oboeEntities = setPoints.loadApi({ Q: Q, searchFields: searchFields, rows: 10000 });
   bboxLoc = bb.toDegrees()
   onChange("producedBy_samplingSite_location_rpt", { ...bb.toDegrees(), error: "" })
 
@@ -112,19 +106,12 @@ async function selectedBoxCallbox(bb) {
  * @param {*} longitude
  */
 function updatePrimitive(latitude, longitude) {
-  if (setPoints) {
-    viewer.removeAll();
-    clearBoundingBox();
-  }
+  clearBoundingBox();
   if (setPrimitive) {
     setPrimitive.clear();
   }
   if (oboePrimitive) {
     oboePrimitive.abort();
-  }
-
-  if (oboeEntities) {
-    oboeEntities.abort();
   }
 
   oboePrimitive = setPrimitive.load({ lat: latitude, long: longitude, searchFields: searchFields, rows: 100000 });
@@ -197,7 +184,7 @@ class CesiumMap extends React.Component {
               placeholder="Please enter"
               type="number"
               step="any" ></input>
-            <button className="btn btn-default btn-sm"
+            <button className="btn btn-default btn-sm cesium-button"
               onClick={this.submitLL.bind(this)}>
               <span className="glyphicon glyphicon-search" />
             </button>
@@ -217,7 +204,6 @@ class CesiumMap extends React.Component {
     viewer.enableTracking(selectedBoxCallbox);
     setPrimitive = new PointStreamPrimitiveCollection(viewer.terrain);
     viewer.addPointPrimitives(setPrimitive);
-    viewer.addDataSource(new PointStreamDatasource("BB points")).then((res) => { setPoints = res });
     searchFields = this.props.searchFields;
     onChange = this.props.onChange;
     // remove the Ceisum information

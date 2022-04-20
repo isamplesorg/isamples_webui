@@ -26,7 +26,6 @@ import { encode, decode } from "plantuml-encoder"
 // import config
 import config from "./config";
 
-
 // iSamples results react component
 import iSamplesResult from './extension/iSamples_results';
 import TextSearch from './extension/iSamples_textSearch';
@@ -37,6 +36,13 @@ import SearchFieldContainer from './extension/iSamples_containers';
 import { fields } from './fields';
 import ScrollToTop from "./components/scrollTop"
 import { wellFormatField } from './components/utilities';
+
+// cookie library:
+//  https://github.com/reactivestack/cookies/tree/master/packages/universal-cookie
+import Cookies from 'universal-cookie';
+
+// initializa a cookie instance
+const cookies = new Cookies();
 
 // Create a store for the reducer.
 const store = createStore(solrReducer);
@@ -108,6 +114,9 @@ function APP() {
     // Update the query parameters with the latest values selected in the UI
     setSearchParams(searchParamsDict);
 
+    // set cookies
+    cookies.set('previousParams', searchParamsDict, { path: "/" });
+
   }, [searchParams, storeState, setSearchParams]);
 
   return (
@@ -168,7 +177,10 @@ document.addEventListener("DOMContentLoaded", () => {
     searchFields = searchParams.get('searchFields');
     sortFields = searchParams.get('sortFields');
     hasEncodedFields = Boolean(start && searchFields);
+  }else{
+    console.log(cookies.get('previousParams'));
   }
+
 
   if (hasEncodedFields) {
     const decodedStart = JSON.parse(decode(start));
