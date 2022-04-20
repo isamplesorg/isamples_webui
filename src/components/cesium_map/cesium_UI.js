@@ -5,8 +5,10 @@
  */
 
 import React from "react";
+import { render } from "react-dom";
 import * as Cesium from "cesium";
 import '../../css/loading_spinner.css';
+import '../../css/cesiumMap.css';
 
 import {
   SpatialView,
@@ -145,6 +147,65 @@ function distanceInKm(lat1, long1, lat2, long2) {
 }
 
 class CesiumMap extends React.Component {
+
+  constructor() {
+    super()
+    this.dropdown =
+      <>
+        <div id="viewerChange" className="Cesium-popBox">
+          <div>
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                    <button
+                      className="btn btn-default btm-sm  margin-right-xs cesium-button"
+                      onClick={this.visitLocation.bind(this, moorea)}>Visit Moorea</button>
+                  </td>
+                  <td>
+                    <button
+                      className="btn btn-default btm-sm  margin-right-xs cesium-button"
+                      onClick={this.visitLocation.bind(this, patagonia)}>Visit Patagonia</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <button
+                      className="btn btn-default btm-sm  margin-right-xs cesium-button"
+                      onClick={this.changeView.bind(this, true)}>Visit Global</button>
+                  </td>
+                  <td>
+                    <button
+                      className="btn btn-default btm-sm  margin-right-xs cesium-button"
+                      onClick={this.changeView.bind(this, false)}>Visit horizon</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div className="geoSearchGroup">
+            <label className="margin-right-xs Cesium-label">Longitude: </label>
+            <input id="longtitudeInput"
+              className="margin-right-xs Cesium-input"
+              placeholder="Please enter"
+              type="number"
+              step="any" ></input>
+            <label className="margin-right-xs Cesium-label">Latitude: </label>
+            <input id="latitudeInput"
+              className="margin-right-xs Cesium-input"
+              placeholder="Please enter"
+              type="number"
+              step="any" ></input>
+            <button className="btn btn-default btn-sm"
+              onClick={this.submitLL.bind(this)}>
+              <span className="glyphicon glyphicon-search" />
+            </button>
+          </div>
+        </div>
+        <button className="cesium-button" onClick={this.toggle.bind(this)}>Viewer Change</button>
+      </>;
+  };
+
   // This is a initial function in react liftcycle.
   // Only call once when this component first render
   componentDidMount() {
@@ -158,18 +219,21 @@ class CesiumMap extends React.Component {
     viewer.addDataSource(new PointStreamDatasource("BB points")).then((res) => { setPoints = res });
     searchFields = this.props.searchFields;
     onChange = this.props.onChange;
+    // remove the Ceisum information
+    const viewButton = document.querySelector("div.cesium-viewer-bottom")
+    render(this.dropdown, viewButton);
     if (searchFields) {
-      updatePrimitive(lat, long)
-    }
+      updatePrimitive(lat, long);
+    };
 
     // initial bbox
-    if (Object.keys(this.props.bbox).length > 0) {
+    if (this.props.bbox && Object.keys(this.props.bbox).length > 0) {
       try {
         selectedBoxCallbox(viewer.generateRactByLL(this.props.bbox));
       } catch (e) {
         console.warn("Adding bbox failed.");
-      }
-    }
+      };
+    };
     // set time interval to check the current view every 5 seconds and update points
     setInterval(() => {
       let diffDistance = distanceInKm(lat, long, viewer.currentView.latitude, viewer.currentView.longitude);
@@ -178,21 +242,21 @@ class CesiumMap extends React.Component {
       // 4000 km is the distance that rotate half earth map on the height 15000000.
       if (diffDistance > 50 + 4000 * viewer.currentView.height / 15000000) {
         updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude)
-      }
-    }, 5000)
-  }
+      };
+    }, 5000);
+  };
 
   // https://medium.com/@garrettmac/reactjs-how-to-safely-manipulate-the-dom-when-reactjs-cant-the-right-way-8a20928e8a6
   // manipulate Dom outside the react model
   shouldComponentUpdate(nextProps) {
     // update point primitive based on searchFields
-    const sf1 = JSON.stringify(nextProps.searchFields)
-    const sf2 = JSON.stringify(this.props.searchFields)
+    const sf1 = JSON.stringify(nextProps.searchFields);
+    const sf2 = JSON.stringify(this.props.searchFields);
     if (sf1 !== sf2) {
       // clear all element in cesium
       searchFields = nextProps.searchFields;
       updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
-    }
+    };
 
     // update bounding box based on bbox
     const bb1 = JSON.stringify(nextProps.bbox);
@@ -208,11 +272,11 @@ class CesiumMap extends React.Component {
         }
       } else {
         clearBoundingBox();
-      }
-    }
+      };
+    };
     // return false to force react not to rerender
     return false;
-  }
+  };
 
   /**
    * The map view flies to new position
@@ -221,7 +285,7 @@ class CesiumMap extends React.Component {
   visitLocation(location) {
     viewer.visit(location);
     updatePrimitive(location.latitude, location.longitude);
-  }
+  };
 
   /**
    * The function to change the viewpoint
@@ -233,8 +297,8 @@ class CesiumMap extends React.Component {
       viewer.visit(new SpatialView(long, lat, 15000000, 90.0, -90));
     } else {
       viewer.visit(new SpatialView(long, lat, 2004.7347996772614, 201.84408760864753, -20.853642866175978));
-    }
-  }
+    };
+  };
 
   /**
    * Change viewpoint based on users' input
@@ -246,40 +310,26 @@ class CesiumMap extends React.Component {
     if (longitude.value !== "" && latitude !== "") {
       const location = new SpatialView(parseFloat(longitude.value), parseFloat(latitude.value), 150000, 90.0, -90);
       this.visitLocation(location);
-    }
-  }
+    };
+  };
+
+  /**
+   * toggle function for addiiton buttons.
+   */
+  toggle() {
+    const viewerChange = document.getElementById('viewerChange');
+    if (viewerChange.classList.contains("Cesium-popBox-out")) {
+      viewerChange.classList.remove('Cesium-popBox-out')
+    } else {
+      viewerChange.classList.add('Cesium-popBox-out')
+    };
+  };
 
   render() {
     return (
-      <>
-        <div id="cesiumContainer"></div>
-        <div>
-          <button
-            className="btn btn-default btm-sm  margin-right-xs"
-            onClick={this.visitLocation.bind(this, moorea)}>Visit Moorea</button>
-          <button
-            className="btn btn-default btm-sm  margin-right-xs "
-            onClick={this.visitLocation.bind(this, patagonia)}>Visit Patagonia</button>
-          <button
-            className="btn btn-default btm-sm  margin-right-xs "
-            onClick={this.changeView.bind(this, true)}>Visit Global</button>
-          <button
-            className="btn btn-default btm-sm  margin-right-xs "
-            onClick={this.changeView.bind(this, false)}>Visit horizon</button>
-        </div>
-        <div className="geoSearchGroup">
-          <label className="margin-right-xs">Longitude: </label>
-          <input id="longtitudeInput" className="margin-right-xs" type="number" step="any" ></input>
-          <label className="margin-right-xs">Latitude: </label>
-          <input id="latitudeInput" className="margin-right-xs" type="number" step="any" ></input>
-          <button className="btn btn-default btn-sm"
-            onClick={this.submitLL.bind(this)}>
-            <span className="glyphicon glyphicon-search" />
-          </button>
-        </div>
-      </>
+      <div id="cesiumContainer"></div>
     );
-  }
+  };
 };
 
 export default React.memo(CesiumMap);
