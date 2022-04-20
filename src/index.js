@@ -112,7 +112,7 @@ function APP() {
     const searchParamsDict = { searchFields, start, sortFields };
 
     // Update the query parameters with the latest values selected in the UI
-    setSearchParams(searchParamsDict);
+    setSearchParams({});
 
     // set cookies
     cookies.set('previousParams', searchParamsDict, { path: "/" });
@@ -161,8 +161,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // We just need to set state when we firstly open the page with url
   // So, we only need to set the initalize solrClient rather than set them in the useEffect
   // Get the parameters when the page loads.
-  // let [searchParams, setSearchParams] = useSearchParams();
-  // console.log(searchParams)
   const curURL = window.location.href;
   const url = new URL(curURL);
   // Read the encoded fields out of the dictionary.  Note that these *must* match up with what we're encoding up above
@@ -171,16 +169,18 @@ document.addEventListener("DOMContentLoaded", () => {
   let start = null;
   let searchFields = null;
   let sortFields = null;
-  if (hash != null) {
+
+  if (hash) {
     let searchParams = new URLSearchParams(url.hash.substring(2));
     start = searchParams.get('start');
     searchFields = searchParams.get('searchFields');
     sortFields = searchParams.get('sortFields');
-    hasEncodedFields = Boolean(start && searchFields);
   }else{
-    console.log(cookies.get('previousParams'));
+    start = cookies.get('previousParams')['start'];
+    searchFields = cookies.get('previousParams')['searchFields'];
+    sortFields = cookies.get('previousParams')['sortFields'];
   }
-
+  hasEncodedFields = Boolean(start && searchFields);
 
   if (hasEncodedFields) {
     const decodedStart = JSON.parse(decode(start));
