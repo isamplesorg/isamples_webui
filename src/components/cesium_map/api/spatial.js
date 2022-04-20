@@ -36,6 +36,13 @@ export class SpatialView {
       pitch: Cesium.Math.toRadians(this.pitch),
     }
   }
+
+  get getView() {
+    return {
+      destination: this.destination,
+      orientation: this.orientation
+    };
+  }
 }
 
 class DRectangle extends Cesium.Rectangle {
@@ -248,7 +255,7 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
       return Cesium.Color.fromCssColorString(colorbind[3]);
     } else if (n > 10) {
       return Cesium.Color.fromCssColorString(colorbind[4]);
-    } else{
+    } else {
       return Cesium.Color.fromCssColorString(colorbind[5])
     }
   }
@@ -304,7 +311,7 @@ export class ISamplesSpatial {
    * Create a new viewer
    * @param element Element or elementId
    */
-  constructor(element) {
+  constructor(element, initialLocation) {
     this.tracking_info = {
       color: Cesium.Color.BLUE,
       width: 10,
@@ -327,13 +334,9 @@ export class ISamplesSpatial {
     this.viewer.scene.screenSpaceCameraController.maximumZoomDistance = 20000000;
     this.viewer.scene.screenSpaceCameraController.minimumZoomDistance = 10;
     // set camera inital position
-    this.viewer.camera.setView({
-      destination: Cesium.Cartesian3.fromDegrees(-149.8169236266867, -17.451466233002286, 2004.7347996772614),
-      orientation: {
-        heading: Cesium.Math.toRadians(201.84408760864753),
-        pitch: Cesium.Math.toRadians(-20.853642866175978),
-      }
-    });
+    if (initialLocation) {
+      this.viewer.camera.setView(initialLocation.getView);
+    }
     this.buildingTileset = this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
     this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
     this.viewer.scene.globe.depthTestAgainstTerrain = true;
@@ -368,8 +371,7 @@ export class ISamplesSpatial {
   visit(place) {
     this.viewer.camera.flyTo({
       destination: place.destination,
-      orientation: place.orientation,
-      duration: 2
+      orientation: place.orientation
     });
   }
 
