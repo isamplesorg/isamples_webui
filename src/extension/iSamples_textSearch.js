@@ -1,8 +1,16 @@
 import PropTypes from 'prop-types';
 import React from "react";
 import cx from "classnames";
-import PopUp from '../components/popup';
 
+const infoBox =
+  <div className="popBox">
+    <ul>
+      <li>Using "<b>*</b>" for the wildcard search (eg. IGSN*).</li>
+      <li><b>&&</b> for the AND operator, <b>||</b> for the OR operator.</li>
+      <li>Using parenthesis "<b>()</b>" to group the multiple keywrods (eg. (water && great)).</li>
+      <li>If there are special characters (eg. : ) in the search words, Please put entire string in a quote, (eg. "IGSN:NHB0005J0").</li>
+    </ul>
+  </div>;
 
 class TextSearch extends React.Component {
   constructor(props) {
@@ -74,7 +82,7 @@ class TextSearch extends React.Component {
                   "glyphicon-info-sign": !collapse
                 })} />
               </span>) : null}
-            {this.state.hint ? <PopUp /> : null}
+            {this.state.hint ? infoBox : null}
           </h5>
         </header>
         <div style={{ display: collapse ? "none" : "block" }}>

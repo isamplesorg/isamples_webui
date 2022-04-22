@@ -15,6 +15,7 @@ import {
   PointStreamPrimitiveCollection
 } from "./api/spatial";
 import { ISamplesAPI } from "./api/server";
+import { addButton } from "./elements/navigationButton";
 
 // Defined ceisum access token
 // Current one is Dave's token
@@ -23,12 +24,19 @@ import { ISamplesAPI } from "./api/server";
 //  https://cesium.com/learn/ion/cesium-ion-access-tokens/
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwNzk3NjkyMy1iNGI1LTRkN2UtODRiMy04OTYwYWE0N2M3ZTkiLCJpZCI6Njk1MTcsImlhdCI6MTYzMzU0MTQ3N30.e70dpNzOCDRLDGxRguQCC-tRzGzA-23Xgno5lNgCeB4';
 
+const api = new ISamplesAPI();
+const moorea = new SpatialView(-149.8169236266867, -17.451466233002286, 2004.7347996772614, 201.84408760864753, -20.853642866175978);
+const patagonia = new SpatialView(-69.60169132023925, -54.315990127766646, 1781.4560051617016, 173.54573250470798, -15.85292472305027);
+
 // the initial map setup
-let lat = -17.451466233002286;
-let long = -149.8169236266867;
+// keep track the camera location
+let cameraLat = moorea.latitude;
+let cameraLong = moorea.longitude;
 let bbox = null;
+let bboxLoc = null;
 let viewer = null;
 let searchFields = null;
+let onChange = null;
 
 // these two represent the pritimive and entity class to handle data query.
 let setPoints = null;
@@ -38,10 +46,6 @@ let setPrimitive = null;
 // we might abort the stream fetch
 let oboePrimitive = null;
 let oboeEntities = null;
-
-const api = new ISamplesAPI();
-const moorea = new SpatialView(-149.8169236266867, -17.451466233002286, 2004.7347996772614, 201.84408760864753, -20.853642866175978);
-const patagonia = new SpatialView(-69.60169132023925, -54.315990127766646, 1781.4560051617016, 173.54573250470798, -15.85292472305027);
 
 /**
  * This method queries the record amount in the bbox
@@ -72,6 +76,7 @@ function showCoordinates(lon, lat, height) {
 function clearBoundingBox() {
   viewer.removeEntity(bbox);
   setPoints.clear();
+  onChange("producedBy_samplingSite_location_rpt", []);
   document.getElementById("clear-bb").style.display = "none";
 }
 
@@ -89,6 +94,8 @@ async function selectedBoxCallbox(bb) {
 
   const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
   oboeEntities = setPoints.loadApi({ Q: Q, searchFields: searchFields, rows: 10000 });
+  bboxLoc = bb.toDegrees()
+  onChange("producedBy_samplingSite_location_rpt", { ...bb.toDegrees(), error: "" })
 
   const btn = document.getElementById("clear-bb");
   btn.style.display = "block";
@@ -119,8 +126,8 @@ function updatePrimitive(latitude, longitude) {
   }
 
   oboePrimitive = setPrimitive.load({ lat: latitude, long: longitude, searchFields: searchFields, rows: 100000 });
-  lat = latitude;
-  long = longitude;
+  cameraLat = latitude;
+  cameraLong = longitude;
 }
 
 /**
@@ -138,26 +145,35 @@ function distanceInKm(lat1, long1, lat2, long2) {
   return new Cesium.EllipsoidGeodesic(p1, p2).surfaceDistance / 1000;
 }
 
-
 class CesiumMap extends React.Component {
   // This is a initial function in react liftcycle.
   // Only call once when this component first render
   componentDidMount() {
-    viewer = new ISamplesSpatial("cesiumContainer");
-    // viewer.addPointsBySource(642092);
-    viewer.visit(moorea);
+    viewer = new ISamplesSpatial("cesiumContainer", moorea);
+    addButton();
     viewer.addHud("cesiumContainer");
-    // viewer.addLoading();
     viewer.trackMouseCoordinates(showCoordinates);
     viewer.enableTracking(selectedBoxCallbox);
     setPrimitive = new PointStreamPrimitiveCollection("Primitive Points");
     viewer.addPointPrimitives(setPrimitive);
     viewer.addDataSource(new PointStreamDatasource("BB points")).then((res) => { setPoints = res });
     searchFields = this.props.searchFields;
-    updatePrimitive(lat, long)
-    // set time interval to check the current view every 3 seconds and update points
+    onChange = this.props.onChange;
+    if (searchFields) {
+      updatePrimitive(cameraLat, cameraLong)
+    }
+
+    // initial bbox
+    if (this.props.bbox && Object.keys(this.props.bbox).length > 0) {
+      try {
+        selectedBoxCallbox(viewer.generateRectByLL(this.props.bbox));
+      } catch (e) {
+        console.warn("Adding bbox failed.");
+      }
+    }
+    // set time interval to check the current view every 5 seconds and update points
     setInterval(() => {
-      let diffDistance = distanceInKm(lat, long, viewer.currentView.latitude, viewer.currentView.longitude);
+      let diffDistance = distanceInKm(cameraLat, cameraLong, viewer.currentView.latitude, viewer.currentView.longitude);
       // update the points every 5 seconds if two points differ in 50km + scale of height.
       // I scale the current height by 15000000, the height of "View Global".
       // 4000 km is the distance that rotate half earth map on the height 15000000.
@@ -170,14 +186,31 @@ class CesiumMap extends React.Component {
   // https://medium.com/@garrettmac/reactjs-how-to-safely-manipulate-the-dom-when-reactjs-cant-the-right-way-8a20928e8a6
   // manipulate Dom outside the react model
   shouldComponentUpdate(nextProps) {
-    const key1 = JSON.stringify(nextProps.searchFields)
-    const key2 = JSON.stringify(this.props.searchFields)
-    if (key1 !== key2) {
+    // update point primitive based on searchFields
+    const sf1 = JSON.stringify(nextProps.searchFields)
+    const sf2 = JSON.stringify(this.props.searchFields)
+    if (sf1 !== sf2) {
       // clear all element in cesium
       searchFields = nextProps.searchFields;
       updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
     }
 
+    // update bounding box based on bbox
+    const bb1 = JSON.stringify(nextProps.bbox);
+    const bb2 = JSON.stringify(this.props.bbox);
+
+    if (bb1 !== bb2 && bb1 !== JSON.stringify(bboxLoc)) {
+      // draw the bounding box or remove the bounding box
+      if (Object.keys(nextProps.bbox).length > 0) {
+        try {
+          selectedBoxCallbox(viewer.generateRactByLL(nextProps.bbox));
+        } catch (e) {
+          console.warn("Adding bbox failed.");
+        }
+      } else {
+        clearBoundingBox();
+      }
+    }
     // return false to force react not to rerender
     return false;
   }
@@ -198,9 +231,9 @@ class CesiumMap extends React.Component {
    */
   changeView(direct) {
     if (direct) {
-      viewer.visit(new SpatialView(long, lat, 15000000, 90.0, -90));
+      viewer.visit(new SpatialView(cameraLong, cameraLat, 15000000, 90.0, -90));
     } else {
-      viewer.visit(new SpatialView(long, lat, 2004.7347996772614, 201.84408760864753, -20.853642866175978));
+      viewer.visit(new SpatialView(cameraLong, cameraLat, 2004.7347996772614, 201.84408760864753, -20.853642866175978));
     }
   }
 

@@ -60,12 +60,22 @@ class ResultList extends React.Component {
   }
 
   render() {
-    const { bootstrapCss } = this.props;
+    const { bootstrapCss, onChange } = this.props;
 
     const doc = this.props.children[0].length !== 0 ? this.props.children[0].map((record) => (record['props']['doc'])) : [];
     const fields = this.props.children[0].length !== 0 ? this.props.children[0][0]['props']['fields'] : [];
-    const searchFields = fields.filter((field) => field.type !== "non-search").map(({ collapse, hidden, ...rest }) => rest);
+    // filter the searchFields with values
+    const searchFields = fields
+      .filter((field) => field.type !== "non-search" && field.type !== "spatialquery")
+      .map(({ collapse, hidden, ...rest }) => rest);
 
+    // filter the fields to only include the spatial information
+    const spatialQuery = fields.filter((field) => field.type === "spatialquery")[0];
+    const bbox = spatialQuery && spatialQuery.hasOwnProperty('value') ?
+      spatialQuery.value
+      : {}
+
+    if(bbox) {delete bbox['error']}
 
     return (
       <ButGroup
@@ -90,7 +100,10 @@ class ResultList extends React.Component {
                 // if there is no searchFields, don't render cesium.
                 searchFields.length > 0
                   ?
-                  <CesiumMap searchFields={searchFields} />
+                  <CesiumMap
+                    searchFields={searchFields}
+                    bbox={bbox}
+                    onChange={onChange} />
                   : null
               }
             </div>
@@ -105,4 +118,4 @@ ResultList.propTypes = {
   children: PropTypes.array
 };
 
-export default ResultList;
+export default React.memo(ResultList);
