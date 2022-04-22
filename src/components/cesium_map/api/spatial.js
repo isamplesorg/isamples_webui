@@ -11,7 +11,7 @@
 import * as Cesium from 'cesium';
 import { html, render } from "lit";
 import { pointStream } from './server';
-import { colorbind, source } from '../utilities';
+import { colorbind, source } from '../config_cesium';
 
 /**
  * Describes a camera viewpoint for Cesium.
@@ -272,7 +272,7 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
    * @param {*} primitive, the current class instance
    */
   updateElevation(collection, primitive) {
-    if(collection.length <= 1){
+    if (collection.length <= 1) {
       return;
     };
     let promise = Cesium.sampleTerrain(this.terrain, 11, collection)
@@ -526,16 +526,16 @@ export class ISamplesSpatial {
     document.body.removeChild(dummy);
   }
 
-  copyPrimitiveId(movement){
+  copyPrimitiveId(movement) {
     const selectPoint = this.viewer.scene.pick(movement.position);
-    if(selectPoint){
+    if (selectPoint) {
       this.textToClipboard(`"${selectPoint.id}"`);
     };
   }
 
   showPrimitiveId(movement) {
     const selectPoint = this.viewer.scene.pick(movement.endPosition);
-    if(this.pointprimitive){
+    if (this.pointprimitive) {
       this.pointprimitive.primitive.pixelSize = 8;
       this.pointprimitive.primitive.outlineColor = Cesium.Color.TRANSPARENT;
       this.pointprimitive.primitive.outlineWidth = 0;

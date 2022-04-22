@@ -37,3 +37,12 @@ export function wellFormatField(field) {
   return name
 }
 
+/**
+ * a function to check if at least one field has value
+ * @param {*} fields a hashtable variable
+ */
+export function checkAllValue(fields) {
+  const values = fields.filter((field) => field.value && field.value.length > 0);
+  return values.length > 0;
+}
+

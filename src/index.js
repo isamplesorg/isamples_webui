@@ -2,15 +2,19 @@ import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import reportWebVitals from './reportWebVitals';
 import './css/index.css';
+import solrReducer from "./solr-reducer";
+import { createStore } from "redux";
+// encode and decode parameter
+import { encode, decode } from "plantuml-encoder"
+
+// import config
+import config from "./config";
 
 import {
   SolrFacetedSearch,
   SolrClient,
   defaultComponentPack
 } from "solr-faceted-search-react";
-
-import solrReducer from "./solr-reducer";
-import { createStore } from "redux";
 
 // react router to define url
 import {
@@ -19,12 +23,6 @@ import {
   Route,
   useSearchParams,
 } from 'react-router-dom';
-
-// encode and decode parameter
-import { encode, decode } from "plantuml-encoder"
-
-// import config
-import config from "./config";
 
 // iSamples results react component
 import iSamplesResult from './extension/iSamples_results';
@@ -35,7 +33,7 @@ import iSamples_RangeFacet from './extension/iSamples_rangeFacet';
 import SearchFieldContainer from './extension/iSamples_containers';
 import { fields } from './fields';
 import ScrollToTop from "./components/scrollTop"
-import { wellFormatField } from './components/utilities';
+import { wellFormatField, checkAllValue } from './components/utilities';
 
 // cookie library:
 //  https://github.com/reactivestack/cookies/tree/master/packages/universal-cookie
@@ -86,6 +84,7 @@ const solrClient = new SolrClient({
   sortFields: sortFields,
   rows: 20,
   pageStrategy: "paginate",
+  view: 'List',
 
   // Delegate change callback to redux dispatcher
   onChange: (state) => store.dispatch({ type: "SET_SOLR_STATE", state: state })
@@ -105,17 +104,28 @@ function APP() {
   // …some time passes
   // (3) This gets called, and we write back the current query string to the browser's location using setSearchParams
   useEffect(() => {
+    const query = store.getState()['query'];
     // For now, encode only the selected search facets and start page in the searchParams
-    const searchFields = encode(JSON.stringify(store.getState()['query']['searchFields']));
-    const start = encode(JSON.stringify(store.getState()['query']['start'] / store.getState()['query']['rows']));
-    const sortFields = encode(JSON.stringify(store.getState()['query']['sortFields']));
-    const searchParamsDict = { searchFields, start, sortFields };
+    const searchFields = encode(JSON.stringify(query['searchFields']));
+    const start = encode(JSON.stringify(query['start'] / query['rows']));
+    const sortFields = encode(JSON.stringify(query['sortFields']));
+    const view = encode(JSON.stringify(query['view']));
+    const searchParamsDict = { searchFields, start, sortFields, view };
 
-    // Update the query parameters with the latest values selected in the UI
-    setSearchParams({});
+    // check if there is new value
+    if (checkAllValue(query['searchFields']) || checkAllValue(query['sortFields']) || query['start'] !== 0 || query['view'] !== "List") {
+      // Update the query parameters with the latest values selected in the UI
+      setSearchParams(searchParamsDict);
 
-    // set cookies
-    cookies.set('previousParams', searchParamsDict, { path: "/" });
+      // set cookies
+      cookies.set('previousParams', searchParamsDict, { path: "/" });
+    } else {
+      setSearchParams({});
+
+      // remove cookies
+      cookies.remove('previousParams', { path: "/" });
+    }
+
 
   }, [searchParams, storeState, setSearchParams]);
 
@@ -169,23 +179,29 @@ document.addEventListener("DOMContentLoaded", () => {
   let start = null;
   let searchFields = null;
   let sortFields = null;
+  let view = null;
 
   if (hash) {
     let searchParams = new URLSearchParams(url.hash.substring(2));
     start = searchParams.get('start');
     searchFields = searchParams.get('searchFields');
     sortFields = searchParams.get('sortFields');
-  }else{
-    start = cookies.get('previousParams')['start'];
-    searchFields = cookies.get('previousParams')['searchFields'];
-    sortFields = cookies.get('previousParams')['sortFields'];
+    view = searchParams.get('view');
+  } else {
+    if (cookies.get('previousParams')) {
+      start = cookies.get('previousParams')['start'];
+      searchFields = cookies.get('previousParams')['searchFields'];
+      sortFields = cookies.get('previousParams')['sortFields'];
+      view = cookies.get('previousParams')['view'];
+    }
   }
-  hasEncodedFields = Boolean(start && searchFields);
+  hasEncodedFields = Boolean(start && searchFields && sortFields && view);
 
   if (hasEncodedFields) {
     const decodedStart = JSON.parse(decode(start));
     const decodedSearchFields = JSON.parse(decode(searchFields));
     const decodedSortFields = JSON.parse(decode(sortFields));
+    const decodedView = JSON.parse(decode(view));
     // Update solrClient and request a new solr query
     const paramesDict = { 'searchFields': decodedSearchFields, 'sortFields': decodedSortFields };
 
@@ -193,7 +209,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // set initial query. This function would not send a query.
     solrClient.setInitialQuery(paramesDict);
     // set page. This function will send a query.
-    solrClient.setCurrentPage(decodedStart)
+    solrClient.setCurrentPage(decodedStart);
+    // set view facet
+    solrClient.setView(decodedView);
+
   } else {
     solrClient.initialize();
   }

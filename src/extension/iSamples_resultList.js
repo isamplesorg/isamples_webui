@@ -47,6 +47,13 @@ class ResultList extends React.Component {
     this.state = { facet: "List" };
   }
 
+  shouldComponentUpdate(nextProps) {
+    if (this.props.view !== nextProps.view) {
+      this.setState({ facet: nextProps.view });
+    }
+    return true;
+  }
+
   switchFormat(format) {
     let paginateButton = document.getElementsByClassName('pagDisplay');
 
@@ -57,6 +64,7 @@ class ResultList extends React.Component {
       [...paginateButton].forEach((paginate) => paginate.style.removeProperty("display"));
     }
     this.setState({ facet: format });
+    this.props.setView(format);
   }
 
   render() {
@@ -75,7 +83,7 @@ class ResultList extends React.Component {
       spatialQuery.value
       : {}
 
-    if(bbox) {delete bbox['error']}
+    if (bbox) { delete bbox['error'] }
 
     return (
       <ButGroup

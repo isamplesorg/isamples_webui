@@ -1,6 +1,6 @@
 import { render } from "react-dom";
 import info from "../../../images/NavigationHelp/info.svg";
-import { colorbind, source } from "../utilities";
+import { colorbind, source } from "../config_cesium";
 
 
 const Labels = (id, color, text) =>
