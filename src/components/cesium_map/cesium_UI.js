@@ -91,6 +91,7 @@ async function selectedBoxCallbox(bb) {
   bbox = viewer.addRectangle(bb, text);
 
   bboxLoc = bb.toDegrees()
+  console.log(bbox)
   onChange("producedBy_samplingSite_location_rpt", { ...bb.toDegrees(), error: "" })
 
   const btn = document.getElementById("clear-bb");
@@ -253,9 +254,9 @@ class CesiumMap extends React.Component {
       // draw the bounding box or remove the bounding box
       if (Object.keys(nextProps.bbox).length > 0) {
         try {
-          selectedBoxCallbox(viewer.generateRactByLL(nextProps.bbox));
+          selectedBoxCallbox(viewer.generateRectByLL(nextProps.bbox));
         } catch (e) {
-          console.warn("Adding bbox failed.");
+          console.warn("Adding bbox failed." + e);
         }
       } else {
         clearBoundingBox();
