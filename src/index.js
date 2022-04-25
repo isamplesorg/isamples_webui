@@ -31,9 +31,9 @@ import ResultList from './extension/iSamples_resultList';
 import ResultPagination from './extension/iSamples_pagination';
 import iSamples_RangeFacet from './extension/iSamples_rangeFacet';
 import SearchFieldContainer from './extension/iSamples_containers';
-import { fields } from './fields';
+import { fields, initalView, initialLong, initialLat } from './fields';
 import ScrollToTop from "./components/scrollTop"
-import { wellFormatField, checkAllValue } from './components/utilities';
+import { wellFormatField, checkAllValue, getAllValueField } from './components/utilities';
 
 // cookie library:
 //  https://github.com/reactivestack/cookies/tree/master/packages/universal-cookie
@@ -84,7 +84,7 @@ const solrClient = new SolrClient({
   sortFields: sortFields,
   rows: 20,
   pageStrategy: "paginate",
-  view: 'List',
+  view: "List",
 
   // Delegate change callback to redux dispatcher
   onChange: (state) => store.dispatch({ type: "SET_SOLR_STATE", state: state })
@@ -105,27 +105,39 @@ function APP() {
   // (3) This gets called, and we write back the current query string to the browser's location using setSearchParams
   useEffect(() => {
     const query = store.getState()['query'];
-    // For now, encode only the selected search facets and start page in the searchParams
-    const searchFields = encode(JSON.stringify(query['searchFields']));
-    const start = encode(JSON.stringify(query['start'] / query['rows']));
-    const sortFields = encode(JSON.stringify(query['sortFields']));
-    const view = encode(JSON.stringify(query['view']));
-    const searchParamsDict = { searchFields, start, sortFields, view };
+    // Only convert the fields with value as the state rather than all fields
+    const searchParamsDict = {};
+    if (checkAllValue(query['searchFields'])) {
+      const searchFields = encode(JSON.stringify(getAllValueField(query['searchFields'])));
+      searchParamsDict['searchFields'] = searchFields;
+    }
 
-    // check if there is new value
-    if (checkAllValue(query['searchFields']) || checkAllValue(query['sortFields']) || query['start'] !== 0 || query['view'] !== "List") {
-      // Update the query parameters with the latest values selected in the UI
-      setSearchParams(searchParamsDict);
+    if (checkAllValue(query['sortFields'])) {
+      const sortFields = encode(JSON.stringify(getAllValueField(query['sortFields'])));
+      searchParamsDict['sortFields'] = sortFields;
+    }
 
+    if (query['start'] !== 0) {
+      const start = encode(JSON.stringify(query['start'] / query['rows']));
+      searchParamsDict['start'] = start;
+    }
+
+    if (query['view'] !== 'List') {
+      const view = encode(JSON.stringify(query['view']));
+      searchParamsDict['view'] = view;
+    }
+
+    setSearchParams(searchParamsDict);
+
+    if (Object.keys(searchParamsDict).length > 0) {
       // set cookies
       cookies.set('previousParams', searchParamsDict, { path: "/" });
-    } else {
-      setSearchParams({});
-
+    }else{
       // remove cookies
       cookies.remove('previousParams', { path: "/" });
     }
 
+    // const searchParamsDict = { searchFields, start, sortFields, view };
 
   }, [searchParams, storeState, setSearchParams]);
 
@@ -195,13 +207,14 @@ document.addEventListener("DOMContentLoaded", () => {
       view = cookies.get('previousParams')['view'];
     }
   }
-  hasEncodedFields = Boolean(start && searchFields && sortFields && view);
+  hasEncodedFields = Boolean(start || searchFields || sortFields || view);
 
   if (hasEncodedFields) {
-    const decodedStart = JSON.parse(decode(start));
-    const decodedSearchFields = JSON.parse(decode(searchFields));
-    const decodedSortFields = JSON.parse(decode(sortFields));
-    const decodedView = JSON.parse(decode(view));
+    // const paramesDict = {};
+    const decodedStart = start ? JSON.parse(decode(start)) : 0;
+    const decodedSearchFields = searchFields ? JSON.parse(decode(searchFields)): [];
+    const decodedSortFields = sortFields ? JSON.parse(decode(sortFields)) : [];
+    const decodedView = view ? JSON.parse(decode(view)) : "List";
     // Update solrClient and request a new solr query
     const paramesDict = { 'searchFields': decodedSearchFields, 'sortFields': decodedSortFields };
 

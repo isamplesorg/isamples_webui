@@ -4,7 +4,7 @@
 // :Param collapse: true -> close , false or default undefined -> open
 // :Param hidden: true -> hide the field, false or default  undefined-> show the field
 
-export const fields = [
+const fields = [
   { field: "curation_accessContraints", type: "non-search", hidden: true },
   { field: "curation_description_text", type: "non-search", hidden: true },
   { field: "curation_label", type: "non-search", hidden: true },
@@ -38,3 +38,15 @@ export const fields = [
   // for spatial query
   { label: "Spatial Query", field: "producedBy_samplingSite_location_rpt", type: "spatialquery"},
 ];
+
+const initalView = "List";
+const initialLong = -17.451466233002286;
+const initialLat = -149.8169236266867;
+
+export {
+  fields,
+  initalView,
+  initialLong,
+  initialLat
+}
+

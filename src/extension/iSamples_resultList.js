@@ -49,7 +49,7 @@ class ResultList extends React.Component {
 
   shouldComponentUpdate(nextProps) {
     if (this.props.view !== nextProps.view) {
-      this.setState({ facet: nextProps.view });
+      this.switchFormat(nextProps.view);
     }
     return true;
   }

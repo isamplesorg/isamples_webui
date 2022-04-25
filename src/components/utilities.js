@@ -42,7 +42,16 @@ export function wellFormatField(field) {
  * @param {*} fields a hashtable variable
  */
 export function checkAllValue(fields) {
-  const values = fields.filter((field) => field.value && field.value.length > 0);
+  const values = fields.filter((field) => field.value && (Object.keys(field.value).length >0 || field.value.length > 0));
   return values.length > 0;
+}
+
+/**
+ * a function to return only fields with values
+ * @param {*} fields a array of field hashtable
+ * @returns
+ */
+export function getAllValueField(fields){
+  return fields.filter((field) => field.value && (Object.keys(field.value).length >0 || field.value.length > 0));
 }
 

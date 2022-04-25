@@ -72,9 +72,9 @@ function showCoordinates(lon, lat, height) {
 /**
  * clear bounding box and clear buttom
  */
-function clearBoundingBox() {
+function clearBoundingBox(updated = false) {
   viewer.removeEntity(bbox);
-  onChange("producedBy_samplingSite_location_rpt", []);
+  if (updated) { onChange("producedBy_samplingSite_location_rpt", []) };
   document.getElementById("clear-bb").style.display = "none";
 }
 
@@ -84,19 +84,18 @@ function clearBoundingBox() {
  *
  * @param {*} bb a DRectangle instance
  */
-async function selectedBoxCallbox(bb) {
+async function selectedBoxCallbox(bb, updated = false) {
   let text = `Record count : ${await countRecordsInBB(bb)}`;
 
   viewer.removeEntity(bbox);
   bbox = viewer.addRectangle(bb, text);
 
   bboxLoc = bb.toDegrees()
-  console.log(bbox)
-  onChange("producedBy_samplingSite_location_rpt", { ...bb.toDegrees(), error: "" })
+  if (updated) { onChange("producedBy_samplingSite_location_rpt", { ...bb.toDegrees(), error: "" }) };
 
   const btn = document.getElementById("clear-bb");
   btn.style.display = "block";
-  btn.onclick = clearBoundingBox;
+  btn.onclick = () => (clearBoundingBox(true));
 }
 
 /**
@@ -107,7 +106,7 @@ async function selectedBoxCallbox(bb) {
  * @param {*} longitude
  */
 function updatePrimitive(latitude, longitude) {
-  clearBoundingBox();
+
   if (setPrimitive) {
     setPrimitive.clear();
   }
@@ -130,8 +129,8 @@ function updatePrimitive(latitude, longitude) {
  * @returns distance in kilometer
  */
 function distanceInKm(lat1, long1, lat2, long2) {
-  const p1 = Cesium.Cartographic.fromCartesian(Cesium.Cartesian3.fromDegrees(long1, lat1, 0))
-  const p2 = Cesium.Cartographic.fromCartesian(Cesium.Cartesian3.fromDegrees(long2, lat2, 0))
+  const p1 = Cesium.Cartographic.fromCartesian(Cesium.Cartesian3.fromDegrees(long1, lat1, 0));
+  const p2 = Cesium.Cartographic.fromCartesian(Cesium.Cartesian3.fromDegrees(long2, lat2, 0));
   return new Cesium.EllipsoidGeodesic(p1, p2).surfaceDistance / 1000;
 }
 
@@ -200,18 +199,18 @@ class CesiumMap extends React.Component {
   componentDidMount() {
     viewer = new ISamplesSpatial("cesiumContainer", moorea);
     addButton();
+    // remove the Ceisum information
+    render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
     viewer.addHud("cesiumContainer");
     viewer.trackMouseCoordinates(showCoordinates);
-    viewer.enableTracking(selectedBoxCallbox);
+    viewer.enableTracking((bb) => selectedBoxCallbox(bb, true));
     setPrimitive = new PointStreamPrimitiveCollection(viewer.terrain);
     viewer.addPointPrimitives(setPrimitive);
     searchFields = this.props.searchFields;
     onChange = this.props.onChange;
-    // remove the Ceisum information
-    const viewButton = document.querySelector("div.cesium-viewer-bottom")
-    render(this.dropdown, viewButton);
+
     if (searchFields) {
-      updatePrimitive(cameraLat, cameraLong)
+      updatePrimitive(cameraLat, cameraLong);
     }
 
     // initial bbox
@@ -307,9 +306,9 @@ class CesiumMap extends React.Component {
   toggle() {
     const viewerChange = document.getElementById('viewerChange');
     if (viewerChange.classList.contains("Cesium-popBox-out")) {
-      viewerChange.classList.remove('Cesium-popBox-out')
+      viewerChange.classList.remove('Cesium-popBox-out');
     } else {
-      viewerChange.classList.add('Cesium-popBox-out')
+      viewerChange.classList.add('Cesium-popBox-out');
     };
   };
 
