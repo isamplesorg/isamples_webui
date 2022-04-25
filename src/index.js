@@ -132,7 +132,7 @@ function APP() {
     if (Object.keys(searchParamsDict).length > 0) {
       // set cookies
       cookies.set('previousParams', searchParamsDict, { path: "/" });
-    }else{
+    } else {
       // remove cookies
       cookies.remove('previousParams', { path: "/" });
     }
@@ -212,7 +212,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (hasEncodedFields) {
     // const paramesDict = {};
     const decodedStart = start ? JSON.parse(decode(start)) : 0;
-    const decodedSearchFields = searchFields ? JSON.parse(decode(searchFields)): [];
+    const decodedSearchFields = searchFields ? JSON.parse(decode(searchFields)) : [];
     const decodedSortFields = sortFields ? JSON.parse(decode(sortFields)) : [];
     const decodedView = view ? JSON.parse(decode(view)) : "List";
     // Update solrClient and request a new solr query

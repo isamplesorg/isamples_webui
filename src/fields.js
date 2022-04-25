@@ -36,7 +36,7 @@ const fields = [
   { field: "source", type: "list-facet", facetSort: "index", collapse: true },
   { field: "sourceUpdatedTime", type: "non-search", collapse: true },
   // for spatial query
-  { label: "Spatial Query", field: "producedBy_samplingSite_location_rpt", type: "spatialquery"},
+  { label: "Spatial Query", field: "producedBy_samplingSite_location_rpt", type: "spatialquery" },
 ];
 
 const initalView = "List";
