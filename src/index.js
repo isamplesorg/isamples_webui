@@ -31,7 +31,7 @@ import ResultList from './extension/iSamples_resultList';
 import ResultPagination from './extension/iSamples_pagination';
 import iSamples_RangeFacet from './extension/iSamples_rangeFacet';
 import SearchFieldContainer from './extension/iSamples_containers';
-import { fields, initalView, initialLong, initialLat } from './fields';
+import { fields, initialCamera } from './fields';
 import ScrollToTop from "./components/scrollTop"
 import { wellFormatField, checkAllValue, getAllValueField } from './components/utilities';
 
@@ -84,7 +84,7 @@ const solrClient = new SolrClient({
   sortFields: sortFields,
   rows: 20,
   pageStrategy: "paginate",
-  view: "List",
+  view: initialCamera,
 
   // Delegate change callback to redux dispatcher
   onChange: (state) => store.dispatch({ type: "SET_SOLR_STATE", state: state })
@@ -122,7 +122,7 @@ function APP() {
       searchParamsDict['start'] = start;
     }
 
-    if (query['view'] !== 'List') {
+    if (JSON.stringify(query['view']) !== JSON.stringify(initialCamera)) {
       const view = encode(JSON.stringify(query['view']));
       searchParamsDict['view'] = view;
     }
@@ -214,7 +214,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const decodedStart = start ? JSON.parse(decode(start)) : 0;
     const decodedSearchFields = searchFields ? JSON.parse(decode(searchFields)) : [];
     const decodedSortFields = sortFields ? JSON.parse(decode(sortFields)) : [];
-    const decodedView = view ? JSON.parse(decode(view)) : "List";
+    const decodedView = view ? JSON.parse(decode(view)) : initialCamera;
     // Update solrClient and request a new solr query
     const paramesDict = { 'searchFields': decodedSearchFields, 'sortFields': decodedSortFields };
 
@@ -225,7 +225,6 @@ document.addEventListener("DOMContentLoaded", () => {
     solrClient.setCurrentPage(decodedStart);
     // set view facet
     solrClient.setView(decodedView);
-
   } else {
     solrClient.initialize();
   }

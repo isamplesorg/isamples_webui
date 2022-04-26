@@ -31,8 +31,8 @@ const patagonia = new SpatialView(-69.60169132023925, -54.315990127766646, 1781.
 
 // the initial map setup
 // keep track the camera location
-let cameraLat = moorea.latitude;
-let cameraLong = moorea.longitude;
+let cameraLat = null;
+let cameraLong = null;
 let bbox = null;
 let bboxLoc = null;
 let viewer = null;
@@ -96,27 +96,6 @@ async function selectedBoxCallbox(bb, updated = false) {
   const btn = document.getElementById("clear-bb");
   btn.style.display = "block";
   btn.onclick = () => (clearBoundingBox(true));
-}
-
-/**
- * This method clear all objects in the map
- * and render new point primitive based on new position
- *
- * @param {*} latitude
- * @param {*} longitude
- */
-function updatePrimitive(latitude, longitude) {
-
-  if (setPrimitive) {
-    setPrimitive.clear();
-  }
-  if (oboePrimitive) {
-    oboePrimitive.abort();
-  }
-
-  oboePrimitive = setPrimitive.load({ lat: latitude, long: longitude, searchFields: searchFields, rows: 100000 });
-  cameraLat = latitude;
-  cameraLong = longitude;
 }
 
 /**
@@ -197,7 +176,9 @@ class CesiumMap extends React.Component {
   // This is a initial function in react liftcycle.
   // Only call once when this component first render
   componentDidMount() {
-    viewer = new ISamplesSpatial("cesiumContainer", moorea);
+    // set the initial position based on the parameters from parent components
+    const initialPosition = new SpatialView(this.props.mapInfo.longitude, this.props.mapInfo.latitude, this.props.mapInfo.height, this.props.mapInfo.heading, this.props.mapInfo.pitch);
+    viewer = new ISamplesSpatial("cesiumContainer", initialPosition || moorea);
     addButton();
     // remove the Ceisum information
     render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
@@ -210,7 +191,7 @@ class CesiumMap extends React.Component {
     onChange = this.props.onChange;
 
     if (searchFields) {
-      updatePrimitive(cameraLat, cameraLong);
+      this.updatePrimitive(initialPosition.latitude, initialPosition.longitude);
     }
 
     // initial bbox
@@ -228,7 +209,9 @@ class CesiumMap extends React.Component {
       // I scale the current height by 15000000, the height of "View Global".
       // 4000 km is the distance that rotate half earth map on the height 15000000.
       if (diffDistance > 50 + 4000 * viewer.currentView.height / 15000000) {
-        updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude)
+        this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
+        // update camera position to the url
+        this.props.setCamera({ facet: "Map", ...viewer.currentView.viewDict });
       };
     }, 5000);
   };
@@ -242,13 +225,12 @@ class CesiumMap extends React.Component {
     if (sf1 !== sf2) {
       // clear all element in cesium
       searchFields = nextProps.searchFields;
-      updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
+      this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
     };
 
     // update bounding box based on bbox
     const bb1 = JSON.stringify(nextProps.bbox);
     const bb2 = JSON.stringify(this.props.bbox);
-
     if (bb1 !== bb2 && bb1 !== JSON.stringify(bboxLoc)) {
       // draw the bounding box or remove the bounding box
       if (Object.keys(nextProps.bbox).length > 0) {
@@ -261,9 +243,36 @@ class CesiumMap extends React.Component {
         clearBoundingBox();
       };
     };
+
+    //update camera view based on URL parameter
+    // if (nextProps.mapInfo.facet === "Map" && JSON.stringify(this.props.mapInfo) !== JSON.stringify(nextProps.mapInfo)) {
+    //   console.log("new")
+    //   // viewer.visit(new SpatialView(nextProps.mapInfo.longitude, nextProps.mapInfo.latitude, nextProps.mapInfo.height, nextProps.mapInfo.heading, nextProps.mapInfo.pitch));
+    // }
     // return false to force react not to rerender
     return false;
   };
+
+  /**
+ * This method clear all objects in the map
+ * and render new point primitive based on new position
+ *
+ * @param {*} latitude
+ * @param {*} longitude
+ */
+  updatePrimitive(latitude, longitude) {
+
+    if (setPrimitive) {
+      setPrimitive.clear();
+    }
+    if (oboePrimitive) {
+      oboePrimitive.abort();
+    }
+
+    oboePrimitive = setPrimitive.load({ lat: latitude, long: longitude, searchFields: searchFields, rows: 100000 });
+    cameraLat = latitude;
+    cameraLong = longitude;
+  }
 
   /**
    * The map view flies to new position
@@ -271,7 +280,12 @@ class CesiumMap extends React.Component {
    */
   visitLocation(location) {
     viewer.visit(location);
-    updatePrimitive(location.latitude, location.longitude);
+    this.updatePrimitive(location.latitude, location.longitude);
+    // when we use visit function, the currentview only return last camera position
+    // rather than the current one
+    if (!location.compareTo(this.props.mapInfo)) {
+      this.props.setCamera({ facet: "Map", ...location.viewDict });
+    }
   };
 
   /**
@@ -294,7 +308,7 @@ class CesiumMap extends React.Component {
     const longitude = document.getElementById("longtitudeInput");
     const latitude = document.getElementById("latitudeInput");
 
-    if (longitude.value !== "" && latitude !== "") {
+    if (longitude.value !== "" && latitude.value !== "") {
       const location = new SpatialView(parseFloat(longitude.value), parseFloat(latitude.value), 150000, 90.0, -90);
       this.visitLocation(location);
     };

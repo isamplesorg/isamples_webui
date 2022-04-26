@@ -39,14 +39,18 @@ const fields = [
   { label: "Spatial Query", field: "producedBy_samplingSite_location_rpt", type: "spatialquery" },
 ];
 
-const initalView = "List";
-const initialLong = -17.451466233002286;
-const initialLat = -149.8169236266867;
+// the initial camera position
+const initialCamera = {
+  facet: "List",
+  longitude: -149.8169236266867,
+  latitude: -17.451466233002286,
+  height: 2004.7347996772614,
+  heading: 201.84408760864753,
+  pitch: -20.853642866175978
+}
 
 export {
   fields,
-  initalView,
-  initialLong,
-  initialLat
+  initialCamera
 }
 
