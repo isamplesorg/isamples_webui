@@ -33,7 +33,11 @@ import iSamples_RangeFacet from './extension/iSamples_rangeFacet';
 import SearchFieldContainer from './extension/iSamples_containers';
 import { fields, initialCamera } from './fields';
 import ScrollToTop from "./components/scrollTop"
-import { wellFormatField, checkAllValue, getAllValueField } from './components/utilities';
+import {
+  wellFormatField,
+  checkAllValue,
+  getAllValueField
+} from './components/utilities';
 
 // cookie library:
 //  https://github.com/reactivestack/cookies/tree/master/packages/universal-cookie
