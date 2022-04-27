@@ -249,11 +249,6 @@ class CesiumMap extends React.Component {
       };
     };
 
-    //update camera view based on URL parameter
-    // if (nextProps.mapInfo.facet === "Map" && JSON.stringify(this.props.mapInfo) !== JSON.stringify(nextProps.mapInfo)) {
-    //   console.log("new")
-    //   // viewer.visit(new SpatialView(nextProps.mapInfo.longitude, nextProps.mapInfo.latitude, nextProps.mapInfo.height, nextProps.mapInfo.heading, nextProps.mapInfo.pitch));
-    // }
     // return false to force react not to rerender
     return false;
   };

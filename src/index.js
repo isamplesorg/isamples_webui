@@ -133,6 +133,8 @@ function APP() {
 
     setSearchParams(searchParamsDict);
 
+    // cookie library:
+    //  https://github.com/reactivestack/cookies/tree/master/packages/universal-cookie
     if (Object.keys(searchParamsDict).length > 0) {
       // set cookies
       cookies.set('previousParams', searchParamsDict, { path: "/" });
@@ -140,8 +142,6 @@ function APP() {
       // remove cookies
       cookies.remove('previousParams', { path: "/" });
     }
-
-    // const searchParamsDict = { searchFields, start, sortFields, view };
 
   }, [searchParams, storeState, setSearchParams]);
 
