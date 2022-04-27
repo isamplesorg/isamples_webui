@@ -283,7 +283,7 @@ class CesiumMap extends React.Component {
     this.updatePrimitive(location.latitude, location.longitude);
     // when we use visit function, the currentview only return last camera position
     // rather than the current one
-    if (!location.compareTo(this.props.mapInfo)) {
+    if (!location.equalTo(this.props.mapInfo)) {
       this.props.setCamera({ facet: "Map", ...location.viewDict });
     }
   };

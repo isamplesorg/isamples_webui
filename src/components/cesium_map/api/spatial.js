@@ -56,7 +56,7 @@ export class SpatialView {
   }
 
   // compare if two positions are the same
-  compareTo(position) {
+  equalTo(position) {
     return this.longitude.toFixed(8) === position.longitude.toFixed(8) &&
       this.latitude.toFixed(8) === position.latitude.toFixed(8) &&
       this.height.toFixed(8) === position.height.toFixed(8) &&
