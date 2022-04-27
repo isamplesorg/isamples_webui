@@ -1,5 +1,6 @@
 import { render } from "react-dom";
 import info from "../../../images/NavigationHelp/info.svg";
+import reset from "../../../images/NavigationHelp/reset.png";
 import { colorbind, source } from "../config_cesium";
 
 
@@ -30,7 +31,7 @@ const InformationButton = () => {
   };
 
   return (
-    <span className="cesium-navigationHelpButton-wrapper">
+    <>
       <button className="cesium-button cesium-toolbar-button cesium-navigation-help-button"
         onClick={() => toggle()}>
         <img src={info} alt="informatioin icon"></img>
@@ -70,19 +71,41 @@ const InformationButton = () => {
           </table>
         </div>
       </div>
-    </span>
+    </>
+  );
+}
+
+/**
+ * a refresh button component
+ * @param {*} props a variable to contain all required information
+ */
+export const RefreshButton = (props) => {
+  const { viewer, refresh } = props;
+  return (
+    <button className="cesium-button cesium-toolbar-button cesium-navigation-help-button"
+      onClick={() => refresh(viewer.currentView.latitude, viewer.currentView.longitude)}>
+      <img src={reset} alt="informatioin icon" width="24" height="24" ></img>
+    </button>
   );
 }
 
 /**
  * A function to add legend button into the Cesium map toolbar
  */
-export function addButton() {
+export function addButton(SpatialViewer, refresh) {
   const toolbar = document.querySelector("div.cesium-viewer-toolbar")
 
   // react render will overwrite the content in the container
   // So, we need a temporary container
-  const temp = document.createElement("span");
-  toolbar.appendChild(temp);
-  render(<InformationButton />, temp);
+  const infoButton = document.createElement("span");
+  infoButton.className = "cesium-navigationHelpButton-wrapper";
+  toolbar.appendChild(infoButton);
+  render(<InformationButton />, infoButton);
+
+  // add refresh button
+  const viewer = document.querySelector("div.cesium-viewer");
+  const refreshButton = document.createElement("span");
+  refreshButton.className = "cesium-navigationHelpButton-wrapper Cesium-refresh";
+  viewer.appendChild(refreshButton);
+  render(<RefreshButton viewer={SpatialViewer} refresh={refresh} />, refreshButton);
 }

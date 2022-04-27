@@ -184,7 +184,7 @@ class CesiumMap extends React.Component {
     // set the initial position based on the parameters from parent components
     const initialPosition = new SpatialView(this.props.mapInfo.longitude, this.props.mapInfo.latitude, this.props.mapInfo.height, this.props.mapInfo.heading, this.props.mapInfo.pitch);
     viewer = new ISamplesSpatial("cesiumContainer", initialPosition || moorea);
-    addButton();
+    addButton(viewer, this.updatePrimitive);
     // remove the Ceisum information
     render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
     viewer.addHud("cesiumContainer");
