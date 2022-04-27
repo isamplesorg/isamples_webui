@@ -189,7 +189,7 @@ class CesiumMap extends React.Component {
     render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
     viewer.addHud("cesiumContainer");
     viewer.trackMouseCoordinates(showCoordinates);
-    viewer.enableTracking((bb) => selectedBoxCallbox(bb, true));
+    viewer.enableTracking(api, (bb) => selectedBoxCallbox(bb, true));
     setPrimitive = new PointStreamPrimitiveCollection(viewer.terrain);
     viewer.addPointPrimitives(setPrimitive);
     searchFields = this.props.searchFields;

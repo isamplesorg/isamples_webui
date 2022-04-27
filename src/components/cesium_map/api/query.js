@@ -35,6 +35,12 @@ const setSolrQuery = (param) => {
     `&fl=${baseReturnParam},searchText`;
 };
 
+const recordInfoQuery = (id) => {
+  const returnParam = `searchText,sourceUpdatedTime`;
+  return `q=id:"${id}"&fl=${returnParam}`;
+};
+
 export {
-  setSolrQuery
+  setSolrQuery,
+  recordInfoQuery
 };

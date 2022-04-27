@@ -385,7 +385,6 @@ export class ISamplesSpatial {
     this.worldTerrain = Cesium.createWorldTerrain({});
 
     this.viewer = new Cesium.Viewer(element, {
-      infoBox: false,
       timeline: false,
       animation: false,
       sceneModePicker: false,
@@ -422,6 +421,13 @@ export class ISamplesSpatial {
         disableDepthTestDistance: Number.POSITIVE_INFINITY,
       },
     });
+
+    // entity for infoBox
+    this.selectedPoints = this.viewer.entities.add({
+      point: {
+        show: false
+      }
+    })
 
     // record the last interactive point primitive
     this.pointprimitive = null;
@@ -505,7 +511,7 @@ export class ISamplesSpatial {
    *
    * @param {*} selectBoxCallback
    */
-  enableTracking(selectBoxCallback) {
+  enableTracking(api, selectBoxCallback) {
     this.handler.setInputAction((click) => {
       this.startTracking(click)
     }, Cesium.ScreenSpaceEventType.LEFT_DOWN, Cesium.KeyboardEventModifier.ALT);
@@ -516,7 +522,7 @@ export class ISamplesSpatial {
       this.showPrimitiveId(movement);
     }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
     this.handler.setInputAction((movement) => {
-      this.copyPrimitiveId(movement);
+      this.copyPrimitiveId(api, movement);
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
     if (selectBoxCallback !== undefined) {
       this.selectBoxCallback = selectBoxCallback;
@@ -545,11 +551,30 @@ export class ISamplesSpatial {
     document.body.removeChild(dummy);
   }
 
-  copyPrimitiveId(movement) {
+  async copyPrimitiveId(api, movement) {
     const selectPoint = this.viewer.scene.pick(movement.position);
     if (selectPoint) {
       this.textToClipboard(`"${selectPoint.id}"`);
-    };
+      const info = await api.recordInformation(selectPoint.id);
+      this.selectedPoints.name = selectPoint.id;
+      this.selectedPoints.description = `
+        <div style="padding:10px;">
+          <span style="font-size: 14px; font-weight: bold;">Source Updated Time:</span>
+          <div>${info[0].sourceUpdatedTime}</div>
+          <span style="font-size: 14px; font-weight: bold;">Search Text:</span>
+          <div style="word-wrap:break-word;">${info[0].searchText}</div>
+        </div>`;
+
+      this.viewer.selectedEntity = this.selectedPoints;
+    } else {
+      // close info box
+      const infoContainer = document.querySelector("div.cesium-infoBox");
+      infoContainer.classList.remove("cesium-infoBox-visible");
+    }
+
+    //close legend
+    const legend = document.querySelector("div#legend");
+    legend.classList.remove("cesium-navigation-help-visible");
   }
 
   showPrimitiveId(movement) {

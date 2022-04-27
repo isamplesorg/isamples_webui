@@ -106,6 +106,6 @@ export function addButton(SpatialViewer, refresh) {
   const viewer = document.querySelector("div.cesium-viewer");
   const refreshButton = document.createElement("span");
   refreshButton.className = "cesium-navigationHelpButton-wrapper Cesium-refresh";
-  viewer.appendChild(refreshButton);
+  viewer.insertBefore(refreshButton, viewer.firstChild.nextSibling);
   render(<RefreshButton viewer={SpatialViewer} refresh={refresh} />, refreshButton);
 }

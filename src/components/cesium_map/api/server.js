@@ -1,6 +1,6 @@
 import oboe from "oboe";
 import config from "../../../config";
-import { setSolrQuery } from "../api/query";
+import { setSolrQuery, recordInfoQuery } from "../api/query";
 
 export class ISamplesAPI {
 
@@ -59,6 +59,20 @@ export class ISamplesAPI {
     try {
       let data = await this._fetchPromise(config.solr_url + "?" + setSolrQuery(query));
       return data.response.numFound;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /**
+   * A method to fetch the information based on identifier
+   * @param {*} id the record identifier
+   * @returns
+   */
+  async recordInformation(id) {
+    try {
+      let data = await this._fetchPromise(config.solr_url + "?" + recordInfoQuery(id));
+      return data.response.docs;
     } catch (e) {
       console.error(e);
     }
