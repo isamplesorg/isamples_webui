@@ -261,7 +261,7 @@ class CesiumMap extends React.Component {
  * @param {*} longitude
  */
   updatePrimitive(latitude, longitude) {
-
+    clearBoundingBox(true);
     if (setPrimitive) {
       setPrimitive.clear();
     }
