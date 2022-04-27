@@ -557,20 +557,16 @@ export class ISamplesSpatial {
       this.textToClipboard(`"${selectPoint.id}"`);
       const info = await api.recordInformation(selectPoint.id);
       this.selectedPoints.name = selectPoint.id;
-      this.selectedPoints.description = `
-        <div style="padding:10px;">
-          <span style="font-size: 14px; font-weight: bold;">Source Updated Time:</span>
-          <div>${info[0].sourceUpdatedTime}</div>
-          <span style="font-size: 14px; font-weight: bold;">Search Text:</span>
-          <div style="word-wrap:break-word;">${info[0].searchText}</div>
-        </div>`;
-
+      let description = `<div style="padding:10px;">`;
+      for (const [key, value] of Object.entries(info[0])){
+        description += `<span style="font-size: 14px; font-weight: bold;">${key}:</span>
+                        <div style="word-wrap:break-word;">${value}</div>`;
+      }
+      description += "</div>";
+      this.selectedPoints.description = description;
+      // select enetity to show
       this.viewer.selectedEntity = this.selectedPoints;
-    } else {
-      // close info box
-      const infoContainer = document.querySelector("div.cesium-infoBox");
-      infoContainer.classList.remove("cesium-infoBox-visible");
-    }
+    };
 
     //close legend
     const legend = document.querySelector("div#legend");
