@@ -54,15 +54,6 @@ export class SpatialView {
       pitch: this.pitch
     }
   }
-
-  // compare if two positions are the same
-  compareTo(position) {
-    return this.longitude.toFixed(8) === position.longitude.toFixed(8) &&
-      this.latitude.toFixed(8) === position.latitude.toFixed(8) &&
-      this.height.toFixed(8) === position.height.toFixed(8) &&
-      this.heading.toFixed(8) === position.heading.toFixed(8) &&
-      this.pitch.toFixed(8) === position.pitch.toFixed(8);
-  }
 }
 
 class DRectangle extends Cesium.Rectangle {
