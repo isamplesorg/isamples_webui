@@ -346,7 +346,6 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
           this.add({
             id: doc.id,
             position: p0,
-            // color: this.outlineStyle(locations, location),
             color: Cesium.Color.fromCssColorString(colorbind[source.indexOf(doc.source) % colorbind.length]),
             pixelSize: 8,
             disableDepthTestDistance: 100
