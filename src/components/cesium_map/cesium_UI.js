@@ -71,6 +71,9 @@ function showCoordinates(lon, lat, height) {
 
 /**
  * clear bounding box and clear buttom
+ *
+ * @param {*} updated a bool parameter to indicate if we need to update
+ *                    the information to left pane.
  */
 function clearBoundingBox(updated = false) {
   viewer.removeEntity(bbox);
@@ -83,6 +86,8 @@ function clearBoundingBox(updated = false) {
  * and renders point entities in the map
  *
  * @param {*} bb a DRectangle instance
+ * @param {*} updated a bool parameter to indicate if we need to update
+ *                    the information to left pane
  */
 async function selectedBoxCallbox(bb, updated = false) {
   let text = `Record count : ${await countRecordsInBB(bb)}`;
