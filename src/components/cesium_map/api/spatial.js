@@ -320,12 +320,15 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
   }
 
   // function to query results and add point into cesium
-  load(params) {
+  load(facet, params) {
     let locations = {};
     // display loading page
     this.loading = document.getElementById("loading");
     this.loading.style.removeProperty("display");
     this.collection = []
+
+    const field = facet ? Object.keys(facet)[0] : 'source';
+    const CV = facet ? facet[field] : source;
 
     return pointStream(
       params,
@@ -346,7 +349,7 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
           this.add({
             id: doc.id,
             position: p0,
-            color: Cesium.Color.fromCssColorString(colorbind[source.indexOf(doc.source) % colorbind.length]),
+            color: Cesium.Color.fromCssColorString(colorbind[CV.indexOf(doc[field]) % colorbind.length]),
             pixelSize: 8,
             disableDepthTestDistance: 100
           })
@@ -526,7 +529,7 @@ export class ISamplesSpatial {
       this.showPrimitiveId(movement);
     }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
     this.handler.setInputAction((movement) => {
-      this.copyPrimitiveId(api, movement);
+      this.PrimitiveInfo(api, movement);
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
     if (selectBoxCallback !== undefined) {
       this.selectBoxCallback = selectBoxCallback;
@@ -559,15 +562,20 @@ export class ISamplesSpatial {
     window.open(URL, "_blank");
   }
 
-  async copyPrimitiveId(api, movement) {
+  /**
+   * a function to copy the primitive id and add information to the infoBox
+   * @param {*} api the api to fetch the selected record information
+   * @param {*} movement the mouse movement
+   */
+  async PrimitiveInfo(api, movement) {
     const selectPoint = this.viewer.scene.pick(movement.position);
-    if (selectPoint) {
+    if (Cesium.defined(selectPoint) && selectPoint.hasOwnProperty("primitive")) {
       this.textToClipboard(`"${selectPoint.id}"`);
       const info = await api.recordInformation(selectPoint.id);
       this.selectedPoints.name = selectPoint.id;
       let description = `<div style="padding:10px;">`;
       description += `<span style="font-size: 14px; font-weight: bold;">Link: </span>
-                      <a href="https://n2t.net/${selectPoint.id}">${selectPoint.id}</a><br/>`
+                      <a href="https://n2t.net/${selectPoint.id}">https://n2t.net/${selectPoint.id}</a><br/>`
       for (const [key, value] of Object.entries(info[0])) {
         description += `<span style="font-size: 14px; font-weight: bold;">${key}:</span>
                         <div style="word-wrap:break-word;">${value}</div>`;

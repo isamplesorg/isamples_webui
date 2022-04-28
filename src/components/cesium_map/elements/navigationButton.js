@@ -19,7 +19,7 @@ const Labels = (id, color, text) =>
 /**
  * A function component to return a new legend button.
  */
-const InformationButton = () => {
+const InformationButton = (props) => {
 
   function toggle() {
     const legend = document.getElementById('legend');
@@ -29,6 +29,8 @@ const InformationButton = () => {
       legend.classList.add('cesium-navigation-help-visible')
     };
   };
+
+  const facet = props.facet || source;
 
   return (
     <>
@@ -66,7 +68,7 @@ const InformationButton = () => {
                   </div>
                 </td>
               </tr>
-              {source.map((e, i) => (Labels(i, colorbind[i], e)))}
+              {facet.map((e, i) => (Labels(i, colorbind[i], e)))}
             </tbody>
           </table>
         </div>
@@ -92,7 +94,7 @@ export const RefreshButton = (props) => {
 /**
  * A function to add legend button into the Cesium map toolbar
  */
-export function addButton(SpatialViewer, refresh) {
+export function addButton(facet, SpatialViewer, refresh) {
   const toolbar = document.querySelector("div.cesium-viewer-toolbar")
 
   // react render will overwrite the content in the container
@@ -100,7 +102,7 @@ export function addButton(SpatialViewer, refresh) {
   const infoButton = document.createElement("span");
   infoButton.className = "cesium-navigationHelpButton-wrapper";
   toolbar.appendChild(infoButton);
-  render(<InformationButton />, infoButton);
+  render(<InformationButton facet={facet} />, infoButton);
 
   // add refresh button
   const viewer = document.querySelector("div.cesium-viewer");

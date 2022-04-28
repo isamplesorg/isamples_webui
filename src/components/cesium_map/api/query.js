@@ -40,7 +40,12 @@ const recordInfoQuery = (id) => {
   return `q=id:"${id}"&fl=${returnParam}`;
 };
 
+const facetedQuery = (field) => {
+  return `q=*:*&facet.field=${field}&rows=0&start=0&facet=on&wt=json`;
+}
+
 export {
   setSolrQuery,
-  recordInfoQuery
+  recordInfoQuery,
+  facetedQuery
 };
