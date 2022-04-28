@@ -431,6 +431,10 @@ export class ISamplesSpatial {
 
     // record the last interactive point primitive
     this.pointprimitive = null;
+
+    // we need to enable allow-scripts to open link in the iframe
+    // but this might not be a safe way if we don't trust the link source
+    this.viewer.infoBox.frame.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms');
   }
 
   get canvas() {
@@ -551,6 +555,10 @@ export class ISamplesSpatial {
     document.body.removeChild(dummy);
   }
 
+  openLinkInNewWindow(URL) {
+    window.open(URL, "_blank");
+  }
+
   async copyPrimitiveId(api, movement) {
     const selectPoint = this.viewer.scene.pick(movement.position);
     if (selectPoint) {
@@ -558,12 +566,15 @@ export class ISamplesSpatial {
       const info = await api.recordInformation(selectPoint.id);
       this.selectedPoints.name = selectPoint.id;
       let description = `<div style="padding:10px;">`;
-      for (const [key, value] of Object.entries(info[0])){
+      description += `<span style="font-size: 14px; font-weight: bold;">Link: </span>
+                      <a href="https://n2t.net/${selectPoint.id}">${selectPoint.id}</a><br/>`
+      for (const [key, value] of Object.entries(info[0])) {
         description += `<span style="font-size: 14px; font-weight: bold;">${key}:</span>
                         <div style="word-wrap:break-word;">${value}</div>`;
       }
       description += "</div>";
       this.selectedPoints.description = description;
+
       // select enetity to show
       this.viewer.selectedEntity = this.selectedPoints;
     };
