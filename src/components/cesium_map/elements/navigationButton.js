@@ -41,9 +41,9 @@ const InformationButton = (props) => {
       <div id="legend"
         className="cesium-navigation-help"
         style={{ minWidth: "200px" }}>
-        <div className="cesium-click-navigation-help-visible">
-          <table className="cesium-navigation-help-instructions">
-            <tbody>
+        <div className="cesium-click-navigation-help-visible" >
+          <table className="cesium-navigation-help-instructions" >
+            <tbody style={{ height: "400px", overflow: "auto", display: "block", border: "white solid 1px" }}>
               <tr>
                 <td>
                   <svg style={{ color: 'white' }} xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" className="bi bi-alt" viewBox="0 0 16 16">
@@ -97,12 +97,19 @@ export const RefreshButton = (props) => {
 export function addButton(facet, SpatialViewer, refresh) {
   const toolbar = document.querySelector("div.cesium-viewer-toolbar")
 
-  // react render will overwrite the content in the container
-  // So, we need a temporary container
-  const infoButton = document.createElement("span");
-  infoButton.className = "cesium-navigationHelpButton-wrapper";
-  toolbar.appendChild(infoButton);
-  render(<InformationButton facet={facet} />, infoButton);
+  if (document.querySelector("span#isamples-legend") === null) {
+    // react render will overwrite the content in the container
+    // So, we need a temporary container
+    const infoButton = document.createElement("span");
+    infoButton.className = "cesium-navigationHelpButton-wrapper";
+    infoButton.id = "isamples-legend";
+    toolbar.appendChild(infoButton);
+    render(<InformationButton facet={facet} />, infoButton);
+  }else{
+    const infoButton = document.querySelector("span#isamples-legend");
+    render(<InformationButton facet={facet} />, infoButton);
+  }
+
 
   // add refresh button
   const viewer = document.querySelector("div.cesium-viewer");
