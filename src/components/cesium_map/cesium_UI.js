@@ -236,11 +236,11 @@ class CesiumMap extends React.Component {
   // manipulate Dom outside the react model
   shouldComponentUpdate(nextProps) {
     // update point primitive based on searchFields
-    const sf1 = JSON.stringify(nextProps.searchFields);
-    const sf2 = JSON.stringify(this.props.searchFields);
+    const sf1 = JSON.stringify(nextProps.SearchFields);
+    const sf2 = JSON.stringify(this.props.SearchFields);
     if (sf1 !== sf2) {
       // clear all element in cesium
-      searchFields = nextProps.searchFields;
+      searchFields = nextProps.SearchFields;
       this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
     };
 

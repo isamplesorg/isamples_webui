@@ -36,7 +36,7 @@ const setSolrQuery = (param) => {
 };
 
 const recordInfoQuery = (id) => {
-  const returnParam = `searchText,sourceUpdatedTime`;
+  const returnParam = `searchText,producedBy_resultTime`;
   return `q=id:"${id}"&fl=${returnParam}`;
 };
 

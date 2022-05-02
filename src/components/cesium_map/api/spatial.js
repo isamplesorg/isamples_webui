@@ -12,6 +12,7 @@ import * as Cesium from 'cesium';
 import { html, render } from "lit";
 import { pointStream } from './server';
 import { colorbind, source } from '../config_cesium';
+import { wellFormatField } from '../../utilities';
 
 /**
  * Describes a camera viewpoint for Cesium.
@@ -438,6 +439,7 @@ export class ISamplesSpatial {
     // we need to enable allow-scripts to open link in the iframe
     // but this might not be a safe way if we don't trust the link source
     this.viewer.infoBox.frame.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms');
+    this.viewer.infoBox.frame.removeAttribute("src");
   }
 
   get canvas() {
@@ -575,10 +577,15 @@ export class ISamplesSpatial {
       this.selectedPoints.name = selectPoint.id;
       let description = `<div style="padding:10px;">`;
       description += `<span style="font-size: 14px; font-weight: bold;">Link: </span>
-                      <a href="https://n2t.net/${selectPoint.id}">https://n2t.net/${selectPoint.id}</a><br/>`
+                      <a href="https://n2t.net/${selectPoint.id}" target="_blank">https://n2t.net/${selectPoint.id}</a><br/>`
       for (const [key, value] of Object.entries(info[0])) {
-        description += `<span style="font-size: 14px; font-weight: bold;">${key}:</span>
+        description += `<span style="font-size: 14px; font-weight: bold;">${wellFormatField(key)}:</span>
                         <div style="word-wrap:break-word;">${value}</div>`;
+      }
+      // handle unknown producedBy_resultTime
+      if (!("producedBy_resultTime" in info[0])) {
+        description += `<span style="font-size: 14px; font-weight: bold;">${wellFormatField("producedBy_resultTime")}: </span>
+                        <div style="word-wrap:break-word;">Unknown</div>`;
       }
       description += "</div>";
       this.selectedPoints.description = description;
