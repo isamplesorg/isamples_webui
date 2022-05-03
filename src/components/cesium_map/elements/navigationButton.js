@@ -1,5 +1,6 @@
 import { render } from "react-dom";
 import info from "../../../images/NavigationHelp/info.svg";
+import reset from "../../../images/NavigationHelp/reset.png";
 import { colorbind, source } from "../config_cesium";
 
 
@@ -18,7 +19,7 @@ const Labels = (id, color, text) =>
 /**
  * A function component to return a new legend button.
  */
-const InformationButton = () => {
+const InformationButton = (props) => {
 
   function toggle() {
     const legend = document.getElementById('legend');
@@ -29,8 +30,10 @@ const InformationButton = () => {
     };
   };
 
+  const facet = props.facet || source;
+
   return (
-    <span className="cesium-navigationHelpButton-wrapper">
+    <>
       <button className="cesium-button cesium-toolbar-button cesium-navigation-help-button"
         onClick={() => toggle()}>
         <img src={info} alt="informatioin icon"></img>
@@ -38,9 +41,9 @@ const InformationButton = () => {
       <div id="legend"
         className="cesium-navigation-help"
         style={{ minWidth: "200px" }}>
-        <div className="cesium-click-navigation-help-visible">
-          <table className="cesium-navigation-help-instructions">
-            <tbody>
+        <div className="cesium-click-navigation-help-visible" >
+          <table className="cesium-navigation-help-instructions" >
+            <tbody style={{ height: "400px", overflow: "auto", display: "block", border: "white solid 1px" }}>
               <tr>
                 <td>
                   <svg style={{ color: 'white' }} xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" className="bi bi-alt" viewBox="0 0 16 16">
@@ -65,24 +68,53 @@ const InformationButton = () => {
                   </div>
                 </td>
               </tr>
-              {source.map((e, i) => (Labels(i, colorbind[i], e)))}
+              {facet.map((e, i) => (Labels(i, colorbind[i], e)))}
             </tbody>
           </table>
         </div>
       </div>
-    </span>
+    </>
+  );
+}
+
+/**
+ * a refresh button component
+ * @param {*} props a variable to contain all required information
+ */
+export const RefreshButton = (props) => {
+  const { viewer, refresh } = props;
+  return (
+    <button className="cesium-button cesium-toolbar-button cesium-navigation-help-button"
+      onClick={() => refresh(viewer.currentView.latitude, viewer.currentView.longitude)}>
+      <img src={reset} alt="informatioin icon" width="24" height="24" ></img>
+    </button>
   );
 }
 
 /**
  * A function to add legend button into the Cesium map toolbar
  */
-export function addButton() {
+export function addButton(facet, SpatialViewer, refresh) {
   const toolbar = document.querySelector("div.cesium-viewer-toolbar")
 
-  // react render will overwrite the content in the container
-  // So, we need a temporary container
-  const temp = document.createElement("span");
-  toolbar.appendChild(temp);
-  render(<InformationButton />, temp);
+  if (document.querySelector("span#isamples-legend") === null) {
+    // react render will overwrite the content in the container
+    // So, we need a temporary container
+    const infoButton = document.createElement("span");
+    infoButton.className = "cesium-navigationHelpButton-wrapper";
+    infoButton.id = "isamples-legend";
+    toolbar.appendChild(infoButton);
+    render(<InformationButton facet={facet} />, infoButton);
+  }else{
+    const infoButton = document.querySelector("span#isamples-legend");
+    render(<InformationButton facet={facet} />, infoButton);
+  }
+
+
+  // add refresh button
+  const viewer = document.querySelector("div.cesium-viewer");
+  const refreshButton = document.createElement("span");
+  refreshButton.className = "cesium-navigationHelpButton-wrapper Cesium-refresh";
+  viewer.insertBefore(refreshButton, viewer.firstChild.nextSibling);
+  render(<RefreshButton viewer={SpatialViewer} refresh={refresh} />, refreshButton);
 }

@@ -53,11 +53,13 @@ class ResultList extends React.Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    if (JSON.stringify(this.props.view) !== JSON.stringify(nextProps.view)) {
+    if (JSON.stringify(this.props) !== JSON.stringify(nextProps)) {
       this.switchView(nextProps.view.facet);
       this.setState(nextProps.view);
+      return true;
     }
-    return true;
+
+    return false;
   }
 
   switchView(format) {
@@ -75,6 +77,7 @@ class ResultList extends React.Component {
   // Only view buttons need to set view to url.
   switchFormat(format) {
     this.switchView(format);
+    this.setState({ ...this.state, facet: format });
     this.props.setView({ ...this.state, facet: format });
   }
 
@@ -122,9 +125,9 @@ class ResultList extends React.Component {
                   <CesiumMap
                     mapInfo={this.state}
                     setCamera={setView}
-                    searchFields={searchFields}
-                    bbox={bbox}
-                    onChange={onChange} />
+                    SearchFields={searchFields}
+                    Bbox={bbox}
+                    onSetFields={onChange} />
                   : null
               }
             </div>

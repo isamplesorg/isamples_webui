@@ -12,6 +12,7 @@ import * as Cesium from 'cesium';
 import { html, render } from "lit";
 import { pointStream } from './server';
 import { colorbind, source } from '../config_cesium';
+import { wellFormatField } from '../../utilities';
 
 /**
  * Describes a camera viewpoint for Cesium.
@@ -320,12 +321,15 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
   }
 
   // function to query results and add point into cesium
-  load(params) {
+  load(facet, params) {
     let locations = {};
     // display loading page
     this.loading = document.getElementById("loading");
     this.loading.style.removeProperty("display");
     this.collection = []
+
+    const field = facet ? Object.keys(facet)[0] : 'source';
+    const CV = facet ? facet[field] : source;
 
     return pointStream(
       params,
@@ -346,7 +350,7 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
           this.add({
             id: doc.id,
             position: p0,
-            color: Cesium.Color.fromCssColorString(colorbind[source.indexOf(doc.source) % colorbind.length]),
+            color: Cesium.Color.fromCssColorString(colorbind[CV.indexOf(doc[field]) % colorbind.length]),
             pixelSize: 8,
             disableDepthTestDistance: 100
           })
@@ -385,7 +389,6 @@ export class ISamplesSpatial {
     this.worldTerrain = Cesium.createWorldTerrain({});
 
     this.viewer = new Cesium.Viewer(element, {
-      infoBox: false,
       timeline: false,
       animation: false,
       sceneModePicker: false,
@@ -423,8 +426,20 @@ export class ISamplesSpatial {
       },
     });
 
+    // entity for infoBox
+    this.selectedPoints = this.viewer.entities.add({
+      point: {
+        show: false
+      }
+    })
+
     // record the last interactive point primitive
     this.pointprimitive = null;
+
+    // we need to enable allow-scripts to open link in the iframe
+    // but this might not be a safe way if we don't trust the link source
+    this.viewer.infoBox.frame.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms');
+    this.viewer.infoBox.frame.removeAttribute("src");
   }
 
   get canvas() {
@@ -505,7 +520,7 @@ export class ISamplesSpatial {
    *
    * @param {*} selectBoxCallback
    */
-  enableTracking(selectBoxCallback) {
+  enableTracking(api, selectBoxCallback) {
     this.handler.setInputAction((click) => {
       this.startTracking(click)
     }, Cesium.ScreenSpaceEventType.LEFT_DOWN, Cesium.KeyboardEventModifier.ALT);
@@ -516,7 +531,7 @@ export class ISamplesSpatial {
       this.showPrimitiveId(movement);
     }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
     this.handler.setInputAction((movement) => {
-      this.copyPrimitiveId(movement);
+      this.PrimitiveInfo(api, movement);
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
     if (selectBoxCallback !== undefined) {
       this.selectBoxCallback = selectBoxCallback;
@@ -545,11 +560,43 @@ export class ISamplesSpatial {
     document.body.removeChild(dummy);
   }
 
-  copyPrimitiveId(movement) {
+  openLinkInNewWindow(URL) {
+    window.open(URL, "_blank");
+  }
+
+  /**
+   * a function to copy the primitive id and add information to the infoBox
+   * @param {*} api the api to fetch the selected record information
+   * @param {*} movement the mouse movement
+   */
+  async PrimitiveInfo(api, movement) {
     const selectPoint = this.viewer.scene.pick(movement.position);
-    if (selectPoint) {
+    if (Cesium.defined(selectPoint) && selectPoint.hasOwnProperty("primitive")) {
       this.textToClipboard(`"${selectPoint.id}"`);
+      const info = await api.recordInformation(selectPoint.id);
+      this.selectedPoints.name = selectPoint.id;
+      let description = `<div style="padding:10px;">`;
+      description += `<span style="font-size: 14px; font-weight: bold;">Link: </span>
+                      <a href="https://n2t.net/${selectPoint.id}" target="_blank">https://n2t.net/${selectPoint.id}</a><br/>`
+      for (const [key, value] of Object.entries(info[0])) {
+        description += `<span style="font-size: 14px; font-weight: bold;">${wellFormatField(key)}:</span>
+                        <div style="word-wrap:break-word;">${value}</div>`;
+      }
+      // handle unknown producedBy_resultTime
+      if (!("producedBy_resultTime" in info[0])) {
+        description += `<span style="font-size: 14px; font-weight: bold;">${wellFormatField("producedBy_resultTime")}: </span>
+                        <div style="word-wrap:break-word;">Unknown</div>`;
+      }
+      description += "</div>";
+      this.selectedPoints.description = description;
+
+      // select enetity to show
+      this.viewer.selectedEntity = this.selectedPoints;
     };
+
+    //close legend
+    const legend = document.querySelector("div#legend");
+    legend.classList.remove("cesium-navigation-help-visible");
   }
 
   showPrimitiveId(movement) {

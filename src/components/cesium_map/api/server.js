@@ -1,6 +1,10 @@
 import oboe from "oboe";
 import config from "../../../config";
-import { setSolrQuery } from "../api/query";
+import {
+  setSolrQuery,
+  recordInfoQuery,
+  facetedQuery
+} from "../api/query";
 
 export class ISamplesAPI {
 
@@ -61,6 +65,34 @@ export class ISamplesAPI {
       return data.response.numFound;
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  /**
+   * A method to fetch the information based on identifier
+   * @param {*} id the record identifier
+   * @returns an array contained result
+   */
+  async recordInformation(id) {
+    try {
+      let data = await this._fetchPromise(config.solr_url + "?" + recordInfoQuery(id));
+      return data.response.docs;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /**
+   * A method to fetch the facet information
+   * @param {*} field the facet field
+   * @returns a hashtable
+   */
+  async facetInformation(field) {
+    try {
+      let data = await this._fetchPromise(config.solr_url + "?" + facetedQuery(field));
+      return data.facet_counts.facet_fields;
+    } catch (e) {
+      console.error(e)
     }
   }
 }

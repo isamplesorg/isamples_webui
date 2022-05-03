@@ -21,7 +21,7 @@ const setSolrQuery = (param) => {
   let baseQuery = `rows=${param.rows}` +
     `${fieldsParams.length > 0 ? `&${fieldsParams}` : ""}`;
 
-  const baseReturnParam = `id,source,x:producedBy_samplingSite_location_longitude,y:producedBy_samplingSite_location_latitude`;
+  const baseReturnParam = `id,${param.field},x:producedBy_samplingSite_location_longitude,y:producedBy_samplingSite_location_latitude`;
   // build query for primitive
   if (param.lat && param.long) {
     const geoDistParams = geodist(param.lat, param.long);
@@ -35,6 +35,17 @@ const setSolrQuery = (param) => {
     `&fl=${baseReturnParam},searchText`;
 };
 
+const recordInfoQuery = (id) => {
+  const returnParam = `searchText,producedBy_resultTime`;
+  return `q=id:"${id}"&fl=${returnParam}`;
+};
+
+const facetedQuery = (field) => {
+  return `q=*:*&facet.field=${field}&rows=0&start=0&facet=on&wt=json`;
+}
+
 export {
-  setSolrQuery
+  setSolrQuery,
+  recordInfoQuery,
+  facetedQuery
 };

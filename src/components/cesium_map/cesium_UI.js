@@ -38,6 +38,7 @@ let bboxLoc = null;
 let viewer = null;
 let searchFields = null;
 let onChange = null;
+let facet = null;
 
 // this represents the pritimive class to handle data query.
 let setPrimitive = null;
@@ -101,6 +102,12 @@ async function selectedBoxCallbox(bb, updated = false) {
   const btn = document.getElementById("clear-bb");
   btn.style.display = "block";
   btn.onclick = () => (clearBoundingBox(true));
+}
+
+async function getFacetInfo(field) {
+  const facet = await api.facetInformation(field);
+  const result = { [field]: facet[field].filter((cv) => isNaN(cv)) };
+  return result;
 }
 
 /**
@@ -181,28 +188,32 @@ class CesiumMap extends React.Component {
   // This is a initial function in react liftcycle.
   // Only call once when this component first render
   componentDidMount() {
+    const { mapInfo, setCamera, SearchFields, Bbox, onSetFields } = this.props;
     // set the initial position based on the parameters from parent components
-    const initialPosition = new SpatialView(this.props.mapInfo.longitude, this.props.mapInfo.latitude, this.props.mapInfo.height, this.props.mapInfo.heading, this.props.mapInfo.pitch);
+    const initialPosition = new SpatialView(mapInfo.longitude, mapInfo.latitude, mapInfo.height, mapInfo.heading, mapInfo.pitch);
     viewer = new ISamplesSpatial("cesiumContainer", initialPosition || moorea);
-    addButton();
-    // remove the Ceisum information
+    // remove the Ceisum information with custom button group
     render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
     viewer.addHud("cesiumContainer");
     viewer.trackMouseCoordinates(showCoordinates);
-    viewer.enableTracking((bb) => selectedBoxCallbox(bb, true));
+    viewer.enableTracking(api, (bb) => selectedBoxCallbox(bb, true));
     setPrimitive = new PointStreamPrimitiveCollection(viewer.terrain);
     viewer.addPointPrimitives(setPrimitive);
-    searchFields = this.props.searchFields;
-    onChange = this.props.onChange;
-
-    if (searchFields) {
-      this.updatePrimitive(initialPosition.latitude, initialPosition.longitude);
-    }
+    searchFields = SearchFields;
+    onChange = onSetFields;
+    // get the facet control vocabulary
+    getFacetInfo("source").then((res) => {
+      facet = res;
+      addButton(facet['source'], viewer, this.updatePrimitive);
+      if (searchFields) {
+        this.updatePrimitive(initialPosition.latitude, initialPosition.longitude);
+      }
+    });
 
     // initial bbox
-    if (this.props.bbox && Object.keys(this.props.bbox).length > 0) {
+    if (Bbox && Object.keys(Bbox).length > 0) {
       try {
-        selectedBoxCallbox(viewer.generateRectByLL(this.props.bbox));
+        selectedBoxCallbox(viewer.generateRectByLL(Bbox));
       } catch (e) {
         console.warn("Adding bbox failed.");
       };
@@ -216,7 +227,7 @@ class CesiumMap extends React.Component {
       if (diffDistance > 50 + 4000 * viewer.currentView.height / 15000000) {
         this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
         // update camera position to the url
-        this.props.setCamera({ facet: "Map", ...viewer.currentView.viewDict });
+        setCamera({ facet: "Map", ...viewer.currentView.viewDict });
       };
     }, 5000);
   };
@@ -225,22 +236,22 @@ class CesiumMap extends React.Component {
   // manipulate Dom outside the react model
   shouldComponentUpdate(nextProps) {
     // update point primitive based on searchFields
-    const sf1 = JSON.stringify(nextProps.searchFields);
-    const sf2 = JSON.stringify(this.props.searchFields);
+    const sf1 = JSON.stringify(nextProps.SearchFields);
+    const sf2 = JSON.stringify(this.props.SearchFields);
     if (sf1 !== sf2) {
       // clear all element in cesium
-      searchFields = nextProps.searchFields;
+      searchFields = nextProps.SearchFields;
       this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
     };
 
     // update bounding box based on bbox
-    const bb1 = JSON.stringify(nextProps.bbox);
-    const bb2 = JSON.stringify(this.props.bbox);
+    const bb1 = JSON.stringify(nextProps.Bbox);
+    const bb2 = JSON.stringify(this.props.Bbox);
     if (bb1 !== bb2 && bb1 !== JSON.stringify(bboxLoc)) {
       // draw the bounding box or remove the bounding box
-      if (Object.keys(nextProps.bbox).length > 0) {
+      if (Object.keys(nextProps.Bbox).length > 0) {
         try {
-          selectedBoxCallbox(viewer.generateRectByLL(nextProps.bbox));
+          selectedBoxCallbox(viewer.generateRectByLL(nextProps.Bbox));
         } catch (e) {
           console.warn("Adding bbox failed.");
         }
@@ -269,7 +280,7 @@ class CesiumMap extends React.Component {
       oboePrimitive.abort();
     }
 
-    oboePrimitive = setPrimitive.load({ lat: latitude, long: longitude, searchFields: searchFields, rows: 100000 });
+    oboePrimitive = setPrimitive.load(facet, {field: "source", lat: latitude, long: longitude, searchFields: searchFields, rows: 100000 });
     cameraLat = latitude;
     cameraLong = longitude;
   }
