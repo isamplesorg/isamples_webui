@@ -11,7 +11,7 @@
 import * as Cesium from 'cesium';
 import { html, render } from "lit";
 import { pointStream } from './server';
-import colorbind from '../utilities';
+import { colorbind, source } from '../config_cesium';
 
 /**
  * Describes a camera viewpoint for Cesium.
@@ -42,6 +42,26 @@ export class SpatialView {
       destination: this.destination,
       orientation: this.orientation
     };
+  }
+
+  // return position information as list
+  get viewDict() {
+    return {
+      longitude: this.longitude,
+      latitude: this.latitude,
+      height: this.height,
+      heading: this.heading,
+      pitch: this.pitch
+    }
+  }
+
+  // compare if two positions are the same
+  equalTo(position) {
+    return this.longitude.toFixed(8) === position.longitude.toFixed(8) &&
+      this.latitude.toFixed(8) === position.latitude.toFixed(8) &&
+      this.height.toFixed(8) === position.height.toFixed(8) &&
+      this.heading.toFixed(8) === position.heading.toFixed(8) &&
+      this.pitch.toFixed(8) === position.pitch.toFixed(8);
   }
 }
 
@@ -96,19 +116,19 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
     // colorbind friendly schema
     this.pins = {
       pin50: pinBuilder
-        .fromText("50+", Cesium.Color.fromCssColorString(colorbind[0]), 48)
+        .fromText("50+", Cesium.Color.fromCssColorString(colorbind[5]), 48)
         .toDataURL(),
       pin40: pinBuilder
-        .fromText("40+", Cesium.Color.fromCssColorString(colorbind[1]), 48)
+        .fromText("40+", Cesium.Color.fromCssColorString(colorbind[5]), 48)
         .toDataURL(),
       pin30: pinBuilder
-        .fromText("30+", Cesium.Color.fromCssColorString(colorbind[2]), 48)
+        .fromText("30+", Cesium.Color.fromCssColorString(colorbind[5]), 48)
         .toDataURL(),
       pin20: pinBuilder
-        .fromText("20+", Cesium.Color.fromCssColorString(colorbind[3]), 48)
+        .fromText("20+", Cesium.Color.fromCssColorString(colorbind[5]), 48)
         .toDataURL(),
       pin10: pinBuilder
-        .fromText("10+", Cesium.Color.fromCssColorString(colorbind[4]), 48)
+        .fromText("10+", Cesium.Color.fromCssColorString(colorbind[5]), 48)
         .toDataURL(),
     }
     var singleDigitPins = new Array(8);
@@ -188,14 +208,14 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
             // remove loading spinner
             this.loading.style.display = "none";
           }
-          const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, 10);
+          const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, 1);
           this.entities.add({
             position: p0,
             description: `<h4>Identifier: ${doc.id}</h4><span><b>All text fields</b>: ${doc.searchText}</span>`,
             name: doc.id,
             point: {
               color: Cesium.Color.WHITE,
-              pixelSize: 10,
+              pixelSize: 8,
               outlineColor: Cesium.Color.YELLOW,
               outlineWidth: 3,
               heightReference: Cesium.HeightReference.RELATIVE_TO_GROUND
@@ -236,6 +256,10 @@ function asDRectangle(rectangle) {
 * Requires that "oboe" is globally available.
 */
 export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollection {
+  constructor(terrain) {
+    super(terrain)
+    this.terrain = terrain;
+  }
 
   clear() {
     this.removeAll();
@@ -260,12 +284,48 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
     }
   }
 
+  // function to update point elevation
+  /**
+   * See link:
+   *  https://cesium.com/learn/cesiumjs/ref-doc/sampleTerrainMostDetailed.html
+   * @param {*} collection, the stored cartographic position
+   * @param {*} primitive, the current class instance
+   */
+  updateElevation(collection, primitive) {
+    if (collection.length <= 1) {
+      return;
+    };
+    let promise = Cesium.sampleTerrain(this.terrain, 11, collection)
+    Cesium.when(promise, function (updatedPosition) {
+      let positions = {};
+      for (let i = 0; i < collection.length; i++) {
+        const point = primitive.get(i)
+        const Position = Cesium.Cartographic.toCartesian(updatedPosition[i]);
+        const origMagnitude = Cesium.Cartesian3.magnitude(Position);
+        const key = Position.y.toString() + ":" + Position.z.toString();
+        const newPosition = new Cesium.Cartesian3();
+        let newMagnitude = 0;
+        let scalar = 1;
+        if (key in positions) {
+          newMagnitude += origMagnitude + 1 * positions[key];
+          positions[key] += 1;
+        } else {
+          positions[key] = 1;
+        }
+        scalar = newMagnitude / origMagnitude;
+        Cesium.Cartesian3.multiplyByScalar(Position, scalar, newPosition);
+        point.position = newPosition;
+      }
+    })
+  }
+
   // function to query results and add point into cesium
   load(params) {
     let locations = {};
     // display loading page
     this.loading = document.getElementById("loading");
     this.loading.style.removeProperty("display");
+    this.collection = []
 
     return pointStream(
       params,
@@ -286,12 +346,15 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
           this.add({
             id: doc.id,
             position: p0,
-            color: this.outlineStyle(locations, location),
-            pixelSize: 10
+            color: Cesium.Color.fromCssColorString(colorbind[source.indexOf(doc.source) % colorbind.length]),
+            pixelSize: 8,
+            disableDepthTestDistance: 100
           })
+          this.collection.push(Cesium.Cartographic.fromDegrees(doc.x, doc.y))
         }
       },
       (final) => {
+        this.updateElevation(this.collection, this);
         console.log("Point primitive stream complete");
       },
       (err) => {
@@ -319,15 +382,17 @@ export class ISamplesSpatial {
       polyline: null,
       positions: [],
     };
-    let worldTerrain = Cesium.createWorldTerrain({});
+    this.worldTerrain = Cesium.createWorldTerrain({});
 
     this.viewer = new Cesium.Viewer(element, {
+      infoBox: false,
       timeline: false,
       animation: false,
       sceneModePicker: false,
-      terrainProvider: worldTerrain,
+      terrainProvider: this.worldTerrain,
       fullscreenElement: element
     });
+
     // limit the map max height
     // 20000000 is the maxium zoom distance so the users wouldn't zoom too far way from earth
     // 10 the minimum height for the points so the users wouldn't zoom to the ground.
@@ -357,10 +422,17 @@ export class ISamplesSpatial {
         disableDepthTestDistance: Number.POSITIVE_INFINITY,
       },
     });
+
+    // record the last interactive point primitive
+    this.pointprimitive = null;
   }
 
   get canvas() {
     return this.viewer.canvas;
+  }
+
+  get terrain() {
+    return this.worldTerrain;
   }
 
   /**
@@ -443,6 +515,9 @@ export class ISamplesSpatial {
     this.handler.setInputAction((movement) => {
       this.showPrimitiveId(movement);
     }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+    this.handler.setInputAction((movement) => {
+      this.copyPrimitiveId(movement);
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
     if (selectBoxCallback !== undefined) {
       this.selectBoxCallback = selectBoxCallback;
     }
@@ -456,12 +531,42 @@ export class ISamplesSpatial {
     this.mouseCoordinateCallback = null;
   }
 
+  /**
+   * See link:
+   *  https://stackoverflow.com/questions/33855641/copy-output-of-a-javascript-variable-to-the-clipboard
+   * @param {*} text the string to be copied
+   */
+  textToClipboard(text) {
+    var dummy = document.createElement("textarea");
+    document.body.appendChild(dummy);
+    dummy.value = text;
+    dummy.select();
+    document.execCommand("copy");
+    document.body.removeChild(dummy);
+  }
+
+  copyPrimitiveId(movement) {
+    const selectPoint = this.viewer.scene.pick(movement.position);
+    if (selectPoint) {
+      this.textToClipboard(`"${selectPoint.id}"`);
+    };
+  }
+
   showPrimitiveId(movement) {
     const selectPoint = this.viewer.scene.pick(movement.endPosition);
+    if (this.pointprimitive) {
+      this.pointprimitive.primitive.pixelSize = 8;
+      this.pointprimitive.primitive.outlineColor = Cesium.Color.TRANSPARENT;
+      this.pointprimitive.primitive.outlineWidth = 0;
+    }
     if (Cesium.defined(selectPoint) && selectPoint.hasOwnProperty("primitive") && typeof selectPoint.id === 'string') {
       this.pointLabel.position = selectPoint.primitive.position;
       this.pointLabel.label.show = true;
       this.pointLabel.label.text = selectPoint.id;
+      selectPoint.primitive.pixelSize = 20;
+      selectPoint.primitive.outlineColor = Cesium.Color.YELLOW;
+      selectPoint.primitive.outlineWidth = 3;
+      this.pointprimitive = selectPoint;
     } else {
       this.pointLabel.label.show = false;
     }
@@ -472,7 +577,6 @@ export class ISamplesSpatial {
     if (this.tracking_info.tracking) {
       console.log("stop tracking");
       const bb = this.stopTracking();
-      console.log(bb);
       if (this.selectedBox !== null) {
         this.viewer.entities.remove(this.selectedBox);
       }
@@ -607,7 +711,7 @@ export class ISamplesSpatial {
     //    https://loading.io/css/
     let hud = html`<div class="spatial-hud" style="position: absolute; top: 0px; left: 0;">
                     <p><code id='position'>0, 0, 0</code></p>
-                    <p><button id='clear-bb' style='display:none'>Clear BB</button></p>
+                    <p><button id='clear-bb' class="cesium-button" style='display:none'>Clear BB</button></p>
                     <div id="selected-record"></div>
                   </div>
                   <div id="loading" style="display: none;">

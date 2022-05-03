@@ -47,7 +47,20 @@ class ResultList extends React.Component {
     this.state = { facet: "List" };
   }
 
-  switchFormat(format) {
+  // set the initial camera position
+  componentDidMount() {
+    this.setState(this.props.view);
+  }
+
+  shouldComponentUpdate(nextProps) {
+    if (JSON.stringify(this.props.view) !== JSON.stringify(nextProps.view)) {
+      this.switchView(nextProps.view.facet);
+      this.setState(nextProps.view);
+    }
+    return true;
+  }
+
+  switchView(format) {
     let paginateButton = document.getElementsByClassName('pagDisplay');
 
     // hide the pagination button by display property
@@ -56,11 +69,17 @@ class ResultList extends React.Component {
     } else {
       [...paginateButton].forEach((paginate) => paginate.style.removeProperty("display"));
     }
-    this.setState({ facet: format });
+  }
+
+  // This function and shouldComponentUpdate are very similar.
+  // Only view buttons need to set view to url.
+  switchFormat(format) {
+    this.switchView(format);
+    this.props.setView({ ...this.state, facet: format });
   }
 
   render() {
-    const { bootstrapCss, onChange } = this.props;
+    const { bootstrapCss, onChange, setView } = this.props;
 
     const doc = this.props.children[0].length !== 0 ? this.props.children[0].map((record) => (record['props']['doc'])) : [];
     const fields = this.props.children[0].length !== 0 ? this.props.children[0][0]['props']['fields'] : [];
@@ -75,7 +94,7 @@ class ResultList extends React.Component {
       spatialQuery.value
       : {}
 
-    if(bbox) {delete bbox['error']}
+    if (bbox) { delete bbox['error'] }
 
     return (
       <ButGroup
@@ -101,6 +120,8 @@ class ResultList extends React.Component {
                 searchFields.length > 0
                   ?
                   <CesiumMap
+                    mapInfo={this.state}
+                    setCamera={setView}
                     searchFields={searchFields}
                     bbox={bbox}
                     onChange={onChange} />

@@ -4,7 +4,7 @@
 // :Param collapse: true -> close , false or default undefined -> open
 // :Param hidden: true -> hide the field, false or default  undefined-> show the field
 
-export const fields = [
+const fields = [
   { field: "curation_accessContraints", type: "non-search", hidden: true },
   { field: "curation_description_text", type: "non-search", hidden: true },
   { field: "curation_label", type: "non-search", hidden: true },
@@ -36,5 +36,21 @@ export const fields = [
   { field: "source", type: "list-facet", facetSort: "index", collapse: true },
   { field: "sourceUpdatedTime", type: "non-search", collapse: true },
   // for spatial query
-  { label: "Spatial Query", field: "producedBy_samplingSite_location_rpt", type: "spatialquery"},
+  { label: "Spatial Query", field: "producedBy_samplingSite_location_rpt", type: "spatialquery" },
 ];
+
+// the initial camera position
+const initialCamera = {
+  facet: "List",
+  longitude: -149.8169236266867,
+  latitude: -17.451466233002286,
+  height: 2004.7347996772614,
+  heading: 201.84408760864753,
+  pitch: -20.853642866175978
+}
+
+export {
+  fields,
+  initialCamera
+}
+
