@@ -42,8 +42,8 @@ const ButGroup = (props) => {
 };
 
 class ResultList extends React.Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
     this.state = { facet: "List" };
   }
 
@@ -125,8 +125,8 @@ class ResultList extends React.Component {
                   <CesiumMap
                     mapInfo={this.state}
                     setCamera={setView}
-                    SearchFields={searchFields}
-                    Bbox={bbox}
+                    newSearchFields={searchFields}
+                    newBbox={bbox}
                     onSetFields={onChange} />
                   : null
               }

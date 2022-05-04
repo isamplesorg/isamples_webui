@@ -1,3 +1,8 @@
+// A query file to wrap query parameter to url parameter
+// follow the solr query parameters rule
+// see link:
+//   https://solr.apache.org/guide/8_11/common-query-parameters.html
+
 import { solrQuery } from "solr-faceted-search-react";
 
 const { fieldToQueryFilter } = solrQuery;
