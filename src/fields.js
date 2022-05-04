@@ -39,14 +39,21 @@ const fields = [
   { label: "Spatial Query", field: "producedBy_samplingSite_location_rpt", type: "spatialquery" },
 ];
 
+// moorea position
+const INITIAL_LONGITUDE = -149.8169236266867;
+const INITIAL_LATITUDE = -17.451466233002286;
+const INITIAL_HEIGHT = 2004.7347996772614;
+const INITIAL_HEADING = 201.84408760864753;
+const INITIAL_PITCH = -20.853642866175978;
+
 // the initial camera position, moorea
 const initialCamera = {
   facet: "List",
-  longitude: -149.8169236266867,
-  latitude: -17.451466233002286,
-  height: 2004.7347996772614,
-  heading: 201.84408760864753,
-  pitch: -20.853642866175978
+  longitude: INITIAL_LONGITUDE,
+  latitude: INITIAL_LATITUDE,
+  height: INITIAL_HEIGHT,
+  heading: INITIAL_HEADING,
+  pitch: INITIAL_PITCH
 }
 
 export {

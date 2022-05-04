@@ -26,13 +26,13 @@ import { addButton } from "./elements/navigationButton";
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwNzk3NjkyMy1iNGI1LTRkN2UtODRiMy04OTYwYWE0N2M3ZTkiLCJpZCI6Njk1MTcsImlhdCI6MTYzMzU0MTQ3N30.e70dpNzOCDRLDGxRguQCC-tRzGzA-23Xgno5lNgCeB4';
 
 // constant variables
-const REFRESHTIMEMS = 5000;
-const MINIMUMREFRESHDISTANCE = 50;
-const MAXIMUMREFRESHDISTANCE = 4000;
-const MAXIMUMZOOMDISTANCE = 15000000;
-const NUMBEROFPOINTS = 100000;
-const GLOBALHEADING = 90;
-const GLOBALPITCH = -90;
+const REFRESH_TIME_MS = 5000;
+const MINIMUM_REFRESH_DISTANCE = 50;
+const MAXIMUM_REFRESH_DISTANCE = 4000;
+const MAXIMUM_ZOOM_DISTANCE = 15000000;
+const NUMBER_OF_POINTS = 100000;
+const GLOBAL_HEADING = 90;
+const GLOBAL_PITCH = -90;
 const api = new ISamplesAPI();
 const moorea = new SpatialView(-149.8169236266867, -17.451466233002286, 2004.7347996772614, 201.84408760864753, -20.853642866175978);
 const patagonia = new SpatialView(-69.60169132023925, -54.315990127766646, 1781.4560051617016, 173.54573250470798, -15.85292472305027);
@@ -197,6 +197,8 @@ class CesiumMap extends React.Component {
   // Only call once when this component first render
   componentDidMount() {
     const { mapInfo, setCamera, newSearchFields, newBbox, onSetFields } = this.props;
+    // avoid to rerender when the view is list or table
+    if (mapInfo.facet !== 'Map'){ return }
     // set the initial position based on the parameters from parent components
     const initialPosition = new SpatialView(mapInfo.longitude, mapInfo.latitude, mapInfo.height, mapInfo.heading, mapInfo.pitch);
     viewer = new ISamplesSpatial("cesiumContainer", initialPosition || moorea);
@@ -232,13 +234,13 @@ class CesiumMap extends React.Component {
       // update the points every 5 seconds if two points differ in 50km + scale of height.
       // I scale the current height by 15000000, the height of "View Global".
       // 4000 km is the distance that rotate half earth map on the height 15000000.
-      if (diffDistance > MINIMUMREFRESHDISTANCE + MAXIMUMREFRESHDISTANCE * viewer.currentView.height / MAXIMUMZOOMDISTANCE) {
+      if (diffDistance > MINIMUM_REFRESH_DISTANCE + MAXIMUM_REFRESH_DISTANCE * viewer.currentView.height / MAXIMUM_ZOOM_DISTANCE) {
         clearBoundingBox(true);
         this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
         // update camera position to the url
         setCamera({ facet: "Map", ...viewer.currentView.viewDict });
       };
-    }, REFRESHTIMEMS);
+    }, REFRESH_TIME_MS);
   };
 
   // https://medium.com/@garrettmac/reactjs-how-to-safely-manipulate-the-dom-when-reactjs-cant-the-right-way-8a20928e8a6
@@ -290,7 +292,7 @@ class CesiumMap extends React.Component {
       oboePrimitive.abort();
     }
 
-    oboePrimitive = setPrimitive.load(facet, { field: "source", lat: latitude, long: longitude, searchFields: searchFields, rows: NUMBEROFPOINTS });
+    oboePrimitive = setPrimitive.load(facet, { field: "source", lat: latitude, long: longitude, searchFields: searchFields, rows: NUMBER_OF_POINTS });
     cameraLat = latitude;
     cameraLong = longitude;
   }
@@ -317,7 +319,7 @@ class CesiumMap extends React.Component {
    */
   changeView(direct) {
     if (direct) {
-      viewer.visit(new SpatialView(cameraLong, cameraLat, MAXIMUMZOOMDISTANCE, GLOBALHEADING, GLOBALPITCH));
+      viewer.visit(new SpatialView(cameraLong, cameraLat, MAXIMUM_ZOOM_DISTANCE, GLOBAL_HEADING, GLOBAL_PITCH));
     } else {
       viewer.visit(new SpatialView(cameraLong, cameraLat, moorea.height, moorea.heading, moorea.pitch));
     }
@@ -331,7 +333,7 @@ class CesiumMap extends React.Component {
     const latitude = document.getElementById("latitudeInput");
 
     if (longitude.value !== "" && latitude.value !== "") {
-      const location = new SpatialView(parseFloat(longitude.value), parseFloat(latitude.value), MAXIMUMZOOMDISTANCE, GLOBALHEADING, GLOBALPITCH);
+      const location = new SpatialView(parseFloat(longitude.value), parseFloat(latitude.value), MAXIMUM_ZOOM_DISTANCE, GLOBAL_HEADING, GLOBAL_PITCH);
       this.visitLocation(location);
     };
   };

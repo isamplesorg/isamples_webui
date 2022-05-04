@@ -120,7 +120,7 @@ class ResultList extends React.Component {
             <div style={{ display: this.state.facet === 'Map' ? "block" : "none" }}>
               {
                 // if there is no searchFields, don't render cesium.
-                searchFields.length > 0 && this.state.facet === "Map"
+                searchFields.length > 0
                   ?
                   <CesiumMap
                     mapInfo={this.state}
