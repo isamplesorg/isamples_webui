@@ -30,6 +30,9 @@ const REFRESHTIMEMS = 5000;
 const MINIMUMREFRESHDISTANCE = 50;
 const MAXIMUMREFRESHDISTANCE = 4000;
 const MAXIMUMZOOMDISTANCE = 15000000;
+const NUMBEROFPOINTS = 100000;
+const GLOBALHEADING = 90;
+const GLOBALPITCH = -90;
 const api = new ISamplesAPI();
 const moorea = new SpatialView(-149.8169236266867, -17.451466233002286, 2004.7347996772614, 201.84408760864753, -20.853642866175978);
 const patagonia = new SpatialView(-69.60169132023925, -54.315990127766646, 1781.4560051617016, 173.54573250470798, -15.85292472305027);
@@ -186,7 +189,7 @@ class CesiumMap extends React.Component {
             </button>
           </div>
         </div>
-        <button className="cesium-button" onClick={this.toggle.bind(this)}>Viewer Change</button>
+        <button className="cesium-visit-button cesium-button" onClick={this.toggle.bind(this)}>Viewer Change</button>
       </>;
   };
 
@@ -287,7 +290,7 @@ class CesiumMap extends React.Component {
       oboePrimitive.abort();
     }
 
-    oboePrimitive = setPrimitive.load(facet, { field: "source", lat: latitude, long: longitude, searchFields: searchFields, rows: 100000 });
+    oboePrimitive = setPrimitive.load(facet, { field: "source", lat: latitude, long: longitude, searchFields: searchFields, rows: NUMBEROFPOINTS });
     cameraLat = latitude;
     cameraLong = longitude;
   }
@@ -314,9 +317,9 @@ class CesiumMap extends React.Component {
    */
   changeView(direct) {
     if (direct) {
-      viewer.visit(new SpatialView(cameraLong, cameraLat, 15000000, 90.0, -90));
+      viewer.visit(new SpatialView(cameraLong, cameraLat, MAXIMUMZOOMDISTANCE, GLOBALHEADING, GLOBALPITCH));
     } else {
-      viewer.visit(new SpatialView(cameraLong, cameraLat, 2004.7347996772614, 201.84408760864753, -20.853642866175978));
+      viewer.visit(new SpatialView(cameraLong, cameraLat, moorea.height, moorea.heading, moorea.pitch));
     }
   }
 
@@ -328,7 +331,7 @@ class CesiumMap extends React.Component {
     const latitude = document.getElementById("latitudeInput");
 
     if (longitude.value !== "" && latitude.value !== "") {
-      const location = new SpatialView(parseFloat(longitude.value), parseFloat(latitude.value), 150000, 90.0, -90);
+      const location = new SpatialView(parseFloat(longitude.value), parseFloat(latitude.value), MAXIMUMZOOMDISTANCE, GLOBALHEADING, GLOBALPITCH);
       this.visitLocation(location);
     };
   };

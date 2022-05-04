@@ -1,7 +1,7 @@
 .Cesium-popBox {
   position: absolute;
   top: -230px;
-  left: 10px;
+  left: 5px;
   background-color: rgba(38, 38, 38, 0.75);
   border: solid #ddd 1px;
   width: 300px;
@@ -22,6 +22,10 @@
   visibility: visible;
   transform: scale(1);
   transition: transform 0.25s ease-out;
+}
+
+.cesium-visit-button {
+  margin: 5px;
 }
 
 #viewerChange > div > table {
