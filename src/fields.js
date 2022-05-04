@@ -39,7 +39,7 @@ const fields = [
   { label: "Spatial Query", field: "producedBy_samplingSite_location_rpt", type: "spatialquery" },
 ];
 
-// the initial camera position
+// the initial camera position, moorea
 const initialCamera = {
   facet: "List",
   longitude: -149.8169236266867,

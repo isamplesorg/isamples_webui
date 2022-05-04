@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from "react";
 import cx from "classnames";
 
+// the constant popup window for solr query
 const infoBox =
   <div className="popBox">
     <ul>

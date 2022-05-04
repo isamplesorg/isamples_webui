@@ -1,21 +1,5 @@
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import reportWebVitals from './reportWebVitals';
-import './css/index.css';
-import solrReducer from "./solr-reducer";
-import { createStore } from "redux";
-// encode and decode parameter
-import { encode, decode } from "plantuml-encoder"
-
-// import config
-import config from "./config";
-
-import {
-  SolrFacetedSearch,
-  SolrClient,
-  defaultComponentPack
-} from "solr-faceted-search-react";
-
 // react router to define url
 import {
   HashRouter,
@@ -24,6 +8,21 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 
+import reportWebVitals from './reportWebVitals';
+import solrReducer from "./solr-reducer";
+import { createStore } from "redux";
+
+// import config
+import config from "./config";
+import { fields, initialCamera } from './fields';
+import './css/index.css';
+
+import {
+  SolrFacetedSearch,
+  SolrClient,
+  defaultComponentPack
+} from "solr-faceted-search-react";
+
 // iSamples results react component
 import iSamplesResult from './extension/iSamples_results';
 import TextSearch from './extension/iSamples_textSearch';
@@ -31,17 +30,19 @@ import ResultList from './extension/iSamples_resultList';
 import ResultPagination from './extension/iSamples_pagination';
 import iSamples_RangeFacet from './extension/iSamples_rangeFacet';
 import SearchFieldContainer from './extension/iSamples_containers';
-import { fields, initialCamera } from './fields';
-import ScrollToTop from "./components/scrollTop"
+
 import {
   wellFormatField,
   checkAllValue,
   getAllValueField
 } from './components/utilities';
+import ScrollToTop from "./components/scrollTop"
 
 // cookie library:
 //  https://github.com/reactivestack/cookies/tree/master/packages/universal-cookie
 import Cookies from 'universal-cookie';
+// encode and decode parameter
+import { encode, decode } from "plantuml-encoder"
 
 // initializa a cookie instance
 const cookies = new Cookies();

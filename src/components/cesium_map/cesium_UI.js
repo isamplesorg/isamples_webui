@@ -25,6 +25,11 @@ import { addButton } from "./elements/navigationButton";
 //  https://cesium.com/learn/ion/cesium-ion-access-tokens/
 Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwNzk3NjkyMy1iNGI1LTRkN2UtODRiMy04OTYwYWE0N2M3ZTkiLCJpZCI6Njk1MTcsImlhdCI6MTYzMzU0MTQ3N30.e70dpNzOCDRLDGxRguQCC-tRzGzA-23Xgno5lNgCeB4';
 
+// constant variables
+const REFRESHTIMEMS = 5000;
+const MINIMUMREFRESHDISTANCE = 50;
+const MAXIMUMREFRESHDISTANCE = 4000;
+const MAXIMUMZOOMDISTANCE = 15000000;
 const api = new ISamplesAPI();
 const moorea = new SpatialView(-149.8169236266867, -17.451466233002286, 2004.7347996772614, 201.84408760864753, -20.853642866175978);
 const patagonia = new SpatialView(-69.60169132023925, -54.315990127766646, 1781.4560051617016, 173.54573250470798, -15.85292472305027);
@@ -188,7 +193,7 @@ class CesiumMap extends React.Component {
   // This is a initial function in react liftcycle.
   // Only call once when this component first render
   componentDidMount() {
-    const { mapInfo, setCamera, SearchFields, Bbox, onSetFields } = this.props;
+    const { mapInfo, setCamera, newSearchFields, newBbox, onSetFields } = this.props;
     // set the initial position based on the parameters from parent components
     const initialPosition = new SpatialView(mapInfo.longitude, mapInfo.latitude, mapInfo.height, mapInfo.heading, mapInfo.pitch);
     viewer = new ISamplesSpatial("cesiumContainer", initialPosition || moorea);
@@ -199,7 +204,7 @@ class CesiumMap extends React.Component {
     viewer.enableTracking(api, (bb) => selectedBoxCallbox(bb, true));
     setPrimitive = new PointStreamPrimitiveCollection(viewer.terrain);
     viewer.addPointPrimitives(setPrimitive);
-    searchFields = SearchFields;
+    searchFields = newSearchFields;
     onChange = onSetFields;
     // get the facet control vocabulary
     getFacetInfo("source").then((res) => {
@@ -211,9 +216,9 @@ class CesiumMap extends React.Component {
     });
 
     // initial bbox
-    if (Bbox && Object.keys(Bbox).length > 0) {
+    if (newBbox && Object.keys(newBbox).length > 0) {
       try {
-        selectedBoxCallbox(viewer.generateRectByLL(Bbox));
+        selectedBoxCallbox(viewer.generateRectByLL(newBbox));
       } catch (e) {
         console.warn("Adding bbox failed.");
       };
@@ -224,34 +229,37 @@ class CesiumMap extends React.Component {
       // update the points every 5 seconds if two points differ in 50km + scale of height.
       // I scale the current height by 15000000, the height of "View Global".
       // 4000 km is the distance that rotate half earth map on the height 15000000.
-      if (diffDistance > 50 + 4000 * viewer.currentView.height / 15000000) {
+      if (diffDistance > MINIMUMREFRESHDISTANCE + MAXIMUMREFRESHDISTANCE * viewer.currentView.height / MAXIMUMZOOMDISTANCE) {
+        clearBoundingBox(true);
         this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
         // update camera position to the url
         setCamera({ facet: "Map", ...viewer.currentView.viewDict });
       };
-    }, 5000);
+    }, REFRESHTIMEMS);
   };
 
   // https://medium.com/@garrettmac/reactjs-how-to-safely-manipulate-the-dom-when-reactjs-cant-the-right-way-8a20928e8a6
   // manipulate Dom outside the react model
   shouldComponentUpdate(nextProps) {
     // update point primitive based on searchFields
-    const sf1 = JSON.stringify(nextProps.SearchFields);
-    const sf2 = JSON.stringify(this.props.SearchFields);
+    const sf1 = JSON.stringify(nextProps.newSearchFields);
+    const sf2 = JSON.stringify(this.props.newSearchFields);
     if (sf1 !== sf2) {
       // clear all element in cesium
-      searchFields = nextProps.SearchFields;
+      searchFields = nextProps.newSearchFields;
+      clearBoundingBox(true);
       this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
     };
 
     // update bounding box based on bbox
-    const bb1 = JSON.stringify(nextProps.Bbox);
-    const bb2 = JSON.stringify(this.props.Bbox);
+    const bb1 = JSON.stringify(nextProps.newBbox);
+    const bb2 = JSON.stringify(this.props.newBbox);
     if (bb1 !== bb2 && bb1 !== JSON.stringify(bboxLoc)) {
+
       // draw the bounding box or remove the bounding box
-      if (Object.keys(nextProps.Bbox).length > 0) {
+      if (Object.keys(nextProps.newBbox).length > 0) {
         try {
-          selectedBoxCallbox(viewer.generateRectByLL(nextProps.Bbox));
+          selectedBoxCallbox(viewer.generateRectByLL(nextProps.newBbox));
         } catch (e) {
           console.warn("Adding bbox failed.");
         }
@@ -272,7 +280,6 @@ class CesiumMap extends React.Component {
  * @param {*} longitude
  */
   updatePrimitive(latitude, longitude) {
-    clearBoundingBox(true);
     if (setPrimitive) {
       setPrimitive.clear();
     }
@@ -280,7 +287,7 @@ class CesiumMap extends React.Component {
       oboePrimitive.abort();
     }
 
-    oboePrimitive = setPrimitive.load(facet, {field: "source", lat: latitude, long: longitude, searchFields: searchFields, rows: 100000 });
+    oboePrimitive = setPrimitive.load(facet, { field: "source", lat: latitude, long: longitude, searchFields: searchFields, rows: 100000 });
     cameraLat = latitude;
     cameraLong = longitude;
   }
@@ -291,6 +298,7 @@ class CesiumMap extends React.Component {
    */
   visitLocation(location) {
     viewer.visit(location);
+    clearBoundingBox(true);
     this.updatePrimitive(location.latitude, location.longitude);
     // when we use visit function, the currentview only return last camera position
     // rather than the current one

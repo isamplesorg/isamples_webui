@@ -560,10 +560,6 @@ export class ISamplesSpatial {
     document.body.removeChild(dummy);
   }
 
-  openLinkInNewWindow(URL) {
-    window.open(URL, "_blank");
-  }
-
   /**
    * a function to copy the primitive id and add information to the infoBox
    * @param {*} api the api to fetch the selected record information
