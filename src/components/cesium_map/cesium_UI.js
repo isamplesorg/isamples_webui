@@ -197,8 +197,6 @@ class CesiumMap extends React.Component {
   // Only call once when this component first render
   componentDidMount() {
     const { mapInfo, setCamera, newSearchFields, newBbox, onSetFields } = this.props;
-    // avoid to rerender when the view is list or table
-    if (mapInfo.facet !== 'Map'){ return }
     // set the initial position based on the parameters from parent components
     const initialPosition = new SpatialView(mapInfo.longitude, mapInfo.latitude, mapInfo.height, mapInfo.heading, mapInfo.pitch);
     viewer = new ISamplesSpatial("cesiumContainer", initialPosition || moorea);
