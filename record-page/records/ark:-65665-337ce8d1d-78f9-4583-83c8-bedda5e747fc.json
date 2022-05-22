@@ -1,0 +1,66 @@
+{
+    "$schema": "../../iSamplesSchemaBasic0.2.json",
+    "@id": "metadata/65665/337ce8d1d-78f9-4583-83c8-bedda5e747fc",
+    "label": "Trochocercus cyanomelas AB5PZ59",
+    "sampleidentifier": "ark:/65665/337ce8d1d-78f9-4583-83c8-bedda5e747fc",
+    "description": "basisOfRecord: MaterialSample | type: PhysicalObject | sex: Female | lifeStage: Immature | disposition: in collection | startDayOfYear: 38 | endDayOfYear: 38",
+    "hasContextCategory": [
+        "Subaerial surface environment"
+    ],
+    "hasMaterialCategory": [
+        "Organic material"
+    ],
+    "hasSpecimenCategory": [
+        "Organism part"
+    ],
+    "informalClassification": [
+        "Trochocercus cyanomelas"
+    ],
+    "keywords": [
+        "Birds",
+        "Animalia",
+        "Chordata",
+        "Vertebrata",
+        "Aves",
+        "Passeriformes",
+        "Monarchidae",
+        "Monarchinae",
+        "Trochocercus cyanomelas"
+    ],
+    "producedBy": {
+        "@id": "Not Provided",
+        "label": "Not Provided",
+        "description": "",
+        "hasFeatureOfInterest": "Not Provided",
+        "responsibility": [
+            "recordedBy: J. Kiure"
+        ],
+        "resultTime": "2004-02-07",
+        "samplingSite": {
+            "description": "",
+            "label": "",
+            "location": {
+                "elevation": "",
+                "latitude": null,
+                "longitude": null
+            },
+            "placeName": [
+                "Rufiji",
+                "Pwani",
+                "Tanzania",
+                "Africa",
+                "Africa, Tanzania, Pwani, Rufiji"
+            ]
+        }
+    },
+    "registrant": "Not Provided",
+    "samplingPurpose": "Not Provided",
+    "curation": {
+        "label": "Not Provided",
+        "description": "Not Provided",
+        "accessConstraints": "Not Provided",
+        "curationLocation": "Not Provided",
+        "responsibility": "USNM http://grbio.org/cool/142r-0w94"
+    },
+    "relatedResource": []
+}

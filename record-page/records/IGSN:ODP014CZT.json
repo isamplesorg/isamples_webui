@@ -1,0 +1,51 @@
+{
+    "$schema": "../../iSamplesSchemaBasic0.2.json",
+    "@id": "https://data.isamples.org/digitalsample/igsn/ODP014CZT",
+    "label": "Section Half 42-380*-21R-5-A",
+    "sampleidentifier": "IGSN:ODP014CZT",
+    "description": "Not Provided",
+    "hasContextCategory": [
+        "Not Provided"
+    ],
+    "hasMaterialCategory": [
+        "Not Provided"
+    ],
+    "hasSpecimenCategory": [
+        "Other solid object"
+    ],
+    "informalClassification": "Not Provided",
+    "keywords": [
+        "Core Section Half"
+    ],
+    "producedBy": {
+        "@id": "",
+        "label": "Not Provided",
+        "description": "cruiseFieldPrgrm:DSDP Leg 42",
+        "hasFeatureOfInterest": "Not Provided",
+        "responsibility": [
+            "Curator,,Collector",
+            "Curator Integrated Ocean Drilling Program (TAMU),,Sample Owner"
+        ],
+        "resultTime": "2006-08-10 12:00:00",
+        "samplingSite": {
+            "description": "Not Provided",
+            "label": "Not Provided",
+            "location": {
+                "elevation": "-2107.0 m",
+                "latitude": 42.099,
+                "longitude": 29.6137
+            },
+            "placeName": []
+        }
+    },
+    "registrant": "Curator Integrated Ocean Drilling Program (TAMU)",
+    "samplingPurpose": "",
+    "curation": {
+        "label": "Not Provided",
+        "description": "Not Provided",
+        "accessConstraints": "Not Provided",
+        "curationLocation": "Not Provided",
+        "responsibility": "Not Provided"
+    },
+    "relatedResource": []
+}

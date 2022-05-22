@@ -1,0 +1,63 @@
+{
+    "$schema": "../../iSamplesSchemaBasic0.2.json",
+    "@id": "metadata/65665/31a4ebda8-01f5-4b26-8ff3-1da928424337",
+    "label": "Microhyla heymonsi AB0KY58",
+    "sampleidentifier": "ark:/65665/31a4ebda8-01f5-4b26-8ff3-1da928424337",
+    "description": "basisOfRecord: MaterialSample | catalogNumber: USNM 586957 | type: PhysicalObject | disposition: in collection | startDayOfYear: 165 | endDayOfYear: 165",
+    "hasContextCategory": [
+        "Subaerial surface environment"
+    ],
+    "hasMaterialCategory": [
+        "Organic material"
+    ],
+    "hasSpecimenCategory": [
+        "Organism part"
+    ],
+    "informalClassification": [
+        "Microhyla heymonsi"
+    ],
+    "keywords": [
+        "Amphibians and Reptiles",
+        "Animalia",
+        "Chordata",
+        "Vertebrata",
+        "Amphibia",
+        "Anura",
+        "Microhylidae",
+        "Microhyla heymonsi"
+    ],
+    "producedBy": {
+        "@id": "Not Provided",
+        "label": "Not Provided",
+        "description": "verbatimEventDate: 14 June 2014",
+        "hasFeatureOfInterest": "Not Provided",
+        "responsibility": [],
+        "resultTime": "2014-06-14",
+        "samplingSite": {
+            "description": "geodeticDatum: WGS84 | verbatimLatitude: N 12.40389 | verbatimLongitude: E 99.13123",
+            "label": "Yeybu village, ca 3.4 km (air) NE of",
+            "location": {
+                "elevation": "",
+                "latitude": 12.4039,
+                "longitude": 99.1312
+            },
+            "placeName": [
+                "Yeybu village, ca 3.4 km (air) NE of",
+                "Tanintharyi Division",
+                "Burma",
+                "Asia",
+                "Asia, Burma, Tanintharyi Division"
+            ]
+        }
+    },
+    "registrant": "Not Provided",
+    "samplingPurpose": "Not Provided",
+    "curation": {
+        "label": "Not Provided",
+        "description": "Not Provided",
+        "accessConstraints": "Not Provided",
+        "curationLocation": "Not Provided",
+        "responsibility": "USNM http://grbio.org/cool/142r-0w94"
+    },
+    "relatedResource": []
+}

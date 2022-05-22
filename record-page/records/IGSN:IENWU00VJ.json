@@ -1,0 +1,50 @@
+{
+    "$schema": "../../iSamplesSchemaBasic0.2.json",
+    "@id": "https://data.isamples.org/digitalsample/igsn/IENWU00VJ",
+    "label": "PB-WL1_03_micro",
+    "sampleidentifier": "IGSN:IENWU00VJ",
+    "description": "Not Provided",
+    "hasContextCategory": [
+        "Subaerial surface environment"
+    ],
+    "hasMaterialCategory": [
+        "Soil"
+    ],
+    "hasSpecimenCategory": [
+        "Other solid object"
+    ],
+    "informalClassification": "Not Provided",
+    "keywords": [
+        "Core Section"
+    ],
+    "producedBy": {
+        "@id": "",
+        "label": "Not Provided",
+        "description": "",
+        "hasFeatureOfInterest": "Not Provided",
+        "responsibility": [
+            "Vivien Rivera,,Sample Owner"
+        ],
+        "resultTime": "2020-09-06 05:18:08",
+        "samplingSite": {
+            "description": "Not Provided",
+            "label": "Not Provided",
+            "location": {
+                "elevation": "Not Provided",
+                "latitude": null,
+                "longitude": null
+            },
+            "placeName": []
+        }
+    },
+    "registrant": "Vivien Rivera",
+    "samplingPurpose": "",
+    "curation": {
+        "label": "Not Provided",
+        "description": "Not Provided",
+        "accessConstraints": "Not Provided",
+        "curationLocation": "Not Provided",
+        "responsibility": "Not Provided"
+    },
+    "relatedResource": []
+}

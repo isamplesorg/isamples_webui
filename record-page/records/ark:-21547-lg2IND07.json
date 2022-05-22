@@ -1,0 +1,63 @@
+{
+    "$schema": "../../iSamplesSchemaBasic0.2.json",
+    "@id": "metadata/21547/lg2IND07",
+    "label": "IND07",
+    "sampleidentifier": "ark:/21547/lg2IND07",
+    "description": "identificationRemarks: morphology",
+    "hasContextCategory": [],
+    "hasMaterialCategory": [
+        "Organic material"
+    ],
+    "hasSpecimenCategory": [
+        "Whole organism"
+    ],
+    "informalClassification": [
+        "Acanthaster",
+        "planci"
+    ],
+    "keywords": [
+        "Pulau Seribu",
+        "Indonesia",
+        "Echinodermata"
+    ],
+    "producedBy": {
+        "@id": "ark:/21547/BEE2cd368672f34f0d2525c6198f8c9152d8",
+        "label": "cd368672f34f0d2525c6198f8c9152d8 acapla_CO1_all",
+        "description": "expeditionCode: acapla_CO1_all | projectId: 1",
+        "hasFeatureOfInterest": "Not Provided",
+        "responsibility": [
+            "principalInvestigator: Gert Woerheide"
+        ],
+        "resultTime": "1991",
+        "samplingSite": {
+            "description": "Not Provided",
+            "label": "Pulau Seribu",
+            "location": {
+                "elevation": "Not Provided",
+                "latitude": -5.71076,
+                "longitude": 106.597
+            },
+            "placeName": [
+                "Pulau Seribu",
+                "Pulau Seribu",
+                "Indonesia"
+            ]
+        }
+    },
+    "registrant": "Not Provided",
+    "samplingPurpose": "Not Provided",
+    "curation": {
+        "label": "Not Provided",
+        "description": "Not Provided",
+        "accessConstraints": "Not Provided",
+        "curationLocation": "LMU",
+        "responsibility": "curator:LMU"
+    },
+    "relatedResource": [
+        {
+            "label": "subsample tissue",
+            "relationship": "subsample",
+            "target": "ark:/21547/BEF2IND07"
+        }
+    ]
+}

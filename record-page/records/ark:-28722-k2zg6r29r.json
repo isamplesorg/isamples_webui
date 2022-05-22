@@ -1,0 +1,62 @@
+{
+    "$schema": "../../iSamplesSchemaBasic0.2.json",
+    "@id": "metadata/http://n2t.net/ark:/28722/k2zg6r29r",
+    "label": "77148 (52)",
+    "sampleidentifier": "http://n2t.net/ark:/28722/k2zg6r29r",
+    "description": "early bce/ce: -200.0 | late bce/ce: 360.0 | updated: 2017-02-13T02:50:03Z",
+    "hasContextCategory": [
+        "Site of past human activities"
+    ],
+    "hasMaterialCategory": [
+        "Anthropogenic material"
+    ],
+    "hasSpecimenCategory": [
+        "Artifact"
+    ],
+    "informalClassification": [],
+    "keywords": [
+        "Jordan",
+        "Petra Great Temple",
+        "Upper Temenos",
+        "Trench 77",
+        "Locus 9",
+        "Seq. 77148"
+    ],
+    "producedBy": {
+        "@id": "Not Provided",
+        "label": "Petra Great Temple Excavations",
+        "description": "http://opencontext.org/projects/A5DDBEA2-B3C8-43F9-8151-33343CBDC857",
+        "hasFeatureOfInterest": "Not Provided",
+        "responsibility": [
+            "creator: Martha Sharp Joukowsky"
+        ],
+        "resultTime": "2007-11-11T00:00:00Z",
+        "samplingSite": {
+            "description": "Not Provided",
+            "label": "Jordan/Petra Great Temple/Upper Temenos/Trench 77/Locus 9/Seq. 77148",
+            "location": {
+                "elevation": "Not Provided",
+                "latitude": 30.3287,
+                "longitude": 35.4421
+            },
+            "placeName": [
+                "Jordan",
+                "Petra Great Temple",
+                "Upper Temenos",
+                "Trench 77",
+                "Locus 9",
+                "Seq. 77148"
+            ]
+        }
+    },
+    "registrant": null,
+    "samplingPurpose": null,
+    "curation": {
+        "label": "Not Provided",
+        "description": "Not Provided",
+        "accessConstraints": "Not Provided",
+        "curationLocation": "Not Provided",
+        "responsibility": "Not Provided"
+    },
+    "relatedResource": []
+}
