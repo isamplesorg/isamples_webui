@@ -49,8 +49,8 @@ def main():
 
   # Replace original content by the new data
   script.string.replace_with(jsonData)
-  print(record.split(".")[-2])
-  storeFile(record.split("/")[-1].split(".")[-2] + ".html", str(soup))
+
+  print(str(soup))
 
 if __name__ == "__main__":
     main()

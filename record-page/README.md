@@ -28,3 +28,4 @@ Utilties
 ```
 python3 injectJSON.py path_to_html path_to_json_record
 ```
+This command will print the result html file.
