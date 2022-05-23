@@ -3,6 +3,7 @@
 The original JSON data would be stored in the `<script type="application/ld+json">`. The javascript would convert the content into html `table` when the window loads.
 
 <hr/>
+
 ## Static files
 
 [records folder](./records/) contains all JSON record examples.
