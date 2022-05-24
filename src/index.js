@@ -16,6 +16,7 @@ import { createStore } from "redux";
 import config from "./config";
 import { fields, initialCamera } from './fields';
 import './css/index.css';
+import './css/bootstrap5.css';
 
 import {
   SolrFacetedSearch,
@@ -36,7 +37,12 @@ import {
   checkAllValue,
   getAllValueField
 } from './components/utilities';
-import ScrollToTop from "./components/scrollTop"
+import ScrollToTop from "./components/scrollTop";
+
+import {
+  NavBar,
+  FooterBar
+} from "./components/navFooter";
 
 // cookie library:
 //  https://github.com/reactivestack/cookies/tree/master/packages/universal-cookie
@@ -147,7 +153,8 @@ function APP() {
   }, [searchParams, storeState, setSearchParams]);
 
   return (
-    <div>
+    <>
+      <NavBar />
       <SolrFacetedSearch
         {...store.getState()}
         {...solrClient.getHandlers()}
@@ -156,8 +163,9 @@ function APP() {
         customComponents={iSamples_componentPack}
         onSelectDoc={(doc) => { console.log(doc); }}
       />
+      <FooterBar />
       <ScrollToTop />
-    </div>
+    </>
   );
 };
 
