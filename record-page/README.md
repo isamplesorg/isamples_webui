@@ -8,17 +8,9 @@ The original JSON data would be stored in the `<script type="application/ld+json
 
 [records folder](./records/) contains all JSON record examples.
 
-[template.html](./template.html) contains the template html file.
-
 [src folder](./src) contains all js and css files.
 
-<hr />
-
-## Bundle all JS, css, and html files
-The current js, css files are in the different folders. We can use `webpack` to bundle all files into a single [index.html](./build/index.html) file and a single [index.js](./build/index.js) files.
-```
-npm run build
-```
+We use [jsdelivr](https://www.jsdelivr.com/?docs=gh) to link and execute the files hosted on GitHub so we don't need to use bundlejs since we only have one css file and one js file.
 
 <hr/>
 
