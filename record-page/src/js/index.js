@@ -1,5 +1,3 @@
-import '../css/index.css';
-
 const ZOOM_LEVEL = 6;
 const DEFAULT_LOCATION = [0, 0];
 
