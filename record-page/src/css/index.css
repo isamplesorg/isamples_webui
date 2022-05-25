@@ -1,0 +1,20 @@
+* {
+  font-family: 'Open Sans';
+}
+
+span {
+  white-space: pre-wrap;
+}
+
+#tbValue,
+#citation {
+  word-break: break-all;
+}
+
+#TableView {
+  padding: 10px;
+}
+
+#map {
+  height: 300px;
+}

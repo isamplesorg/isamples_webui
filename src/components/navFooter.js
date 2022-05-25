@@ -23,8 +23,8 @@ const FooterBar = function () {
     <>
       <div>&nbsp;</div>
       <footer>
-        <div class="footerStyle bg-light">
-          <div class="text-center text-muted">© Copyright 2020, iSamples Project.This material is based upon work
+        <div className="footerStyle bg-light">
+          <div className="text-center text-muted">© Copyright 2020, iSamples Project.This material is based upon work
             supported
             by the National Science Foundation under Grant Numbers <a href="https://nsf.gov/awardsearch/showAward?AWD_ID=2004839">2004839</a>, <a href="https://nsf.gov/awardsearch/showAward?AWD_ID=2004562">2004562</a>, <a href="https://nsf.gov/awardsearch/showAward?AWD_ID=2004642">2004642</a>, and <a href="https://nsf.gov/awardsearch/showAward?AWD_ID=2004815">2004815</a>. Any opinions, findings, and
             conclusions or recommendations expressed in this material are those of the author(s) and do not
