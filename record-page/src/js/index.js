@@ -1,5 +1,5 @@
 const ZOOM_LEVEL = 6;
-const NO_ZOOM_LEVEL = 2;
+const NO_ZOOM_LEVEL = 1;
 const DEFAULT_LOCATION = [0, 0];
 
 /**
