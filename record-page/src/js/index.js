@@ -1,4 +1,5 @@
 const ZOOM_LEVEL = 6;
+const NO_ZOOM_LEVEL = 2;
 const DEFAULT_LOCATION = [0, 0];
 
 /**
@@ -124,7 +125,7 @@ function findGeoInfo(data, field) {
  * @params {*} location, an arrary, [latitude, longitude]
 */
 function createMap(location) {
-    var map = L.map('map').setView(location.includes(NaN) ? DEFAULT_LOCATION : location, ZOOM_LEVEL);
+    var map = L.map('map').setView(location, ZOOM_LEVEL);
     L.tileLayer('https://{s}.tile.openstreetmap.de/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
@@ -132,6 +133,7 @@ function createMap(location) {
 
     // add a popup window to indicate there is no geo information
     if (location.includes(NaN)) {
+        map.setView(DEFAULT_LOCATION, NO_ZOOM_LEVEL);
         L.popup({
             closeButton: false,
             autoClose: false
