@@ -59,7 +59,7 @@ const InformationButton = (props) => {
               </tr>
               <tr>
                 <td>
-                  <img src="http://localhost:3000/cesium/Widgets/Images/NavigationHelp/MouseLeft.svg" width="40" height="40" alt="Mouseleft"></img>
+                  <img src="./cesium/Widgets/Images/NavigationHelp/MouseLeft.svg" width="40" height="40" alt="Mouseleft"></img>
                 </td>
                 <td>
                   <div className="cesium-navigation-help-pan">Copy Identifier</div>
