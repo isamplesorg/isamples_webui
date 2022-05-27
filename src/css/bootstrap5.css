@@ -3,6 +3,10 @@
   but we need to use some css from bootstrap 5 so we create this css file
 */
 
+.content {
+  position: relative;
+}
+
 .navbar {
   position: relative;
   display: flex;
@@ -25,7 +29,8 @@
 
 .footerStyle {
   padding: 24px;
-  border-top: 1px solid black;
+  bottom: 0;
+  width: 100%;
 }
 
 :root {

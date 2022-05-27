@@ -21,7 +21,6 @@ const NavBar = function () {
 const FooterBar = function () {
   return (
     <>
-      <div>&nbsp;</div>
       <footer>
         <div className="footerStyle bg-light">
           <div className="text-center text-muted">© Copyright 2020, iSamples Project.This material is based upon work
@@ -35,7 +34,14 @@ const FooterBar = function () {
   )
 }
 
-export {
-  NavBar,
-  FooterBar
-};
+const NavFooter = function (props) {
+  return (
+    <div className='content'>
+      <NavBar />
+      {props.children}
+      <FooterBar />
+    </div>
+  )
+}
+
+export default NavFooter;

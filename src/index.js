@@ -39,10 +39,8 @@ import {
 } from './components/utilities';
 import ScrollToTop from "./components/scrollTop";
 
-import {
-  NavBar,
-  FooterBar
-} from "./components/navFooter";
+import NavFooter from "./components/navFooter";
+import Login from './components/Login/login';
 
 // cookie library:
 //  https://github.com/reactivestack/cookies/tree/master/packages/universal-cookie
@@ -154,7 +152,6 @@ function APP() {
 
   return (
     <>
-      <NavBar />
       <SolrFacetedSearch
         {...store.getState()}
         {...solrClient.getHandlers()}
@@ -163,7 +160,6 @@ function APP() {
         customComponents={iSamples_componentPack}
         onSelectDoc={(doc) => { console.log(doc); }}
       />
-      <FooterBar />
       <ScrollToTop />
     </>
   );
@@ -175,7 +171,8 @@ store.subscribe(() =>
   ReactDOM.render(
     <HashRouter>
       <Routes>
-        <Route path="/" element={<APP />} />
+        <Route path="/" element={<NavFooter children={<Login />} />} />
+        <Route path="/main" element={<NavFooter children={<APP />} />} />
       </Routes>
     </HashRouter>
     ,
