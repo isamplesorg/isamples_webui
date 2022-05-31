@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import React from "react";
 import cx from "classnames";
-import Table from '../components/react_table';
-import CesiumMap from "../components/cesium_map/cesium_UI";
+import Table from 'components/react_table';
+import CesiumMap from "components/cesium_map/cesium_UI";
 
 // Functional conponent to render button group
 const ButGroup = (props) => {

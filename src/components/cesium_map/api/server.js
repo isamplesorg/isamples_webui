@@ -1,10 +1,10 @@
 import oboe from "oboe";
-import config from "../../../config";
+import config from "config";
 import {
   setSolrQuery,
   recordInfoQuery,
   facetedQuery
-} from "../api/query";
+} from "components/cesium_map/api/query";
 
 export class ISamplesAPI {
 

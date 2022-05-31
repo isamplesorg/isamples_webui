@@ -8,15 +8,15 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 
-import reportWebVitals from './reportWebVitals';
-import solrReducer from "./solr-reducer";
+import reportWebVitals from 'reportWebVitals';
+import solrReducer from "solr-reducer";
 import { createStore } from "redux";
 
 // import config
-import config from "./config";
-import { fields, initialCamera } from './fields';
-import './css/index.css';
-import './css/bootstrap5.css';
+import config from "config";
+import { fields, initialCamera } from 'fields';
+import 'css/index.css';
+import 'css/bootstrap5.css';
 
 import {
   SolrFacetedSearch,
@@ -25,22 +25,22 @@ import {
 } from "solr-faceted-search-react";
 
 // iSamples results react component
-import iSamplesResult from './extension/iSamples_results';
-import TextSearch from './extension/iSamples_textSearch';
-import ResultList from './extension/iSamples_resultList';
-import ResultPagination from './extension/iSamples_pagination';
-import iSamples_RangeFacet from './extension/iSamples_rangeFacet';
-import SearchFieldContainer from './extension/iSamples_containers';
+import iSamplesResult from 'extension/iSamples_results';
+import TextSearch from 'extension/iSamples_textSearch';
+import ResultList from 'extension/iSamples_resultList';
+import ResultPagination from 'extension/iSamples_pagination';
+import iSamples_RangeFacet from 'extension/iSamples_rangeFacet';
+import SearchFieldContainer from 'extension/iSamples_containers';
 
 import {
   wellFormatField,
   checkAllValue,
   getAllValueField
-} from './components/utilities';
-import ScrollToTop from "./components/scrollTop";
+} from 'components/utilities';
+import ScrollToTop from "components/scrollTop";
 
-import NavFooter from "./components/navFooter";
-import Login from './components/Login/login';
+import NavFooter from "components/navFooter";
+import Login from 'components/Login/login';
 
 // cookie library:
 //  https://github.com/reactivestack/cookies/tree/master/packages/universal-cookie
