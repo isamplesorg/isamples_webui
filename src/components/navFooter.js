@@ -36,11 +36,11 @@ const FooterBar = function () {
 
 const NavFooter = function (props) {
   return (
-    <div className='content'>
+    <>
       <NavBar />
       {props.children}
       <FooterBar />
-    </div>
+    </>
   )
 }
 
