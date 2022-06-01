@@ -5,7 +5,7 @@ import {
   HashRouter,
   Routes,
   Route,
-  useSearchParams,
+  useSearchParams
 } from 'react-router-dom';
 
 import reportWebVitals from 'reportWebVitals';
@@ -35,12 +35,14 @@ import SearchFieldContainer from 'extension/iSamples_containers';
 import {
   wellFormatField,
   checkAllValue,
-  getAllValueField
+  getAllValueField,
+  forceSlashAfterHash
 } from 'components/utilities';
 import ScrollToTop from "components/scrollTop";
 
 import NavFooter from "components/navFooter";
 import Login from 'components/Login/login';
+import Auth from 'components/Login/auth';
 
 // cookie library:
 //  https://github.com/reactivestack/cookies/tree/master/packages/universal-cookie
@@ -170,9 +172,12 @@ store.subscribe(() =>
   // The inclusion of the HashRouter and Routes wrapping our APP is what allows the searchParams functionality to work.
   ReactDOM.render(
     <HashRouter>
+      {forceSlashAfterHash('auth')}
       <Routes>
         <Route path="/" element={<NavFooter children={<Login />} />} />
-        <Route path="/main" element={<NavFooter children={<APP />} />} />
+        <Route path="/main" element={<NavFooter logged={true} children={<APP />} />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="*" element={<h1>Invalid address</h1>} />
       </Routes>
     </HashRouter>
     ,
@@ -204,7 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let view = null;
 
   if (hash) {
-    let searchParams = new URLSearchParams(url.hash.substring(2));
+    let searchParams = new URLSearchParams(url.hash.split("?")[1]);
     start = searchParams.get('start');
     searchFields = searchParams.get('searchFields');
     sortFields = searchParams.get('sortFields');

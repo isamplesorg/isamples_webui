@@ -3,7 +3,7 @@
   justify-content: center;
   align-items: center;
   display: flex;
-  min-height: 80vh;
+  min-height: calc(100vh - 170px);
   background-image: url("../images/earth.jpg");
 }
 
@@ -20,9 +20,10 @@
   justify-content: center;
   align-items: center;
   padding-bottom: 10px;
+  gap: 10px;
 }
 
 .other-login :hover {
-  box-shadow:  0 0 0 3px #606060;
-  border-radius:50%;
+  box-shadow: 0 0 0 3px #606060;
+  border-radius: 50%;
 }

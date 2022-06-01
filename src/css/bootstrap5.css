@@ -2,26 +2,22 @@
   The solr-facet-search-react could only support bootstap 3.3.6,
   but we need to use some css from bootstrap 5 so we create this css file
 */
-
 .navbar {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+  padding: 10px;
   margin-bottom: 0;
 }
 
-.navbar-expand-lg {
-  flex-wrap: nowrap;
-  justify-content: flex-start;
+.navbar-brand {
+  display: block;
+  /* 1. */
+  height: auto;
+  margin: 0 !important;
+  /* 2. */
+  padding: 0 10px 0 0;
 }
 
-.bg-light {
-  --bs-bg-opacity: 1;
-  background-color: #f5f5f5 !important;
+.navbar-title {
+  font-size: 18px;
 }
 
 .footerStyle {
