@@ -7,4 +7,4 @@ const config = {
   "analytics_domain": "isamples.org"
 };
 
-export default config;
+window.config = config;
