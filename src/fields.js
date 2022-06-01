@@ -39,6 +39,17 @@ const fields = [
   { label: "Spatial Query", field: "producedBy_samplingSite_location_rpt", type: "spatialquery" },
 ];
 
+// The sortable fields you want
+const sortFields = [
+  { label: "Identifier", field: "id" },
+  { label: "Source", field: "source" },
+  { label: "Context", field: "hasContextCategory" },
+  { label: "Material", field: "hasMaterialCategory" },
+  { label: "Specimen", field: "hasSpecimenCategory" },
+  { label: "Registrant", field: "registrant" },
+  { label: "Collection Time", field: "producedBy_resultTime" }
+];
+
 // moorea position
 const INITIAL_LONGITUDE = -149.8169236266867;
 const INITIAL_LATITUDE = -17.451466233002286;
@@ -58,6 +69,7 @@ const initialCamera = {
 
 export {
   fields,
+  sortFields,
   initialCamera
 }
 

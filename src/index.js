@@ -14,7 +14,11 @@ import { createStore } from "redux";
 
 // import config
 import config from "config";
-import { fields, initialCamera } from 'fields';
+import {
+  fields,
+  sortFields,
+  initialCamera
+} from 'fields';
 import 'css/index.css';
 import 'css/bootstrap5.css';
 
@@ -55,17 +59,6 @@ const cookies = new Cookies();
 
 // Create a store for the reducer.
 const store = createStore(solrReducer);
-
-// The sortable fields you want
-const sortFields = [
-  { label: "Identifier", field: "id" },
-  { label: "Source", field: "source" },
-  { label: "Context", field: "hasContextCategory" },
-  { label: "Material", field: "hasMaterialCategory" },
-  { label: "Specimen", field: "hasSpecimenCategory" },
-  { label: "Registrant", field: "registrant" },
-  { label: "Collection Time", field: "producedBy_resultTime" }
-];
 
 // Create a cutom component pack from the default component pack
 const iSamples_componentPack = {
@@ -194,6 +187,7 @@ export const appendAnalytics = () => {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
+
   // this will send an initial search initializing the app
   // We just need to set state when we firstly open the page with url
   // So, we only need to set the initalize solrClient rather than set them in the useEffect
@@ -216,6 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
     view = searchParams.get('view');
   } else {
     if (cookies.get('previousParams')) {
+      console.log('test')
       start = cookies.get('previousParams')['start'];
       searchFields = cookies.get('previousParams')['searchFields'];
       sortFields = cookies.get('previousParams')['sortFields'];
