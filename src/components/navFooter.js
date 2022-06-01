@@ -1,5 +1,6 @@
 import isamplesLogo from '../images/isampleslogopetal.png';
-
+import { useNavigate } from "react-router-dom"
+import Cookies from 'universal-cookie';
 
 /**
  * a function to return navigation bar
@@ -7,6 +8,9 @@ import isamplesLogo from '../images/isampleslogopetal.png';
  * @returns jsx component
  */
 const NavBar = function (props) {
+  let navigate = useNavigate();
+  // initializa a cookie instance
+  const cookies = new Cookies();
   return (
     <nav className="navbar navbar-default">
       <div className="container-fluid">
@@ -19,9 +23,10 @@ const NavBar = function (props) {
         <h4 className="navbar-text navbar-title" >Internet of Samples: iSamples</h4>
         {
           props.logged &&
-          <p className="navbar-text navbar-right">
-            <a href="/#" className="navbar-link">Logout</a>
-          </p>
+          <button className="btn btn-default navbar-btn navbar-right" onClick={() => {
+            navigate("/");
+            cookies.remove('previousParams', { path: "/" });
+          }}>Logout</button>
         }
       </div>
     </nav>

@@ -94,12 +94,12 @@ const solrClient = new SolrClient({
   onChange: (state) => store.dispatch({ type: "SET_SOLR_STATE", state: state })
 });
 
-function APP() {
+function App() {
   // https://reactrouterdotcom.fly.dev/docs/en/v6/api#usesearchparams
   // Used for modifying the query string
   let [searchParams, setSearchParams] = useSearchParams();
 
-  const storeState = store.getState();
+  let storeState = store.getState();
   // A note about when this gets called -- https://reactjs.org/docs/hooks-reference.html#useeffect
   // This is called asynchronously after a render is complete.  The rule is that render itself must be
   // stateless, so state mutating operations need to be contained here.  In our case the sequence is
@@ -108,7 +108,7 @@ function APP() {
   // …some time passes
   // (3) This gets called, and we write back the current query string to the browser's location using setSearchParams
   useEffect(() => {
-    const query = store.getState()['query'];
+    const query = storeState['query'];
     // Only convert the fields with value as the state rather than all fields
     const searchParamsDict = {};
     if (checkAllValue(query['searchFields'])) {
@@ -138,9 +138,6 @@ function APP() {
     if (Object.keys(searchParamsDict).length > 0) {
       // set cookies
       cookies.set('previousParams', searchParamsDict, { path: "/" });
-    } else {
-      // remove cookies
-      cookies.remove('previousParams', { path: "/" });
     }
 
   }, [searchParams, storeState, setSearchParams]);
@@ -168,7 +165,7 @@ store.subscribe(() =>
       {forceSlashAfterHash('auth')}
       <Routes>
         <Route path="/" element={<NavFooter children={<Login />} />} />
-        <Route path="/main" element={<NavFooter logged={true} children={<APP />} />} />
+        <Route path="/main" element={<NavFooter logged={true} children={<App />} />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="*" element={<h1>Invalid address</h1>} />
       </Routes>
@@ -202,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let sortFields = null;
   let view = null;
 
-  if (hash) {
+  if (hash.includes('?')) {
     let searchParams = new URLSearchParams(url.hash.split("?")[1]);
     start = searchParams.get('start');
     searchFields = searchParams.get('searchFields');
@@ -210,7 +207,6 @@ document.addEventListener("DOMContentLoaded", () => {
     view = searchParams.get('view');
   } else {
     if (cookies.get('previousParams')) {
-      console.log('test')
       start = cookies.get('previousParams')['start'];
       searchFields = cookies.get('previousParams')['searchFields'];
       sortFields = cookies.get('previousParams')['sortFields'];
@@ -238,6 +234,7 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     solrClient.initialize();
   }
+
   appendAnalytics();
 });
 reportWebVitals();
