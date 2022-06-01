@@ -19,4 +19,4 @@ const config = {
   "orcid_auth": `https://orcid.org/oauth/authorize?client_id=${orcid_client_id}&response_type=${orcid_response_type}&scope=${orcird_scope}&redirect_uri=${orcid_redirect_uri}`
 };
 
-export default config;
+window.config = config;

@@ -1,5 +1,4 @@
 import oboe from "oboe";
-import config from "config";
 import {
   setSolrQuery,
   recordInfoQuery,
@@ -61,7 +60,7 @@ export class ISamplesAPI {
    */
   async countRecordsQuery(query) {
     try {
-      let data = await this._fetchPromise(config.solr_url + "?" + setSolrQuery(query));
+      let data = await this._fetchPromise(window.config.solr_url + "?" + setSolrQuery(query));
       return data.response.numFound;
     } catch (e) {
       console.error(e);
@@ -75,7 +74,7 @@ export class ISamplesAPI {
    */
   async recordInformation(id) {
     try {
-      let data = await this._fetchPromise(config.solr_url + "?" + recordInfoQuery(id));
+      let data = await this._fetchPromise(window.config.solr_url + "?" + recordInfoQuery(id));
       return data.response.docs;
     } catch (e) {
       console.error(e);
@@ -89,7 +88,7 @@ export class ISamplesAPI {
    */
   async facetInformation(field) {
     try {
-      let data = await this._fetchPromise(config.solr_url + "?" + facetedQuery(field));
+      let data = await this._fetchPromise(window.config.solr_url + "?" + facetedQuery(field));
       return data.facet_counts.facet_fields;
     } catch (e) {
       console.error(e)
@@ -111,7 +110,7 @@ function pointStream(query, perdoc_cb = null, finaldoc_cb = null, error_cb = nul
   // See the source code:
   //    https://github.com/jimhigson/oboe.js/blob/52d150dd78b20205bd26d63c807ac170c03f0f64/dist/oboe-browser.js#L2040
   // reture oboe instance so we could abort fetch
-  return oboe(config.solr_stream + "?" + setSolrQuery(query))
+  return oboe(window.config.solr_stream + "?" + setSolrQuery(query))
     .node('docs.*', (doc) => {
       if (perdoc_cb !== null) {
         perdoc_cb(doc);
