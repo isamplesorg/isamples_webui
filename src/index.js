@@ -12,8 +12,6 @@ import reportWebVitals from './reportWebVitals';
 import solrReducer from "./solr-reducer";
 import { createStore } from "redux";
 
-// import config
-import config from "./config";
 import { fields, initialCamera } from './fields';
 import './css/index.css';
 import './css/bootstrap5.css';
@@ -90,7 +88,7 @@ const defaultFields = fields.map((obj) => obj.label ? obj : { ...obj, label: wel
 
 // Construct the solr client api class
 const solrClient = new SolrClient({
-  url: config.solr_url,
+  url: window.config.solr_url,
   searchFields: defaultFields.sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase())),
   sortFields: sortFields,
   rows: 20,
@@ -186,8 +184,8 @@ store.subscribe(() =>
 export const appendAnalytics = () => {
   const script = document.createElement("script");
   script.defer = true;
-  script.src = config.analytics_src;
-  script.setAttribute("data-domain", config.analytics_domain);
+  script.src = window.config.analytics_src;
+  script.setAttribute("data-domain", window.config.analytics_domain);
   document.head.appendChild(script);
 };
 
