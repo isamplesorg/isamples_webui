@@ -43,8 +43,9 @@ import {
 import ScrollToTop from "components/scrollTop";
 
 import NavFooter from "components/navFooter";
-import Login from 'components/Login/login';
-import Auth from 'components/Login/auth';
+import Login from 'pages/Login/login';
+import Auth from 'pages/Login/auth';
+import ProtectedRoute from 'pages/protectedRouter';
 
 // cookie library:
 //  https://github.com/reactivestack/cookies/tree/master/packages/universal-cookie
@@ -163,8 +164,10 @@ store.subscribe(() =>
       {forceSlashAfterHash('auth')}
       <Routes>
         <Route path="/" element={<NavFooter children={<Login />} />} />
-        <Route path="/main" element={<NavFooter logged={true} children={<App />} />} />
         <Route path="/auth" element={<Auth />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/main" element={<NavFooter logged={true} children={<App />} />} />
+        </Route>
         <Route path="*" element={<h1>Invalid address</h1>} />
       </Routes>
     </HashRouter>
@@ -203,12 +206,15 @@ document.addEventListener("DOMContentLoaded", () => {
     searchFields = searchParams.get('searchFields');
     sortFields = searchParams.get('sortFields');
     view = searchParams.get('view');
+    console.log(view)
   } else {
     if (cookies.get('previousParams')) {
+      console.log(cookies.get('previousParams'))
       start = cookies.get('previousParams')['start'];
       searchFields = cookies.get('previousParams')['searchFields'];
       sortFields = cookies.get('previousParams')['sortFields'];
       view = cookies.get('previousParams')['view'];
+      console.log(view)
     }
   }
   hasEncodedFields = Boolean(start || searchFields || sortFields || view);

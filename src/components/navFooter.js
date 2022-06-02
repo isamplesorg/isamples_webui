@@ -26,6 +26,7 @@ const NavBar = function (props) {
           <button className="btn btn-default navbar-btn navbar-right" onClick={() => {
             navigate("/");
             cookies.remove('previousParams', { path: "/" });
+            cookies.remove('auth', { path: "/" });
           }}>Logout</button>
         }
       </div>
