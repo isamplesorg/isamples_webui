@@ -7,9 +7,9 @@ const _solr_base = "https://hyde.cyverse.org/isamples_central/thing/";
  */
 
 const orcid_client_id = "APP-9ZD7APRL7KR5DXAJ";
-const orcid_response_type = "token";
+const orcid_response_type = "code";
 const orcid_redirect_uri = "https://localhost:3000";
-const orcird_scope = "openid";
+const orcird_scope = "/authenticate";
 
 const config = {
   "solr_url": _solr_base + "select",

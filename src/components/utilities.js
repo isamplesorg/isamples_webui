@@ -62,7 +62,7 @@ export function getAllValueField(fields) {
  */
 export function forceSlashAfterHash(path) {
   let _hash = window.location.hash;
-  if (_hash[1] && _hash[1] !== '/' && _hash.includes('access_token')) {
+  if (_hash[1] && _hash[1] !== '/' && _hash.includes('code')) {
     window.location.href = window.location.origin + window.location.pathname + window.location.search + `#/${path}?` + _hash.slice(1);
   }
 }

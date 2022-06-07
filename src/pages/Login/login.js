@@ -1,8 +1,31 @@
 import 'css/login.css';
+import Cookies from 'universal-cookie';
+import { useNavigate } from "react-router-dom";
 
 const IMAGESIZE = 30;
 
 function Login() {
+  const url = window.location.href;
+  const param = new URLSearchParams(url.split('?')[1])
+  const navigate = useNavigate();
+  const cookie = new Cookies();
+
+  // handle authorization code from ORCID
+  if (param.get('code')) {
+    // save the code in the cookie
+    cookie.set('authorization_code', param.get('code'), { path: '/' });
+    return (
+      <>
+        <div className='login'>
+          <div className='account-login'>
+            <p>Oauth code: <input type="text" disabled={true} value={param.get('code')} style={{ width: '80px' }} /></p>
+            <button onClick={() => navigate('/oauth')} >Main Page</button>
+          </div>
+        </div>
+      </>
+
+    )
+  }
   return (
     <div className="login">
       <div className="account-login">

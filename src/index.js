@@ -37,15 +37,14 @@ import SearchFieldContainer from 'extension/iSamples_containers';
 import {
   wellFormatField,
   checkAllValue,
-  getAllValueField,
-  forceSlashAfterHash
+  getAllValueField
 } from 'components/utilities';
 import ScrollToTop from "components/scrollTop";
 
 import NavFooter from "components/navFooter";
 import Login from 'pages/Login/login';
-import Auth from 'pages/Login/auth';
-import ProtectedRoute from 'pages/protectedRouter';
+import Oauth from 'pages/Login/oauth';
+// import ProtectedRoute from 'pages/protectedRouter';
 
 // cookie library:
 //  https://github.com/reactivestack/cookies/tree/master/packages/universal-cookie
@@ -161,13 +160,10 @@ store.subscribe(() =>
   // The inclusion of the HashRouter and Routes wrapping our APP is what allows the searchParams functionality to work.
   ReactDOM.render(
     <HashRouter>
-      {forceSlashAfterHash('auth')}
       <Routes>
         <Route path="/" element={<NavFooter children={<Login />} />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route element={<ProtectedRoute />}>
-          <Route path="/main" element={<NavFooter logged={true} children={<App />} />} />
-        </Route>
+        <Route path="/oauth" element={<Oauth />} />
+        <Route path="/main" element={<NavFooter logged={true} children={<App />} />} />
         <Route path="*" element={<h1>Invalid address</h1>} />
       </Routes>
     </HashRouter>
@@ -206,15 +202,12 @@ document.addEventListener("DOMContentLoaded", () => {
     searchFields = searchParams.get('searchFields');
     sortFields = searchParams.get('sortFields');
     view = searchParams.get('view');
-    console.log(view)
   } else {
     if (cookies.get('previousParams')) {
-      console.log(cookies.get('previousParams'))
       start = cookies.get('previousParams')['start'];
       searchFields = cookies.get('previousParams')['searchFields'];
       sortFields = cookies.get('previousParams')['sortFields'];
       view = cookies.get('previousParams')['view'];
-      console.log(view)
     }
   }
   hasEncodedFields = Boolean(start || searchFields || sortFields || view);
