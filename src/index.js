@@ -162,8 +162,8 @@ store.subscribe(() =>
     <HashRouter>
       <Routes>
         <Route path="/" element={<NavFooter children={<Login />} />} />
-        <Route path="/oauth" element={<Oauth />} />
         <Route path="/main" element={<NavFooter logged={true} children={<App />} />} />
+        <Route path="/oauth" element={<Oauth />} />
         <Route path="*" element={<h1>Invalid address</h1>} />
       </Routes>
     </HashRouter>

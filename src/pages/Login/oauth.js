@@ -13,7 +13,9 @@ function Oauth() {
   cookie.set('oauth', true, { path: "/" });
 
   // remove code in the url
-  window.location.href = window.location.href.split("?")[0] + "#/oauth";
+  if (window.location.href.includes('code')) {
+    window.location.href = window.location.href.split("?")[0] + "#/oauth";
+  }
   return <Navigate to={"/main"} />;
 }
 
