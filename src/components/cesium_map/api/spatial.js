@@ -14,6 +14,9 @@ import { pointStream } from './server';
 import { colorbind, source } from '../config_cesium';
 import { wellFormatField } from '../../utilities';
 
+
+const MAXIMUMZOOMDISTANCE = 20000000;
+const MINIMUMZOOMDISTANCE = 10;
 /**
  * Describes a camera viewpoint for Cesium.
  * All units are degrees.
@@ -346,19 +349,18 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
           } else {
             locations[location] = 1;
           }
-          const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, 10);
+          const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, doc.z[0] + locations[location]);
           this.add({
             id: doc.id,
             position: p0,
             color: Cesium.Color.fromCssColorString(colorbind[CV.indexOf(doc[field]) % colorbind.length]),
             pixelSize: 8,
-            disableDepthTestDistance: 100
+            disableDepthTestDistance: 1
           })
           this.collection.push(Cesium.Cartographic.fromDegrees(doc.x, doc.y))
         }
       },
       (final) => {
-        this.updateElevation(this.collection, this);
         console.log("Point primitive stream complete");
       },
       (err) => {
@@ -399,8 +401,8 @@ export class ISamplesSpatial {
     // limit the map max height
     // 20000000 is the maxium zoom distance so the users wouldn't zoom too far way from earth
     // 10 the minimum height for the points so the users wouldn't zoom to the ground.
-    this.viewer.scene.screenSpaceCameraController.maximumZoomDistance = 20000000;
-    this.viewer.scene.screenSpaceCameraController.minimumZoomDistance = 10;
+    this.viewer.scene.screenSpaceCameraController.maximumZoomDistance = MAXIMUMZOOMDISTANCE;
+    this.viewer.scene.screenSpaceCameraController.minimumZoomDistance = MINIMUMZOOMDISTANCE;
     // set camera inital position
     if (initialLocation) {
       this.viewer.camera.setView(initialLocation.getView);
