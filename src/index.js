@@ -1,5 +1,10 @@
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
+// cookie library:
+//  https://github.com/reactivestack/cookies/tree/master/packages/universal-cookie
+import Cookies from 'universal-cookie';
+// encode and decode parameter
+import { encode, decode } from "plantuml-encoder"
 // react router to define url
 import {
   HashRouter,
@@ -39,18 +44,10 @@ import {
   checkAllValue,
   getAllValueField
 } from 'components/utilities';
-import ScrollToTop from "components/scrollTop";
 
 import NavFooter from "components/navFooter";
-import Login from 'pages/Login/login';
-import Oauth from 'pages/Login/oauth';
-// import ProtectedRoute from 'pages/protectedRouter';
-
-// cookie library:
-//  https://github.com/reactivestack/cookies/tree/master/packages/universal-cookie
-import Cookies from 'universal-cookie';
-// encode and decode parameter
-import { encode, decode } from "plantuml-encoder"
+import Login from 'pages/login';
+import DOIs from 'pages/DOIs';
 
 // initializa a cookie instance
 const cookies = new Cookies();
@@ -150,7 +147,6 @@ function App() {
         customComponents={iSamples_componentPack}
         onSelectDoc={(doc) => { console.log(doc); }}
       />
-      <ScrollToTop />
     </>
   );
 };
@@ -161,9 +157,9 @@ store.subscribe(() =>
   ReactDOM.render(
     <HashRouter>
       <Routes>
-        <Route path="/" element={<NavFooter children={<Login />} />} />
-        <Route path="/main" element={<NavFooter logged={true} children={<App />} />} />
-        <Route path="/oauth" element={<Oauth />} />
+        <Route path="/" element={<NavFooter children={<App />} />} />
+        <Route path="/login" element={<NavFooter children={<Login />} />} />
+        <Route path="/dois" element={<NavFooter logged={true} children={<DOIs />} />} />
         <Route path="*" element={<h1>Invalid address</h1>} />
       </Routes>
     </HashRouter>

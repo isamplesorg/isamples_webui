@@ -1,6 +1,7 @@
 import isamplesLogo from '../images/isampleslogopetal.png';
 import { useNavigate } from "react-router-dom"
 import Cookies from 'universal-cookie';
+import ScrollToTop from "components/scrollTop";
 
 /**
  * a function to return navigation bar
@@ -11,6 +12,34 @@ const NavBar = function (props) {
   let navigate = useNavigate();
   // initializa a cookie instance
   const cookies = new Cookies();
+
+  // Create button group based on different pages
+  const buttonGroup =
+    <div className='navbar-right'>
+      {props.logingPage ?
+        <button className='btn btn-default navbar-btn'
+          onClick={() => window.location.href = window.location.origin}>Records</button>
+        :
+        props.logged
+          ?
+          <>
+            <div className='navbar-text'>Log as {cookies.get('orcid', { path: "/" })}</div>
+            <button className="btn btn-default navbar-btn" onClick={() => {
+              navigate("/login");
+              cookies.remove('refresh_token', { path: "/" });
+              cookies.remove('access_token', { path: "/" });
+              cookies.remove('orcid', { path: "/" });
+            }}>Logout</button>
+          </>
+          :
+          <button
+            className="btn btn-default navbar-btn"
+            onClick={() => { return navigate("/login") }}>
+            Login
+          </button>
+      }
+    </div>;
+
   return (
     <nav className="navbar navbar-default">
       <div className="container-fluid">
@@ -21,15 +50,7 @@ const NavBar = function (props) {
 
         </div>
         <h4 className="navbar-text navbar-title" >Internet of Samples: iSamples</h4>
-        {
-          props.logged &&
-          <button className="btn btn-default navbar-btn navbar-right" onClick={() => {
-            navigate("/");
-            cookies.remove('previousParams', { path: "/" });
-            cookies.remove('oauth', { path: "/" });
-            cookies.remove('authorization_code', { path: "/" });
-          }}>Logout</button>
-        }
+        {buttonGroup}
       </div>
     </nav>
   );
@@ -60,11 +81,13 @@ const FooterBar = function () {
 }
 
 const NavFooter = function (props) {
+  const isLoginPage = props.children.type.name.toLowerCase() === 'login';
   return (
     <>
-      <NavBar logged={props.logged} />
+      <NavBar logged={props.logged} logingPage={isLoginPage} />
       {props.children}
       <FooterBar />
+      <ScrollToTop />
     </>
   )
 }

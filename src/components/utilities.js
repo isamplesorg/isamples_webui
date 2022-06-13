@@ -55,15 +55,4 @@ export function getAllValueField(fields) {
   return fields.filter((field) => field.value && (Object.keys(field.value).length > 0 || field.value.length > 0));
 }
 
-/**
- * A funtion to force adding slash after hash
- * ex, /# become
- * @param {string} path the router path
- */
-export function forceSlashAfterHash(path) {
-  let _hash = window.location.hash;
-  if (_hash[1] && _hash[1] !== '/' && _hash.includes('code')) {
-    window.location.href = window.location.origin + window.location.pathname + window.location.search + `#/${path}?` + _hash.slice(1);
-  }
-}
 
