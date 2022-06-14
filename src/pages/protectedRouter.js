@@ -19,8 +19,8 @@ const ProtectedRoute = () => {
     cookies.set('previousParams', Object.fromEntries(params), { path: "/" });
   }
 
-  if (!cookies.get('auth')) {
-    return <Navigate to="/" replace />;
+  if (!cookies.get('access_token')) {
+    return <Navigate to="/login" replace />;
   }
 
   return <Outlet />;

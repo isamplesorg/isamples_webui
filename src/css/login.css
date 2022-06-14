@@ -27,3 +27,8 @@
   box-shadow: 0 0 0 3px #606060;
   border-radius: 50%;
 }
+
+.navbar-right {
+  display: flex;
+  gap: 5px;
+}

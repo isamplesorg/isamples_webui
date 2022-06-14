@@ -1,8 +1,14 @@
+import Cookies from 'universal-cookie';
 import 'css/login.css';
 
 const IMAGESIZE = 30;
 
 function Login() {
+  const cookie = new Cookies();
+  // if there are ORCID information
+  if(cookie.get('access_token')){
+    window.location.href = window.location.origin;
+  }
 
   return (
     <div className="login">

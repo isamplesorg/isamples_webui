@@ -55,4 +55,15 @@ export function getAllValueField(fields) {
   return fields.filter((field) => field.value && (Object.keys(field.value).length > 0 || field.value.length > 0));
 }
 
+/**
+ * A funtion to force changing path after hash
+ * ex, /# become
+ * @param {string} path the router path
+ */
+export function forceSlashAfterHash(path) {
+  let pathname = window.location.pathname;
+  if (pathname[1] &&  pathname.includes('orcid_token')) {
+    window.location.href = window.location.origin + `#/${path}` + window.location.search ;
+  }
+}
 
