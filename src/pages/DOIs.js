@@ -12,18 +12,30 @@ function DOIs() {
   const cookie = new Cookies();
   const [inputs, setInputs] = useState({});
 
-  const json_dict = {
-    'token': cookie.get('access_token'),
-    'orcid_id': cookie.get('orcid'),
-    'datacite_metadata': {
-      'data': {
-        'type': 'dois',
-        'attributes': {
-          'prefix': window.config.datacite_prefix,
-          'types': {
-            'resourceTypeGeneral': 'PhysicalObject',
-          },
-          ...inputs
+  const json_dict = () => {
+    const {suffix, titles, creators, ...fields} = inputs;
+    return {
+      'token': cookie.get('access_token'),
+      'orcid_id': cookie.get('orcid'),
+      'datacite_metadata': {
+        'data': {
+          'type': 'dois',
+          'attributes': {
+            'prefix': window.config.datacite_prefix,
+            'suffix': suffix,
+            'types': {
+              'resourceTypeGeneral': 'PhysicalObject',
+            },
+            'creators': [
+              creators
+            ],
+            'titles': [
+              {
+                'title': titles
+              }
+            ],
+            ...fields
+          }
         }
       }
     }
@@ -35,7 +47,7 @@ function DOIs() {
     }
 
     if (typeof DOIFIELDS_REQUIRED[field] === 'number') {
-      return <input name={field} type="number" min="0" onChange={handleChange} value={inputs[field] || new Date().getFullYear()} required />
+      return <input name={field} type="number" min="0" onChange={handleChange} value={inputs[field] || ""} required />
     }
     return <input name={field} type="text" onChange={handleChange} value={inputs[field] || ""} required />
   }
@@ -64,7 +76,7 @@ function DOIs() {
   const handleChange = (event) => {
     const name = event.target.name;
     const value = event.target.value;
-    setInputs(values => ({ ...values, [name]: value }))
+    setInputs(values => ({ ...values, [name]: !value.trim() ? undefined : value}))
   }
 
   // Handle submit form
@@ -112,9 +124,9 @@ function DOIs() {
           <input className="btn btn-default" type="Submit" />
         </div>
       </form>
-
+      {console.log(inputs)}
       <div>
-        <textarea className='textarea__json' value={JSON.stringify(json_dict, null, "\t")} readOnly />
+        <textarea className='textarea__json' value={JSON.stringify(json_dict(), null, "\t")} readOnly />
       </div>
     </div>
   )
