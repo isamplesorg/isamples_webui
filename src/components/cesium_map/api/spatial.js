@@ -11,7 +11,7 @@
 import * as Cesium from 'cesium';
 import { html, render } from "lit";
 import { pointStream } from 'components/cesium_map/api/server';
-import { colorbind, source } from 'components/cesium_map/config_cesium';
+import { colorbind, source } from 'fields';
 import { wellFormatField } from 'components/utilities';
 
 /**

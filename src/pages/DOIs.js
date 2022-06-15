@@ -3,7 +3,7 @@ import {
   DOIFIELDS_REQUIRED,
   DOIFIELDS_RECOMMENDED,
   DOIFIELDS_OPTIONAL
-} from "pages/DOIfields";
+} from "fields";
 import 'css/DOIs.css'
 
 function DOIs() {

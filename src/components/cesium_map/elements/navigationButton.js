@@ -1,7 +1,7 @@
 import { render } from "react-dom";
 import info from "images/NavigationHelp/info.svg";
 import reset from "images/NavigationHelp/reset.png";
-import { colorbind, source } from "components/cesium_map/config_cesium";
+import { colorbind, source } from "fields";
 
 
 const Labels = (id, color, text) =>

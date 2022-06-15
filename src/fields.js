@@ -4,6 +4,8 @@
 // :Param collapse: true -> close , false or default undefined -> open
 // :Param hidden: true -> hide the field, false or default  undefined-> show the field
 
+// For the solr faceted search variables
+// ----------------------------------------------------------------------------------------
 const fields = [
   { field: "curation_accessContraints", type: "non-search", hidden: true },
   { field: "curation_description_text", type: "non-search", hidden: true },
@@ -49,7 +51,10 @@ const sortFields = [
   { label: "Registrant", field: "registrant" },
   { label: "Collection Time", field: "producedBy_resultTime" }
 ];
+// ----------------------------------------------------------------------------------------
 
+// For the Cesium Map
+// ----------------------------------------------------------------------------------------
 // moorea position
 const INITIAL_LONGITUDE = -149.8169236266867;
 const INITIAL_LATITUDE = -17.451466233002286;
@@ -67,9 +72,28 @@ const initialCamera = {
   pitch: INITIAL_PITCH
 }
 
+// color bind schema Wong
+const colorbind = ["#D55E00", "#E69F00", "#009E73", "#56B4E9", "#CC79A7", "#F0E442"];
+const source = ["GEOME", "OPENCONTEXT", "SESAR", "SMITHSONIAN"];
+// ----------------------------------------------------------------------------------------
+
+
+// For the DOIs
+// ----------------------------------------------------------------------------------------
+const DOIFIELDS_REQUIRED = ['Identifier', 'Types', 'Titles', 'Creators', 'Publisher', 'PublicationYear'];
+const DOIFIELDS_RECOMMENDED = ['Subject', 'Contributor', 'Date', 'RelatedIdentifier', 'Description', 'GeoLocation'];
+const DOIFIELDS_OPTIONAL = ['Language', 'AlternateIdentifier', 'Size', 'Format', 'Rights', 'FundingReference'];
+
+// ----------------------------------------------------------------------------------------
+
 export {
   fields,
   sortFields,
-  initialCamera
+  initialCamera,
+  colorbind,
+  source,
+  DOIFIELDS_REQUIRED,
+  DOIFIELDS_RECOMMENDED,
+  DOIFIELDS_OPTIONAL
 }
 
