@@ -79,10 +79,124 @@ const source = ["GEOME", "OPENCONTEXT", "SESAR", "SMITHSONIAN"];
 
 
 // For the DOIs
-// ----------------------------------------------------------------------------------------
-const DOIFIELDS_REQUIRED = ['Identifier', 'Types', 'Titles', 'Creators', 'Publisher', 'PublicationYear'];
-const DOIFIELDS_RECOMMENDED = ['Subject', 'Contributor', 'Date', 'RelatedIdentifier', 'Description', 'GeoLocation'];
-const DOIFIELDS_OPTIONAL = ['Language', 'AlternateIdentifier', 'Size', 'Format', 'Rights', 'FundingReference'];
+// -------------------------s---------------------------------------------------------------
+const DOIFIELDS_REQUIRED = {
+  'prefix': window.config.datacite_prefix,
+  'suffix': null,
+  'creators': [],
+  'titles': [],
+  'publisher': null,
+  'publicationYear': 0
+};
+
+const DOIFIELDS_RECOMMENDED = {
+  "curation": {
+    "type": "string",
+    "description": "information about any post-collection processing of the sample, and about its current location and stewadship."
+  },
+  "description": {
+    "description": "free text description of the subject of a triple.",
+    "type": "string"
+  },
+  "hasContextCategory": {
+    "description": "top level context, based on the kind of feature sampled.  Specific identification of the sampled feature of interest is done through the SamplingEvent/Feature of Interest property.",
+    "items": [
+      "Active human occupation site",
+      "Atmosphere",
+      "Earth interior",
+      "Experiment setting",
+      "Extraterrestrial environment",
+      "Glacier environment",
+      "Site of past human activities",
+      "Laboratory environment",
+      "Lake, river or stream bottom",
+      "Marine biome",
+      "Marine water body",
+      "Marine water body bottom",
+      "Subaerial surface environment",
+      "Subaerial terrestrial biome",
+      "Subaqueous terrestrial biome",
+      "Subsurface fluid reservoir",
+      "Terrestrial water body",
+      "Not Provided"
+    ],
+    "type": "array"
+  },
+  "hasMaterialCategory": {
+    "description": "specify the kind of material that constitutes the sample",
+    "items": [
+      "anthropogenicmaterial",
+      "Anthropogenic metal",
+      "Biogenic non-organic material",
+      "Gaseous material",
+      "Ice",
+      "Mineral",
+      "Non-aqueous liquid material",
+      "Not Provided",
+      "Organic material",
+      "Particulate",
+      "Rock",
+      "Sediment",
+      "Soil",
+      "Water"
+    ],
+    "type": "array"
+  },
+  "hasSpecimenCategory": {
+    "description": "specify the kind of object that the specimen is",
+    "items": [
+      "Aggregation",
+      "Analytical preparation",
+      "Anthropogenic aggregation",
+      "Artifact",
+      "Biome aggregation",
+      "Experiment product",
+      "Fossil",
+      "Liquid or gas sample",
+      "Organism part",
+      "Organism product",
+      "Other solid object",
+      "Whole organism",
+      "Not Provided"
+    ],
+    "type": "array"
+  },
+  "informalClassification": {
+    "description": "free text classification terms, not from a controlled vocabulary; generally terms applied by collector",
+
+    "type": "array"
+  },
+  "keywords": {
+    "description": "free text categorization of sample to support discovery",
+    "type": "array"
+  },
+  "label": {
+    "description": "a human intelligible string used to identify a thing, i.e. the name to use for the thing; should be unique in the scope of a sample collection or dataset.",
+    "type": "string"
+  },
+  "producedBy": {
+    "description": "object that documents the sampling event--who, where, when the specimen was obtained",
+    "type": "string"
+  },
+  "registrant": {
+    "description": "identification of the agent that registered the sample, with contact information. Should include person name and affiliation, or position name and affiliation, or just organization name. e-mail address is preferred contact information.",
+    "type": "string"
+  },
+  "relatedResource": {
+    "description": "link to related resource with relationship property to indicate nature of connection. Target should be identifier for a resource.",
+    "type": "array"
+  },
+  "sampleidentifier": {
+    "description": "URI that identifies the physical sample described by this record",
+    "type": "string"
+  },
+  "samplingPurpose": {
+    "description": "term to specify why a sample was collection.",
+    "type": "string"
+  }
+}
+
+
 
 // ----------------------------------------------------------------------------------------
 
@@ -93,7 +207,5 @@ export {
   colorbind,
   source,
   DOIFIELDS_REQUIRED,
-  DOIFIELDS_RECOMMENDED,
-  DOIFIELDS_OPTIONAL
+  DOIFIELDS_RECOMMENDED
 }
-
