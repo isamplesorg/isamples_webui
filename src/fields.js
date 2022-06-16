@@ -81,15 +81,53 @@ const source = ["GEOME", "OPENCONTEXT", "SESAR", "SMITHSONIAN"];
 // For the DOIs
 // -------------------------s---------------------------------------------------------------
 const DOIFIELDS_REQUIRED = {
-  'prefix': window.config.datacite_prefix,
-  'suffix': null,
-  'creators': [],
-  'titles': [],
-  'publisher': null,
-  'publicationYear': 0
+  'prefix': {
+    'type': 'string',
+    'value': window.config.datacite_prefix,
+  },
+  'suffix': {
+    'type': 'null'
+  },
+  'creators': {
+    'type': 'array'
+  },
+  'titles': {
+    'type': 'array'
+  },
+  'publisher': {
+    'type': 'array',
+    'value': window.config.datacite_publisher,
+  },
+  'publicationYear': {
+    'type': 'number',
+    'value': 0
+  }
 };
 
 const DOIFIELDS_RECOMMENDED = {
+  "subject": {
+    "type": "string",
+    "description": "Subject, keyword, classification code, or key phrase describing the resource"
+  },
+  "contributor": {
+    "type": "string",
+    "description": "The institution or person responsible for collection, managing, distributing, or otherwise contributing to the development of the resource"
+  },
+  "date": {
+    "type": 'number',
+    "description": "Different dates relevant to the work"
+  },
+  "relatedIdentifier": {
+    "type": "array",
+    "description": "Identifiers of related resources, These must be globally unique identifiers."
+  },
+  "geolocation": {
+    "type": "string",
+    "description": "Spatial region or named place where the data was gathered or about which the data is focused."
+  }
+}
+
+const ISAMPLES_RECOMMENDED = {
   "curation": {
     "type": "string",
     "description": "information about any post-collection processing of the sample, and about its current location and stewadship."
@@ -207,5 +245,6 @@ export {
   colorbind,
   source,
   DOIFIELDS_REQUIRED,
-  DOIFIELDS_RECOMMENDED
+  DOIFIELDS_RECOMMENDED,
+  ISAMPLES_RECOMMENDED
 }

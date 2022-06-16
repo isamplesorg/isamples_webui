@@ -31,6 +31,8 @@
   list-style-type: none;
   display: flex;
   justify-items: center;
+  margin-bottom: 10px;
+  position: relative;
 }
 
 @media (max-width: 700px) {
@@ -47,7 +49,6 @@
 select {
   width: 100%;
   min-width: 20vw;
-  margin-bottom: 10px;
   min-height: 35px;
 }
 
@@ -66,15 +67,39 @@ select {
   max-height: 30vh;
   min-width: 20vw;
   min-height: 35px;
-  margin-bottom: 10px;
 }
 
 .label__input {
   margin: 5px 10px 5px 0px;
   min-width: 150px;
+  display: flex;
+  align-self: center;
 }
 
 .btn__group {
   display: flex;
   gap: 10px;
+}
+
+.span__info {
+  display: flex;
+  align-self: center;
+  margin-right: 5px;
+}
+
+.form__popbox {
+  position: absolute;
+  top: 30px;
+  background-color: rgb(255, 255, 255);
+  border: solid #ddd 1px;
+  width: 400px;
+  z-index: 100;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: small;
+  display: none;
+}
+
+.form_popbox--show {
+  display: block;
 }

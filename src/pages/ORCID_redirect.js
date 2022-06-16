@@ -22,7 +22,6 @@ function ORCIDPage() {
     fetch(`${window.config.ordic_token}?code=${param.get('code')}`)
       .then((token) => token.json())
       .then((res) => {
-        console.log(res)
         setToken(res);
         const cookies = new Cookies();
         const expired = res['expires_in'];
