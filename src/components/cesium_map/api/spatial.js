@@ -288,41 +288,6 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
     }
   }
 
-  // function to update point elevation
-  /**
-   * See link:
-   *  https://cesium.com/learn/cesiumjs/ref-doc/sampleTerrainMostDetailed.html
-   * @param {*} collection, the stored cartographic position
-   * @param {*} primitive, the current class instance
-   */
-  updateElevation(collection, primitive) {
-    if (collection.length <= 1) {
-      return;
-    };
-    let promise = Cesium.sampleTerrain(this.terrain, 11, collection)
-    Cesium.when(promise, function (updatedPosition) {
-      let positions = {};
-      for (let i = 0; i < collection.length; i++) {
-        const point = primitive.get(i)
-        const Position = Cesium.Cartographic.toCartesian(updatedPosition[i]);
-        const origMagnitude = Cesium.Cartesian3.magnitude(Position);
-        const key = Position.y.toString() + ":" + Position.z.toString();
-        const newPosition = new Cesium.Cartesian3();
-        let newMagnitude = 0;
-        let scalar = 1;
-        if (key in positions) {
-          newMagnitude += origMagnitude + 1 * positions[key];
-          positions[key] += 1;
-        } else {
-          positions[key] = 1;
-        }
-        scalar = newMagnitude / origMagnitude;
-        Cesium.Cartesian3.multiplyByScalar(Position, scalar, newPosition);
-        point.position = newPosition;
-      }
-    })
-  }
-
   // function to query results and add point into cesium
   load(facet, params) {
     let locations = {};
