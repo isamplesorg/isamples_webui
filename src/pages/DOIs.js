@@ -9,14 +9,22 @@ import {
 } from "fields";
 import 'css/DOIs.css';
 
-const recommended_fields = [...Object.keys(ISAMPLES_RECOMMENDED), ...Object.keys(DOIFIELDS_RECOMMENDED)]
+const recommended_fields = [
+  ...Object.keys(ISAMPLES_RECOMMENDED).filter((field) => Object.keys(ISAMPLES_RECOMMENDED[field]).includes('description')),
+  ...Object.keys(DOIFIELDS_RECOMMENDED).filter((field) => Object.keys(DOIFIELDS_RECOMMENDED[field]).includes('description'))]
 const recommended_info = {}
 recommended_fields.forEach((field) => recommended_info[field] = false);
 
 function DOIs() {
   const cookie = new Cookies();
+  // State for form inputs
   const [inputs, setInputs] = useState({});
+
+  // State for fields information box
   const [info, setInfo] = useState(recommended_info);
+
+  // State for if schema is collapse
+  const [collapse, setCollapse] = useState({});
 
   const json_dict = () => {
     const { suffix, titles, creators, ...fields } = inputs;
@@ -50,21 +58,28 @@ function DOIs() {
   // Handle textarea content
   const handleChange = (event) => {
     const name = event.target.name;
-    const value = event.target.value;
-    setInputs(values => ({ ...values, [name]: !value.trim() ? undefined : value }))
+    let value = event.target.value;
+    if (!isNaN(parseFloat(value)) && isFinite(value)) {
+      value = +value;
+      setInputs(values => ({ ...values, [name]: value }));
+      return;
+    }
+    setInputs(values => ({ ...values, [name]: !value.trim() ? undefined : value }));
   }
 
   // Handle submit form
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    // let res = await fetch(`${window.config.dois_create}`, {
-    //   'method': 'POST',
-    //   'Authorization': cookie.get('access_token'),
-    //   'body': json_dict()
-    // })
-
-    // console.log(res)
+    let res = await fetch(`${window.config.dois_create}`, {
+      'method': 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': cookie.get('access_token'),
+      },
+      'body': JSON.stringify(json_dict())
+    })
+    let result = await res.json();
+    console.log(result)
   }
 
   // Clear all inputs
@@ -111,7 +126,7 @@ function DOIs() {
   // Handle recommended field input
   const inputGroupRecommended = (schema, field) => {
     if (schema[field]['type'] === 'number') {
-      return <input name={field} type="number" min="0" onChange={handleChange} value={inputs[field] || ""} required />
+      return <input name={field} type="number" min="0" onChange={handleChange} value={inputs[field] || ""} />
     }
 
     if (Object.keys(schema[field]).includes('items')) {
@@ -135,21 +150,27 @@ function DOIs() {
   const createInputsGroup = (schema, heading) => {
     return (
       <div className="panel panel-default">
-        <div className="panel-heading"><h2 className="panel-title">{heading}</h2></div>
-        <div className="panel-body">
+        <div className="panel-heading" onClick={() => { setCollapse({ ...collapse, [heading]: !collapse[heading] }) }}>
+          <h3 className="panel-title">{heading}
+            <span className={collapse[heading] ? 'glyphicon glyphicon-collapse-up' : 'glyphicon glyphicon-collapse-down'} />
+          </h3>
+        </div>
+        <div className="panel-body" style={{ display: collapse[heading] ? 'block' : 'none' }}>
           <ul>
             {Object.keys(schema).map((field, i) => (
               <li key={i}>
-                <span
-                  onMouseOver={toggle}
-                  onMouseOut={toggle}
-                  className="span__info glyphicon glyphicon-info-sign"
-                  name={field} />
-                <label className="label__input" htmlFor={field}>{field.charAt(0).toUpperCase() + field.slice(1)}</label>
+                <label className="label__input" htmlFor={field}>{field.charAt(0).toUpperCase() + field.slice(1)}             {Object.keys(schema[field]).includes('description') ?
+                  <>
+                    <span
+                      onMouseOver={toggle}
+                      onMouseOut={toggle}
+                      className="span__info glyphicon glyphicon-info-sign"
+                      name={field} />
+                    <div className={info[field] ? "form__popbox form_popbox--show" : "form__popbox"}>
+                      {schema[field]['description']}
+                    </div>
+                  </> : null}</label>
                 {inputGroupRecommended(schema, field)}
-                <div className={info[field] ? "form__popbox form_popbox--show" : "form__popbox"}>
-                  {schema[field]['description']}
-                </div>
               </li>
             ))}
           </ul>

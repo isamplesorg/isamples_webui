@@ -124,6 +124,24 @@ const DOIFIELDS_RECOMMENDED = {
   "geolocation": {
     "type": "string",
     "description": "Spatial region or named place where the data was gathered or about which the data is focused."
+  },
+  "language": {
+    "type": "string"
+  },
+  "alternateIdentifier": {
+    "type": "string"
+  },
+  "size": {
+    "type": "string"
+  },
+  "format": {
+    "type": "string"
+  },
+  "rights": {
+    "type": "string"
+  },
+  "fundingReference": {
+    "type": "string"
   }
 }
 

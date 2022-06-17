@@ -9,6 +9,9 @@
   width: 40vw;
   height: 100%;
   border-color: var(--border-color);
+  overflow-y: scroll;
+  white-space: pre;
+  overflow-wrap: normal;
 }
 
 .form__container {
@@ -17,6 +20,7 @@
   justify-content: flex-start;
   align-items: flex-start;
   width: 60%;
+  gap: 20px;
 }
 
 .panel {
@@ -71,7 +75,7 @@ select {
 
 .label__input {
   margin: 5px 10px 5px 0px;
-  min-width: 150px;
+  min-width: 180px;
   display: flex;
   align-self: center;
 }
@@ -84,7 +88,7 @@ select {
 .span__info {
   display: flex;
   align-self: center;
-  margin-right: 5px;
+  margin-left: 5px;
 }
 
 .form__popbox {
@@ -102,4 +106,17 @@ select {
 
 .form_popbox--show {
   display: block;
+}
+
+.panel {
+  margin-bottom: 0;
+}
+
+.panel-title {
+  position: relative;
+}
+
+.panel-title>span {
+  position: absolute;
+  right: 0;
 }

@@ -1,5 +1,4 @@
-const _solr_base = "https://hyde.cyverse.org/isamples_central/thing/";
-
+const _server_base = "https://hyde.cyverse.org/isamples_central/";
 /**
  * Orcird Implicit flow auth
  * link:
@@ -17,9 +16,9 @@ const DATACITE_PUBLISHER = ['Sesar', 'Geome', "OpenContext", "Smithsonian"];
 
 
 const config = {
-  "solr_url": _solr_base + "select",
-  "solr_stream": _solr_base + "stream",
-  "dois_create": _solr_base + 'mint_identifier',
+  "solr_url": _server_base + "thing/select",
+  "solr_stream": _server_base + "thing/stream",
+  "dois_create": _server_base + 'mint_identifier',
   "analytics_src": "https://metrics.isample.xyz/js/plausible.js",
   "analytics_domain": "isamples.org",
   'datacite_prefix': "10.82273",
