@@ -290,7 +290,7 @@ class CesiumMap extends React.Component {
       oboePrimitive.abort();
     }
 
-    oboePrimitive = setPrimitive.load(facet, { field: "source", lat: latitude, long: longitude, searchFields: searchFields, rows: NUMBER_OF_POINTS });
+    oboePrimitive = setPrimitive.load(facet, { Q: "producedBy_samplingSite_location_cesium_height%3A*", field: "source", lat: latitude, long: longitude, searchFields: searchFields, rows: NUMBER_OF_POINTS });
     cameraLat = latitude;
     cameraLong = longitude;
   }

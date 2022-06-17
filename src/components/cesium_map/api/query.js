@@ -26,7 +26,7 @@ const setSolrQuery = (param) => {
   let baseQuery = `rows=${param.rows}` +
     `${fieldsParams.length > 0 ? `&${fieldsParams}` : ""}`;
 
-  const baseReturnParam = `id,${param.field},x:producedBy_samplingSite_location_longitude,y:producedBy_samplingSite_location_latitude`;
+  const baseReturnParam = `id,${param.field},x:producedBy_samplingSite_location_longitude,y:producedBy_samplingSite_location_latitude,z:producedBy_samplingSite_location_cesium_height`;
   // build query for primitive
   if (param.lat && param.long) {
     const geoDistParams = geodist(param.lat, param.long);

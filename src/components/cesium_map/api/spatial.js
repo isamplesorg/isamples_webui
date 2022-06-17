@@ -14,6 +14,9 @@ import { pointStream } from './server';
 import { colorbind, source } from '../config_cesium';
 import { wellFormatField } from '../../utilities';
 
+
+const MAXIMUMZOOMDISTANCE = 20000000;
+const MINIMUMZOOMDISTANCE = 10;
 /**
  * Describes a camera viewpoint for Cesium.
  * All units are degrees.
@@ -285,41 +288,6 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
     }
   }
 
-  // function to update point elevation
-  /**
-   * See link:
-   *  https://cesium.com/learn/cesiumjs/ref-doc/sampleTerrainMostDetailed.html
-   * @param {*} collection, the stored cartographic position
-   * @param {*} primitive, the current class instance
-   */
-  updateElevation(collection, primitive) {
-    if (collection.length <= 1) {
-      return;
-    };
-    let promise = Cesium.sampleTerrain(this.terrain, 11, collection)
-    Cesium.when(promise, function (updatedPosition) {
-      let positions = {};
-      for (let i = 0; i < collection.length; i++) {
-        const point = primitive.get(i)
-        const Position = Cesium.Cartographic.toCartesian(updatedPosition[i]);
-        const origMagnitude = Cesium.Cartesian3.magnitude(Position);
-        const key = Position.y.toString() + ":" + Position.z.toString();
-        const newPosition = new Cesium.Cartesian3();
-        let newMagnitude = 0;
-        let scalar = 1;
-        if (key in positions) {
-          newMagnitude += origMagnitude + 1 * positions[key];
-          positions[key] += 1;
-        } else {
-          positions[key] = 1;
-        }
-        scalar = newMagnitude / origMagnitude;
-        Cesium.Cartesian3.multiplyByScalar(Position, scalar, newPosition);
-        point.position = newPosition;
-      }
-    })
-  }
-
   // function to query results and add point into cesium
   load(facet, params) {
     let locations = {};
@@ -346,19 +314,18 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
           } else {
             locations[location] = 1;
           }
-          const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, 10);
+          const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, doc.z[0] + locations[location]);
           this.add({
             id: doc.id,
             position: p0,
             color: Cesium.Color.fromCssColorString(colorbind[CV.indexOf(doc[field]) % colorbind.length]),
             pixelSize: 8,
-            disableDepthTestDistance: 100
+            disableDepthTestDistance: 1
           })
           this.collection.push(Cesium.Cartographic.fromDegrees(doc.x, doc.y))
         }
       },
       (final) => {
-        this.updateElevation(this.collection, this);
         console.log("Point primitive stream complete");
       },
       (err) => {
@@ -399,8 +366,8 @@ export class ISamplesSpatial {
     // limit the map max height
     // 20000000 is the maxium zoom distance so the users wouldn't zoom too far way from earth
     // 10 the minimum height for the points so the users wouldn't zoom to the ground.
-    this.viewer.scene.screenSpaceCameraController.maximumZoomDistance = 20000000;
-    this.viewer.scene.screenSpaceCameraController.minimumZoomDistance = 10;
+    this.viewer.scene.screenSpaceCameraController.maximumZoomDistance = MAXIMUMZOOMDISTANCE;
+    this.viewer.scene.screenSpaceCameraController.minimumZoomDistance = MINIMUMZOOMDISTANCE;
     // set camera inital position
     if (initialLocation) {
       this.viewer.camera.setView(initialLocation.getView);
