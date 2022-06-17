@@ -7,6 +7,7 @@ import {
   DOIFIELDS_RECOMMENDED,
   ISAMPLES_RECOMMENDED
 } from "fields";
+import { GenerateDraft } from 'components/DOIs/generateDraft';
 import 'css/DOIs.css';
 
 const recommended_fields = [
@@ -205,7 +206,8 @@ function DOIs() {
           <input className="btn btn-default" type="Submit" />
         </div>
       </form>
-      <div>
+      <div style={{display: 'flex', 'flexDirection': 'column'}}>
+        <GenerateDraft data={json_dict()}/>
         <textarea className='textarea__json' value={JSON.stringify(json_dict(), null, "\t")} readOnly />
       </div>
     </div>

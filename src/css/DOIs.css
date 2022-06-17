@@ -120,3 +120,11 @@ select {
   position: absolute;
   right: 0;
 }
+
+.draft__container {
+  display: flex;
+}
+
+.draft__container input {
+  margin-right: 10px;
+}
