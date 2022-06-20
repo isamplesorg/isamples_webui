@@ -7,9 +7,12 @@ import {
   DOIFIELDS_RECOMMENDED,
   ISAMPLES_RECOMMENDED
 } from "fields";
-import { GenerateDraft } from 'components/DOIs/generateDraft';
 import 'css/DOIs.css';
 
+const MIN_DRAFT = 1;
+const MAX_DRAFT = 100;
+
+// initialize all recommend fileds
 const recommended_fields = [
   ...Object.keys(ISAMPLES_RECOMMENDED).filter((field) => Object.keys(ISAMPLES_RECOMMENDED[field]).includes('description')),
   ...Object.keys(DOIFIELDS_RECOMMENDED).filter((field) => Object.keys(DOIFIELDS_RECOMMENDED[field]).includes('description'))]
@@ -21,22 +24,31 @@ function DOIs() {
   // State for form inputs
   const [inputs, setInputs] = useState({});
 
+  // State for checkbox
+  const [checkbox, setCheckbox] = useState({ 'suffix': false })
+
   // State for fields information box
-  const [info, setInfo] = useState(recommended_info);
+  const [info, setInfo] = useState({
+    'num_drafts': 1,
+    ...recommended_info
+  });
 
   // State for if schema is collapse
   const [collapse, setCollapse] = useState({});
 
+  // Generate data json sent to the endpoints
   const json_dict = () => {
-    const { suffix, titles, creators, ...fields } = inputs;
+    const { suffix, titles, creators, num_drafts, ...fields } = inputs;
     return {
       'orcid_id': cookie.get('orcid'),
+      "num_drafts": num_drafts || 1,
       'datacite_metadata': {
         'data': {
           'type': 'dois',
           'attributes': {
+            'doi': checkbox['suffix'] ? `${window.config.datacite_prefix}/${suffix}` : undefined,
             'prefix': window.config.datacite_prefix,
-            'suffix': suffix,
+            'suffix': checkbox['suffix'] ? suffix : undefined,
             'types': {
               'resourceTypeGeneral': 'PhysicalObject',
             },
@@ -60,6 +72,14 @@ function DOIs() {
   const handleChange = (event) => {
     const name = event.target.name;
     let value = event.target.value;
+
+    // limit the checkbox
+    if (name === 'num_drafts') {
+      setInputs(values => ({ ...values, [name]: Math.max(MIN_DRAFT, Math.min(+value, MAX_DRAFT)) }));
+      return;
+    }
+
+    // Check if the field's value is number
     if (!isNaN(parseFloat(value)) && isFinite(value)) {
       value = +value;
       setInputs(values => ({ ...values, [name]: value }));
@@ -71,7 +91,9 @@ function DOIs() {
   // Handle submit form
   const handleSubmit = async (event) => {
     event.preventDefault();
-    let res = await fetch(`${window.config.dois_create}`, {
+
+    // fetch the identifiers from endpoints
+    let res = await fetch(`${window.config.dois_draft}`, {
       'method': 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -80,7 +102,36 @@ function DOIs() {
       'body': JSON.stringify(json_dict())
     })
     let result = await res.json();
-    console.log(result)
+
+    if (result.includes(null)) {
+      alert("Failled to create DOI(s)");
+    } else {
+      alert("Successful created DOI(s) \nDownloading Record(s)");
+      downloadDraft(result);
+    }
+  }
+
+  // a function to generate draft file based on returned identifiers
+  const downloadDraft = (identifiers) => {
+    const { datacite_metadata } = json_dict();
+    for (let identifier of identifiers) {
+      let element = document.createElement("a");
+      element.setAttribute("href", "data:application/csv;charset=utf-8," + encodeURIComponent(JSON.stringify({ identifier, ...datacite_metadata }, null, "\t")));
+      element.setAttribute("download", `${identifier}.json`);
+
+      element.style.display = "none";
+      document.body.appendChild(element);
+
+      element.click();
+      document.body.removeChild(element);
+    }
+  }
+
+  // Handle checkbox behavior for suffix
+  const handleCheckBox = (event) => {
+    const name = event.target.name;
+    setCheckbox(values => ({ ...values, [name]: !checkbox[name] }));
+    setInputs(values => ({ ...values, [name]: "" }));
   }
 
   // Clear all inputs
@@ -95,6 +146,17 @@ function DOIs() {
 
   // Handle the required field inputs
   const inputGroupRequired = (field) => {
+    // add checkbox to suffix
+    if (field === 'suffix') {
+      return (
+        <div style={{ position: 'relative', width: "100%" }}>
+          <input type='checkbox' name='suffix' onChange={handleCheckBox} checked={checkbox['suffix']} />
+          <input name={field} type="text" onChange={handleChange} disabled={!checkbox['suffix']} value={inputs[field] || ""} required={checkbox['suffix']} />
+        </div>
+      )
+    }
+
+    // Check if the fields have initial values.
     if (Object.keys(DOIFIELDS_REQUIRED[field]).includes('value')) {
       if (DOIFIELDS_REQUIRED[field]['type'] === 'string') {
         return <input name={field} type="text" disabled value={DOIFIELDS_REQUIRED[field]['value']} />
@@ -118,6 +180,7 @@ function DOIs() {
       }
     }
 
+    // check the type of fields
     if (DOIFIELDS_REQUIRED[field]['type'] === 'number') {
       return <input name={field} type="number" min="0" onChange={handleChange} value={inputs[field] || ""} required />
     }
@@ -125,13 +188,13 @@ function DOIs() {
   }
 
   // Handle recommended field input
-  const inputGroupRecommended = (schema, field) => {
+  const inputGroupRecommended = (schema, field, required) => {
     if (schema[field]['type'] === 'number') {
-      return <input name={field} type="number" min="0" onChange={handleChange} value={inputs[field] || ""} />
+      return <input name={field} type="number" min="0" onChange={handleChange} value={inputs[field] || ""} required={required} />
     }
 
     if (Object.keys(schema[field]).includes('items')) {
-      return <select name={field} onChange={handleChange}>
+      return <select name={field} onChange={handleChange} required={required}>
         <option></option>
         {
           schema[field]['items'].map((option, i) => (
@@ -142,13 +205,14 @@ function DOIs() {
     }
 
     if (schema[field]['type'] === 'string') {
-      return <textarea name={field} onChange={handleChange} value={inputs[field] || ""} />
+      return <textarea name={field} onChange={handleChange} value={inputs[field] || ""} required={required} />
     }
 
-    return <input name={field} type="text" onChange={handleChange} value={inputs[field] || ""} />
+    return <input name={field} type="text" onChange={handleChange} value={inputs[field] || ""} required={required} />
   }
 
-  const createInputsGroup = (schema, heading) => {
+  // Create bootstrap pane box fpr each inputs
+  const createInputsGroup = (schema, heading, required) => {
     return (
       <div className="panel panel-default">
         <div className="panel-heading" onClick={() => { setCollapse({ ...collapse, [heading]: !collapse[heading] }) }}>
@@ -171,7 +235,7 @@ function DOIs() {
                       {schema[field]['description']}
                     </div>
                   </> : null}</label>
-                {inputGroupRecommended(schema, field)}
+                {inputGroupRecommended(schema, field, required)}
               </li>
             ))}
           </ul>
@@ -196,18 +260,31 @@ function DOIs() {
             </ul>
           </div>
         </div>
+
         <div className="panel panel-default">
           <div className="panel-heading"><h2 className="panel-title">Recommended Fields</h2></div>
-          {createInputsGroup(ISAMPLES_RECOMMENDED, "iSample Schema")}
-          {createInputsGroup(DOIFIELDS_RECOMMENDED, "DOIs Schema")}
+          {createInputsGroup(ISAMPLES_RECOMMENDED, "iSample Schema", false)}
+          {createInputsGroup(DOIFIELDS_RECOMMENDED, "DOIs Schema", false)}
         </div>
+        {
+          !checkbox['suffix'] ?
+            <div className="panel panel-default">
+              <div className="panel-heading"><h2 className="panel-title">Number of Draft</h2></div>
+              <div className="panel-body">
+                <div className="draft__container">
+                  <label className="label__input" htmlFor="draft">Range: 1 - 100</label>
+                  <input name='num_drafts' type='number' onChange={handleChange} value={inputs['num_drafts'] || 1} />
+                </div>
+              </div>
+            </div> :
+            null
+        }
         <div className="btn__group">
           <input className="btn btn-default" type="button" value='Clear' onClick={handleClear} />
           <input className="btn btn-default" type="Submit" />
         </div>
       </form>
-      <div style={{display: 'flex', 'flexDirection': 'column'}}>
-        <GenerateDraft data={json_dict()}/>
+      <div>
         <textarea className='textarea__json' value={JSON.stringify(json_dict(), null, "\t")} readOnly />
       </div>
     </div>

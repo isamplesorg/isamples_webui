@@ -49,11 +49,17 @@
   font-weight: normal !important;
 }
 
-.form__container input,
+.form__container input:not([type='checkbox']),
 select {
   width: 100%;
   min-width: 20vw;
   min-height: 35px;
+}
+
+.form__container input[type='checkbox'] {
+  position: absolute;
+  left: -15px;
+  margin: 8px 0 0 0;
 }
 
 .form__container input::-webkit-outer-spin-button,
@@ -125,6 +131,8 @@ select {
   display: flex;
 }
 
-.draft__container input {
-  margin-right: 10px;
+.draft__container input::-webkit-outer-spin-button,
+.draft__container input::-webkit-inner-spin-button {
+  -webkit-appearance: auto;
+  margin: 0;
 }
