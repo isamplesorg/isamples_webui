@@ -24,9 +24,6 @@ function DOIs() {
   // State for form inputs
   const [inputs, setInputs] = useState({});
 
-  // State for checkbox
-  const [checkbox, setCheckbox] = useState({ 'suffix': false })
-
   // State for fields information box
   const [info, setInfo] = useState({
     'num_drafts': 1,
@@ -41,14 +38,14 @@ function DOIs() {
     const { suffix, titles, creators, num_drafts, ...fields } = inputs;
     return {
       'orcid_id': cookie.get('orcid'),
-      "num_drafts": num_drafts || 1,
+      "num_drafts": suffix ? 1 : num_drafts,
       'datacite_metadata': {
         'data': {
           'type': 'dois',
           'attributes': {
-            'doi': checkbox['suffix'] ? `${window.config.datacite_prefix}/${suffix}` : undefined,
+            'doi': suffix ? `${window.config.datacite_prefix}/${suffix}` : undefined,
             'prefix': window.config.datacite_prefix,
-            'suffix': checkbox['suffix'] ? suffix : undefined,
+            'suffix': suffix ? suffix : undefined,
             'types': {
               'resourceTypeGeneral': 'PhysicalObject',
             },
@@ -115,7 +112,7 @@ function DOIs() {
   const downloadDraft = (identifiers) => {
     const { datacite_metadata } = json_dict();
 
-    const output = identifiers.map((identifier) => ({identifier, ...datacite_metadata}));
+    const output = identifiers.map((identifier) => ({ identifier, ...datacite_metadata }));
 
     let element = document.createElement("a");
     element.setAttribute("href", "data:application/csv;charset=utf-8," + encodeURIComponent(JSON.stringify(output, null, "\t")));
@@ -126,13 +123,6 @@ function DOIs() {
 
     element.click();
     document.body.removeChild(element);
-  }
-
-  // Handle checkbox behavior for suffix
-  const handleCheckBox = (event) => {
-    const name = event.target.name;
-    setCheckbox(values => ({ ...values, [name]: !checkbox[name] }));
-    setInputs(values => ({ ...values, [name]: "" }));
   }
 
   // Clear all inputs
@@ -147,14 +137,8 @@ function DOIs() {
 
   // Handle the required field inputs
   const inputGroupRequired = (field) => {
-    // add checkbox to suffix
     if (field === 'suffix') {
-      return (
-        <div style={{ position: 'relative', width: "100%" }}>
-          <input type='checkbox' name='suffix' onChange={handleCheckBox} checked={checkbox['suffix']} />
-          <input name={field} type="text" onChange={handleChange} disabled={!checkbox['suffix']} value={inputs[field] || ""} required={checkbox['suffix']} />
-        </div>
-      )
+      return <input name={field} type="text" onChange={handleChange} value={inputs[field] || ""} />
     }
 
     // Check if the fields have initial values.
@@ -225,17 +209,18 @@ function DOIs() {
           <ul>
             {Object.keys(schema).map((field, i) => (
               <li key={i}>
-                <label className="label__input" htmlFor={field}>{field.charAt(0).toUpperCase() + field.slice(1)}             {Object.keys(schema[field]).includes('description') ?
-                  <>
-                    <span
-                      onMouseOver={toggle}
-                      onMouseOut={toggle}
-                      className="span__info glyphicon glyphicon-info-sign"
-                      name={field} />
-                    <div className={info[field] ? "form__popbox form_popbox--show" : "form__popbox"}>
-                      {schema[field]['description']}
-                    </div>
-                  </> : null}</label>
+                <label className="label__input" htmlFor={field}>{field.charAt(0).toUpperCase() + field.slice(1)}
+                  {Object.keys(schema[field]).includes('description') ?
+                    <>
+                      <span
+                        onMouseOver={toggle}
+                        onMouseOut={toggle}
+                        className="span__info glyphicon glyphicon-info-sign"
+                        name={field} />
+                      <div className={info[field] ? "form__popbox form_popbox--show" : "form__popbox"}>
+                        {schema[field]['description']}
+                      </div>
+                    </> : null}</label>
                 {inputGroupRecommended(schema, field, required)}
               </li>
             ))}
@@ -267,19 +252,15 @@ function DOIs() {
           {createInputsGroup(ISAMPLES_RECOMMENDED, "iSample Schema", false)}
           {createInputsGroup(DOIFIELDS_RECOMMENDED, "DOIs Schema", false)}
         </div>
-        {
-          !checkbox['suffix'] ?
-            <div className="panel panel-default">
-              <div className="panel-heading"><h2 className="panel-title">Number of Draft</h2></div>
-              <div className="panel-body">
-                <div className="draft__container">
-                  <label className="label__input" htmlFor="draft">Range: 1 - 100</label>
-                  <input name='num_drafts' type='number' onChange={handleChange} value={inputs['num_drafts'] || 1} />
-                </div>
-              </div>
-            </div> :
-            null
-        }
+        <div className="panel panel-default">
+          <div className="panel-heading"><h2 className="panel-title">Number of Draft</h2></div>
+          <div className="panel-body">
+            <div className="draft__container">
+              <label className="label__input" htmlFor="draft">Range: 1 - 100</label>
+              <input name='num_drafts' type='number' onChange={handleChange} value={inputs['num_drafts'] || 1} />
+            </div>
+          </div>
+        </div>
         <div className="btn__group">
           <input className="btn btn-default" type="button" value='Clear' onClick={handleClear} />
           <input className="btn btn-default" type="Submit" />
