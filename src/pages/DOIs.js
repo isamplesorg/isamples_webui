@@ -114,17 +114,18 @@ function DOIs() {
   // a function to generate draft file based on returned identifiers
   const downloadDraft = (identifiers) => {
     const { datacite_metadata } = json_dict();
-    for (let identifier of identifiers) {
-      let element = document.createElement("a");
-      element.setAttribute("href", "data:application/csv;charset=utf-8," + encodeURIComponent(JSON.stringify({ identifier, ...datacite_metadata }, null, "\t")));
-      element.setAttribute("download", `${identifier}.json`);
 
-      element.style.display = "none";
-      document.body.appendChild(element);
+    const output = identifiers.map((identifier) => ({identifier, ...datacite_metadata}));
 
-      element.click();
-      document.body.removeChild(element);
-    }
+    let element = document.createElement("a");
+    element.setAttribute("href", "data:application/csv;charset=utf-8," + encodeURIComponent(JSON.stringify(output, null, "\t")));
+    element.setAttribute("download", `template.json`);
+
+    element.style.display = "none";
+    document.body.appendChild(element);
+
+    element.click();
+    document.body.removeChild(element);
   }
 
   // Handle checkbox behavior for suffix
