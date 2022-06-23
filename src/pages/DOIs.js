@@ -38,7 +38,7 @@ function DOIs() {
     const { suffix, titles, creators, num_drafts, ...fields } = inputs;
     return {
       'orcid_id': cookie.get('orcid'),
-      "num_drafts": suffix ? 1 : (num_drafts),
+      "num_drafts": suffix ? 1 : (num_drafts || MIN_DRAFT),
       'datacite_metadata': {
         'data': {
           'type': 'dois',
