@@ -320,13 +320,12 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
             position: p0,
             color: Cesium.Color.fromCssColorString(colorbind[CV.indexOf(doc[field]) % colorbind.length]),
             pixelSize: 8,
-            disableDepthTestDistance: 100
+            disableDepthTestDistance: 1
           })
           this.collection.push(Cesium.Cartographic.fromDegrees(doc.x, doc.y))
         }
       },
       (final) => {
-        // this.updateElevation(this.collection, this);
         console.log("Point primitive stream complete");
       },
       (err) => {
