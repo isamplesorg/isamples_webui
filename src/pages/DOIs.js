@@ -33,6 +33,9 @@ function DOIs() {
   // State for if schema is collapse
   const [collapse, setCollapse] = useState({});
 
+  // State for loading
+  const [loading, setLoading] = useState(false);
+
   // Generate data json sent to the endpoints
   const json_dict = () => {
     const { suffix, titles, creators, num_drafts, ...fields } = inputs;
@@ -88,7 +91,7 @@ function DOIs() {
   // Handle submit form
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+    setLoading(!loading)
     // fetch the identifiers from endpoints
     fetch(`${window.config.dois_draft}`, {
       'method': 'POST',
@@ -114,6 +117,9 @@ function DOIs() {
           alert("Failled to create DOI(s)");
         }
       )
+      .finally(() => {
+        setLoading(false)
+      })
   }
 
   // a function to generate draft file based on returned identifiers
@@ -277,7 +283,14 @@ function DOIs() {
       <div>
         <textarea className='textarea__json' value={JSON.stringify(json_dict(), null, "\t")} readOnly />
       </div>
+      <div style={{ display: loading ? "block" : "none" }}>
+        <div className="background-spinner"></div>
+        <div className="lds-spinner">
+          <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+        </div>
+      </div>
     </div>
+
   )
 }
 
