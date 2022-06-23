@@ -130,6 +130,7 @@ function DOIs() {
     setInputs({});
   }
 
+  // Toggle function for schemas
   const toggle = (event) => {
     const name = event.target.getAttribute('name');
     setInfo({ ...info, [name]: !info[name] });
@@ -246,7 +247,6 @@ function DOIs() {
             </ul>
           </div>
         </div>
-
         <div className="panel panel-default">
           <div className="panel-heading"><h2 className="panel-title">Recommended Fields</h2></div>
           {createInputsGroup(ISAMPLES_RECOMMENDED, "iSample Schema", false)}

@@ -105,7 +105,7 @@ export function addButton(facet, SpatialViewer, refresh) {
     infoButton.id = "isamples-legend";
     toolbar.appendChild(infoButton);
     render(<InformationButton facet={facet} />, infoButton);
-  }else{
+  } else {
     const infoButton = document.querySelector("span#isamples-legend");
     render(<InformationButton facet={facet} />, infoButton);
   }

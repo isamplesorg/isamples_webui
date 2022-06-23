@@ -31,7 +31,7 @@ export default function ScrollToTop() {
     <div className="scroll-to-top">
       {isVisible &&
         <div onClick={scrollToTop}>
-          <span className="glyphicon glyphicon-circle-arrow-up"/>
+          <span className="glyphicon glyphicon-circle-arrow-up" />
         </div>}
     </div>
   );

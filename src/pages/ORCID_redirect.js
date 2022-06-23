@@ -25,7 +25,7 @@ function ORCIDPage() {
         setToken(res);
         const cookies = new Cookies();
         const expired = res['expires_in'];
-        if(res === 'Failure') { return };
+        if (res === 'Failure') { return };
         cookies.set('access_token', res['access_token'], { path: '/', expires: new Date(Date.now() + expired) });
         cookies.set('refresh_token', res['refresh_token'], { path: '/', expires: new Date(Date.now() + expired) });
         cookies.set('orcid', res['orcid'], { path: '/' });

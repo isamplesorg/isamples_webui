@@ -136,8 +136,8 @@ function App() {
     if (Object.keys(searchParamsDict).length > 0) {
       // set cookies
       cookies.set('previousParams', searchParamsDict, { path: "/" });
-    }else{
-      cookies.remove('previousParams', {path: "/"})
+    } else {
+      cookies.remove('previousParams', { path: "/" })
     }
 
   }, [searchParams, storeState, setSearchParams]);
