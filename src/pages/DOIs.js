@@ -38,7 +38,7 @@ function DOIs() {
     const { suffix, titles, creators, num_drafts, ...fields } = inputs;
     return {
       'orcid_id': cookie.get('orcid'),
-      "num_drafts": suffix ? 1 : (num_drafts || 1),
+      "num_drafts": suffix ? 1 : (num_drafts),
       'datacite_metadata': {
         'data': {
           'type': 'dois',
@@ -90,7 +90,7 @@ function DOIs() {
     event.preventDefault();
 
     // fetch the identifiers from endpoints
-    let res = await fetch(`${window.config.dois_draft}`, {
+    fetch(`${window.config.dois_draft}`, {
       'method': 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -98,14 +98,22 @@ function DOIs() {
       },
       'body': JSON.stringify(json_dict())
     })
-    let result = await res.json();
-
-    if (result.includes(null)) {
-      alert("Failled to create DOI(s)");
-    } else {
-      alert("Successful created DOI(s) \nDownloading Record(s)");
-      downloadDraft(result);
-    }
+      .then((res) => {
+        // check the POST return status
+        const { status } = res;
+        if (status === 200) {
+          return res.json();
+        }
+        throw new Error(res.json());
+      })
+      .then((result) => {
+        alert("Successful created DOI(s) \nDownloading Record(s)");
+        downloadDraft(result);
+      },
+        (error) => {
+          alert("Failled to create DOI(s)");
+        }
+      )
   }
 
   // a function to generate draft file based on returned identifiers
