@@ -7,8 +7,8 @@
 import React from "react";
 import { render } from "react-dom";
 import * as Cesium from "cesium";
-import '../../css/loading_spinner.css';
-import '../../css/cesiumMap.css';
+import 'css/loading_spinner.css';
+import 'css/cesiumMap.css';
 
 import {
   SpatialView,

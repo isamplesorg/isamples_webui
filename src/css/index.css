@@ -1,5 +1,15 @@
+html,
+body {
+  height: 100%;
+  box-sizing: border-box;
+}
+
 a {
   cursor: pointer;
+}
+
+.container {
+  padding: 15px;
 }
 
 .list-facet ul {
@@ -58,9 +68,11 @@ a {
 }
 
 .solr-search-results ul label::-webkit-scrollbar {
-  width: 0;  /* Remove scrollbar space */
+  width: 0;
+  /* Remove scrollbar space */
   height: 0;
-  background: transparent;  /* Optional: just make scrollbar invisible */
+  background: transparent;
+  /* Optional: just make scrollbar invisible */
 }
 
 .solr-search-results ul li ul {
@@ -83,6 +95,7 @@ svg.search-icon {
 .current-query .label:hover a {
   color: #d08989;
 }
+
 .current-query .label a {
   color: white;
   margin-left: 4px;
@@ -90,23 +103,23 @@ svg.search-icon {
 
 .range-facet header h5 {
   max-width: calc(100% - 75px)
-
 }
 
 .facet-item-amount {
-  display:inline-block;
-  float:right;
+  display: inline-block;
+  float: right;
   color: #aaa;
 }
 
-.list-facet > .list-group {
+.list-facet>.list-group {
   box-shadow: none;
 }
-.list-facet > .list-group > .list-group-item {
+
+.list-facet>.list-group>.list-group-item {
   border: none;
 }
 
-.list-facet > input {
+.list-facet>input {
   width: calc(100% - 125px)
 }
 
@@ -120,7 +133,7 @@ svg.search-icon {
   vertical-align: bottom;
 }
 
-input[type=number]{
+input[type=number] {
   width: 164px;
 }
 
@@ -180,7 +193,7 @@ td {
   font-size: 25px;
 }
 
-.glyphicon:hover{
+.glyphicon:hover {
   color: rgb(155, 155, 150);
   cursor: pointer;
 }
@@ -188,7 +201,7 @@ td {
 .popBoxField {
   position: absolute;
   right: 0;
-  width:fit-content;
+  width: fit-content;
   background-color: rgb(255, 255, 255);
   border: solid #ddd 1px;
   z-index: 100;
@@ -197,7 +210,7 @@ td {
   white-space: nowrap;
 }
 
-.fieldsSelect{
+.fieldsSelect {
   padding: 10px;
   color: #666666;
 }
@@ -212,7 +225,7 @@ td {
   padding: 4px;
 }
 
-.geoSearchGroup{
+.geoSearchGroup {
   margin: 5px;
 }
 

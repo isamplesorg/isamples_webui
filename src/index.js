@@ -1,20 +1,29 @@
 import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom';
+// cookie library:
+//  https://github.com/reactivestack/cookies/tree/master/packages/universal-cookie
+import Cookies from 'universal-cookie';
+// encode and decode parameter
+import { encode, decode } from "plantuml-encoder"
 // react router to define url
 import {
   HashRouter,
   Routes,
   Route,
-  useSearchParams,
+  useSearchParams
 } from 'react-router-dom';
 
-import reportWebVitals from './reportWebVitals';
-import solrReducer from "./solr-reducer";
+import reportWebVitals from 'reportWebVitals';
+import solrReducer from "solr-reducer";
 import { createStore } from "redux";
 
-import { fields, initialCamera } from './fields';
-import './css/index.css';
-import './css/bootstrap5.css';
+import {
+  fields,
+  sortFields,
+  initialCamera
+} from 'fields';
+import 'css/index.css';
+import 'css/bootstrap5.css';
 
 import {
   SolrFacetedSearch,
@@ -23,47 +32,31 @@ import {
 } from "solr-faceted-search-react";
 
 // iSamples results react component
-import iSamplesResult from './extension/iSamples_results';
-import TextSearch from './extension/iSamples_textSearch';
-import ResultList from './extension/iSamples_resultList';
-import ResultPagination from './extension/iSamples_pagination';
-import iSamples_RangeFacet from './extension/iSamples_rangeFacet';
-import SearchFieldContainer from './extension/iSamples_containers';
+import iSamplesResult from 'extension/iSamples_results';
+import TextSearch from 'extension/iSamples_textSearch';
+import ResultList from 'extension/iSamples_resultList';
+import ResultPagination from 'extension/iSamples_pagination';
+import iSamples_RangeFacet from 'extension/iSamples_rangeFacet';
+import SearchFieldContainer from 'extension/iSamples_containers';
 
 import {
   wellFormatField,
   checkAllValue,
-  getAllValueField
-} from './components/utilities';
-import ScrollToTop from "./components/scrollTop";
+  getAllValueField,
+  forceSlashAfterHash
+} from 'components/utilities';
 
-import {
-  NavBar,
-  FooterBar
-} from "./components/navFooter";
-
-// cookie library:
-//  https://github.com/reactivestack/cookies/tree/master/packages/universal-cookie
-import Cookies from 'universal-cookie';
-// encode and decode parameter
-import { encode, decode } from "plantuml-encoder"
+import NavFooter from "pages/navFooter";
+import Login from 'pages/login';
+import DOIs from 'pages/DOIs';
+import ORCIDPage from 'pages/ORCID_redirect';
+import ProtectedRoute from 'pages/protectedRouter';
 
 // initializa a cookie instance
 const cookies = new Cookies();
 
 // Create a store for the reducer.
 const store = createStore(solrReducer);
-
-// The sortable fields you want
-const sortFields = [
-  { label: "Identifier", field: "id" },
-  { label: "Source", field: "source" },
-  { label: "Context", field: "hasContextCategory" },
-  { label: "Material", field: "hasMaterialCategory" },
-  { label: "Specimen", field: "hasSpecimenCategory" },
-  { label: "Registrant", field: "registrant" },
-  { label: "Collection Time", field: "producedBy_resultTime" }
-];
 
 // Create a cutom component pack from the default component pack
 const iSamples_componentPack = {
@@ -99,12 +92,12 @@ const solrClient = new SolrClient({
   onChange: (state) => store.dispatch({ type: "SET_SOLR_STATE", state: state })
 });
 
-function APP() {
+function App() {
   // https://reactrouterdotcom.fly.dev/docs/en/v6/api#usesearchparams
   // Used for modifying the query string
   let [searchParams, setSearchParams] = useSearchParams();
 
-  const storeState = store.getState();
+  let storeState = store.getState();
   // A note about when this gets called -- https://reactjs.org/docs/hooks-reference.html#useeffect
   // This is called asynchronously after a render is complete.  The rule is that render itself must be
   // stateless, so state mutating operations need to be contained here.  In our case the sequence is
@@ -113,7 +106,7 @@ function APP() {
   // …some time passes
   // (3) This gets called, and we write back the current query string to the browser's location using setSearchParams
   useEffect(() => {
-    const query = store.getState()['query'];
+    const query = storeState['query'];
     // Only convert the fields with value as the state rather than all fields
     const searchParamsDict = {};
     if (checkAllValue(query['searchFields'])) {
@@ -144,15 +137,13 @@ function APP() {
       // set cookies
       cookies.set('previousParams', searchParamsDict, { path: "/" });
     } else {
-      // remove cookies
-      cookies.remove('previousParams', { path: "/" });
+      cookies.remove('previousParams', { path: "/" })
     }
 
   }, [searchParams, storeState, setSearchParams]);
 
   return (
     <>
-      <NavBar />
       <SolrFacetedSearch
         {...store.getState()}
         {...solrClient.getHandlers()}
@@ -161,8 +152,6 @@ function APP() {
         customComponents={iSamples_componentPack}
         onSelectDoc={(doc) => { console.log(doc); }}
       />
-      <FooterBar />
-      <ScrollToTop />
     </>
   );
 };
@@ -172,8 +161,15 @@ store.subscribe(() =>
   // The inclusion of the HashRouter and Routes wrapping our APP is what allows the searchParams functionality to work.
   ReactDOM.render(
     <HashRouter>
+      {forceSlashAfterHash('orcid_token')}
       <Routes>
-        <Route path="/" element={<APP />} />
+        <Route path="/" element={<NavFooter page={'records'} children={<App />} />} />
+        <Route path="/login" element={<NavFooter page={'login'} children={<Login />} />} />
+        <Route path='/orcid_token' element={<NavFooter page={'redirect'} children={<ORCIDPage />} />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dois" element={<NavFooter logged={true} page={'dois'} children={<DOIs />} />} />
+        </Route>
+        <Route path="*" element={<h1>Invalid address</h1>} />
       </Routes>
     </HashRouter>
     ,
@@ -190,6 +186,7 @@ export const appendAnalytics = () => {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
+
   // this will send an initial search initializing the app
   // We just need to set state when we firstly open the page with url
   // So, we only need to set the initalize solrClient rather than set them in the useEffect
@@ -204,8 +201,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let sortFields = null;
   let view = null;
 
-  if (hash) {
-    let searchParams = new URLSearchParams(url.hash.substring(2));
+  if (hash.includes('?')) {
+    let searchParams = new URLSearchParams(url.hash.split("?")[1]);
     start = searchParams.get('start');
     searchFields = searchParams.get('searchFields');
     sortFields = searchParams.get('sortFields');
@@ -239,6 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     solrClient.initialize();
   }
+
   appendAnalytics();
 });
 reportWebVitals();

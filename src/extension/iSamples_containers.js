@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from "react";
 import cx from "classnames";
-import CheckBoxes from '../components/checkBoxes';
+import CheckBoxes from 'components/checkBoxes';
 
 class SearchFieldContainer extends React.Component {
   constructor(props) {

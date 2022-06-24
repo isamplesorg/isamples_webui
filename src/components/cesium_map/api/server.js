@@ -3,7 +3,7 @@ import {
   setSolrQuery,
   recordInfoQuery,
   facetedQuery
-} from "../api/query";
+} from "components/cesium_map/api/query";
 
 export class ISamplesAPI {
 

@@ -1,7 +1,7 @@
 import { render } from "react-dom";
-import info from "../../../images/NavigationHelp/info.svg";
-import reset from "../../../images/NavigationHelp/reset.png";
-import { colorbind, source } from "../config_cesium";
+import info from "images/NavigationHelp/info.svg";
+import reset from "images/NavigationHelp/reset.png";
+import { colorbind, source } from "fields";
 
 
 const Labels = (id, color, text) =>
@@ -105,7 +105,7 @@ export function addButton(facet, SpatialViewer, refresh) {
     infoButton.id = "isamples-legend";
     toolbar.appendChild(infoButton);
     render(<InformationButton facet={facet} />, infoButton);
-  }else{
+  } else {
     const infoButton = document.querySelector("span#isamples-legend");
     render(<InformationButton facet={facet} />, infoButton);
   }

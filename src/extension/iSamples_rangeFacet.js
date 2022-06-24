@@ -21,7 +21,7 @@ class iSamples_RangeFacet extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({value: nextProps.value});
+    this.setState({ value: nextProps.value });
   }
 
 
@@ -80,8 +80,8 @@ class iSamples_RangeFacet extends React.Component {
 
 
   render() {
-    const {label, field, bootstrapCss, collapse} = this.props;
-    const {value} = this.state;
+    const { label, field, bootstrapCss, collapse } = this.props;
+    const { value } = this.state;
 
     // Original line was:
     // const range = this.facetsToRange();
@@ -92,36 +92,36 @@ class iSamples_RangeFacet extends React.Component {
 
 
     return (
-      <li className={cx("range-facet", {"list-group-item": bootstrapCss})} id={`solr-range-facet-${field}`}>
+      <li className={cx("range-facet", { "list-group-item": bootstrapCss })} id={`solr-range-facet-${field}`}>
         <header onClick={this.toggleExpand.bind(this)}>
-          <button style={{display: this.state.expanded ? "block" : "none"}}
-                  className={cx("clear-button", {
-                      "btn": bootstrapCss,
-                      "btn-default": bootstrapCss,
-                      "btn-xs": bootstrapCss,
-                      "pull-right": bootstrapCss
-                    }
-                  )}
-                  onClick={() => this.props.onChange(field, [])}>
+          <button style={{ display: this.state.expanded ? "block" : "none" }}
+            className={cx("clear-button", {
+              "btn": bootstrapCss,
+              "btn-default": bootstrapCss,
+              "btn-xs": bootstrapCss,
+              "pull-right": bootstrapCss
+            }
+            )}
+            onClick={() => this.props.onChange(field, [])}>
             clear
           </button>
           <h5>
             {bootstrapCss ? (<span>
-						<span className={cx("glyphicon", {
-              "glyphicon-collapse-down": !collapse,
-              "glyphicon-collapse-up": collapse
-            })}/>{" "}
-						</span>) : null}
+              <span className={cx("glyphicon", {
+                "glyphicon-collapse-down": !collapse,
+                "glyphicon-collapse-up": collapse
+              })} />{" "}
+            </span>) : null}
             {label}
           </h5>
 
         </header>
 
-        <div style={{display: collapse ? "none" : "block"}}>
+        <div style={{ display: collapse ? "none" : "block" }}>
           <defaultComponentPack.searchFields.rangeSlider lowerLimit={this.getPercentage(range, filterRange[0])} onChange={this.onRangeChange.bind(this)}
-                       upperLimit={this.getPercentage(range, filterRange[1])}/>
+            upperLimit={this.getPercentage(range, filterRange[1])} />
           <label>{filterRange[0]}</label>
-          <label className={cx({"pull-right": bootstrapCss})}>{filterRange[1]}</label>
+          <label className={cx({ "pull-right": bootstrapCss })}>{filterRange[1]}</label>
         </div>
       </li>
     );

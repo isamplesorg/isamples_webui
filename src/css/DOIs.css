@@ -1,0 +1,139 @@
+.dois__container {
+  min-height: calc(100vh - 170px);
+  display: flex;
+  padding: 15px 30px;
+  gap: 10px;
+  position: relative;
+}
+
+.textarea__json {
+  width: 40vw;
+  height: 100%;
+  border-color: var(--border-color);
+  overflow-y: scroll;
+  white-space: pre;
+  overflow-wrap: normal;
+}
+
+.form__container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  width: 60%;
+  gap: 20px;
+}
+
+.panel {
+  width: 100%;
+}
+
+.form__container ul {
+  padding: 0;
+}
+
+.form__container li {
+  list-style-type: none;
+  display: flex;
+  justify-items: center;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+@media (max-width: 700px) {
+  .form__container li {
+    flex-direction: column;
+  }
+}
+
+.form__container label {
+  font-weight: normal !important;
+}
+
+.form__container input:not([type='checkbox']),
+select {
+  width: 100%;
+  min-width: 20vw;
+  min-height: 35px;
+}
+
+.form__container input[type='checkbox'] {
+  position: absolute;
+  left: -15px;
+  margin: 8px 0 0 0;
+}
+
+.form__container input::-webkit-outer-spin-button,
+.form__container input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.form__container textarea {
+  padding: 5px;
+  box-sizing: border-box;
+  height: 35px;
+  width: 100%;
+  max-width: 60vw;
+  max-height: 30vh;
+  min-width: 20vw;
+  min-height: 35px;
+}
+
+.label__input {
+  margin: 5px 10px 5px 0px;
+  min-width: 180px;
+  display: flex;
+  align-self: center;
+}
+
+.btn__group {
+  display: flex;
+  gap: 10px;
+}
+
+.span__info {
+  display: flex;
+  align-self: center;
+  margin-left: 5px;
+}
+
+.form__popbox {
+  position: absolute;
+  top: 30px;
+  background-color: rgb(255, 255, 255);
+  border: solid #ddd 1px;
+  width: 400px;
+  z-index: 100;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: small;
+  display: none;
+}
+
+.form_popbox--show {
+  display: block;
+}
+
+.panel {
+  margin-bottom: 0;
+}
+
+.panel-title {
+  position: relative;
+}
+
+.panel-title>span {
+  position: absolute;
+  right: 0;
+}
+
+.draft__container {
+  display: flex;
+}
+
+.draft__container input::-webkit-outer-spin-button,
+.draft__container input::-webkit-inner-spin-button {
+  -webkit-appearance: auto;
+  margin: 0;
+}
