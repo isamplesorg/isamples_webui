@@ -227,7 +227,7 @@ class CesiumMap extends React.Component {
       };
     };
     // set time interval to check the current view every 5 seconds and update points
-    setInterval(() => {
+    this.checkPosition = setInterval(() => {
       let diffDistance = distanceInKm(cameraLat, cameraLong, viewer.currentView.latitude, viewer.currentView.longitude);
       // update the points every 5 seconds if two points differ in 50km + scale of height.
       // I scale the current height by 15000000, the height of "View Global".
@@ -238,6 +238,7 @@ class CesiumMap extends React.Component {
         // update camera position to the url
         setCamera({ facet: "Map", ...viewer.currentView.viewDict });
       };
+      console.log('interval')
     }, REFRESH_TIME_MS);
   };
 
@@ -274,6 +275,13 @@ class CesiumMap extends React.Component {
     // return false to force react not to rerender
     return false;
   };
+
+  /**
+   * A function to avoid memory leak
+   */
+  componentWillUnmount() {
+    clearInterval(this.checkPosition);
+  }
 
   /**
  * This method clear all objects in the map
