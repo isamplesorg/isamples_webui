@@ -539,7 +539,9 @@ export class ISamplesSpatial {
       const info = await api.recordInformation(selectPoint.id);
       this.selectedPoints.name = selectPoint.id;
       let description = `<div style="padding:10px;">`;
-      description += `<span style="font-size: 14px; font-weight: bold;">Link: </span>
+      description += `<span style="font-size: 14px; font-weight: bold;">Full Record: </span>
+                      <a href="${window.config.thingpage}/${selectPoint.id}" target="_blank" style=" word-wrap: break-word;">${window.config.thingpage}/${selectPoint.id}</a><br/>
+                      <span style="font-size: 14px; font-weight: bold;">Source: </span>
                       <a href="https://n2t.net/${selectPoint.id}" target="_blank">https://n2t.net/${selectPoint.id}</a><br/>`
       for (const [key, value] of Object.entries(info[0])) {
         description += `<span style="font-size: 14px; font-weight: bold;">${wellFormatField(key)}:</span>
