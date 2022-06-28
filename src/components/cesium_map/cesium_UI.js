@@ -238,7 +238,6 @@ class CesiumMap extends React.Component {
         // update camera position to the url
         setCamera({ facet: "Map", ...viewer.currentView.viewDict });
       };
-      console.log('interval')
     }, REFRESH_TIME_MS);
   };
 
