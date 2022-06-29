@@ -52,6 +52,11 @@ class ResultList extends React.Component {
     this.setState(this.props.view);
   }
 
+  // React life cycle method to initialzie state
+  static getDerivedStateFromProps(props, state) {
+    return props.view;
+  }
+
   shouldComponentUpdate(nextProps) {
     if (JSON.stringify(this.props) !== JSON.stringify(nextProps)) {
       this.switchView(nextProps.view.facet);
@@ -60,6 +65,11 @@ class ResultList extends React.Component {
     }
 
     return false;
+  }
+
+  // Clean up state to avoid memory leak
+  componentWillUnmount() {
+    this.setState({ facet: "List" })
   }
 
   switchView(format) {
