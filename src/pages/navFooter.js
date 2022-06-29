@@ -27,7 +27,7 @@ const NavBar = function (props) {
 
   const btn_record = <button
     className='btn btn-default navbar-btn'
-    onClick={() => window.location.href = window.location.origin}>
+    onClick={() => { return navigate("/") }}>
     Records
   </button>;
 
