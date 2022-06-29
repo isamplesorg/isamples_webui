@@ -1,4 +1,3 @@
-import Cookies from 'universal-cookie';
 import {
   useState
 } from "react";
@@ -20,7 +19,6 @@ const recommended_info = {}
 recommended_fields.forEach((field) => recommended_info[field] = false);
 
 function DOIs() {
-  const cookie = new Cookies();
   // State for form inputs
   const [inputs, setInputs] = useState({});
 
@@ -40,7 +38,6 @@ function DOIs() {
   const json_dict = () => {
     const { suffix, titles, creators, num_drafts, ...fields } = inputs;
     return {
-      'orcid_id': cookie.get('orcid'),
       "num_drafts": suffix ? 1 : (num_drafts || MIN_DRAFT),
       'datacite_metadata': {
         'data': {
@@ -97,7 +94,6 @@ function DOIs() {
       'method': 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': cookie.get('access_token'),
       },
       'body': JSON.stringify(json_dict())
     })

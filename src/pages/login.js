@@ -34,7 +34,7 @@ function Login() {
             <a href='/#'>
               <img alt="Instagram" width={IMAGESIZE} src="https://cdn.jsdelivr.net/npm/simple-icons@3.13.0/icons/github.svg" />
             </a>
-            <a href={window.config.orcid_auth}>
+            <a href={window.config.login}>
               <img alt="ORCID logo" src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png" width={IMAGESIZE} />
             </a>
           </div>
