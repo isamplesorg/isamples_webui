@@ -33,10 +33,7 @@ const NavBar = function (props) {
 
   const btn_logout = <button className="btn btn-default navbar-btn" onClick={() => {
     navigate("/login");
-    cookies.remove('refresh_token', { path: "/" });
-    cookies.remove('access_token', { path: "/" });
-    cookies.remove('orcid', { path: "/" });
-    cookies.remove('name', { path: "/" });
+    cookies.remove('logged', { path: "/" });
   }}>Logout</button>;
 
   // Create button group based on different pages
@@ -55,7 +52,7 @@ const NavBar = function (props) {
                   {btn_logout}
                 </>);
             case 'records':
-              if (cookies.get('access_token')) {
+              if (cookies.get('logged')) {
                 return (
                   <>
                     {btn_dois}

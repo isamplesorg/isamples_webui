@@ -1,6 +1,7 @@
 import {
   useState
 } from "react";
+import Cookies from 'universal-cookie';
 import {
   DOIFIELDS_REQUIRED,
   DOIFIELDS_RECOMMENDED,
@@ -19,6 +20,8 @@ const recommended_info = {}
 recommended_fields.forEach((field) => recommended_info[field] = false);
 
 function DOIs() {
+  const cookies = new Cookies();
+  cookies.set('logged', true, { path: "/" });
   // State for form inputs
   const [inputs, setInputs] = useState({});
 
