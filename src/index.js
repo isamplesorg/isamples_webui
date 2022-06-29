@@ -42,15 +42,12 @@ import SearchFieldContainer from 'extension/iSamples_containers';
 import {
   wellFormatField,
   checkAllValue,
-  getAllValueField,
-  forceSlashAfterHash
+  getAllValueField
 } from 'components/utilities';
 
 import NavFooter from "pages/navFooter";
 import Login from 'pages/login';
 import DOIs from 'pages/DOIs';
-import ORCIDPage from 'pages/ORCID_redirect';
-import ProtectedRoute from 'pages/protectedRouter';
 
 // initializa a cookie instance
 const cookies = new Cookies();
@@ -161,14 +158,10 @@ store.subscribe(() =>
   // The inclusion of the HashRouter and Routes wrapping our APP is what allows the searchParams functionality to work.
   ReactDOM.render(
     <HashRouter>
-      {forceSlashAfterHash('orcid_token')}
       <Routes>
         <Route path="/" element={<NavFooter page={'records'} children={<App />} />} />
         <Route path="/login" element={<NavFooter page={'login'} children={<Login />} />} />
-        <Route path='/orcid_token' element={<NavFooter page={'redirect'} children={<ORCIDPage />} />} />
-        <Route element={<ProtectedRoute />}>
-          <Route path="/dois" element={<NavFooter logged={true} page={'dois'} children={<DOIs />} />} />
-        </Route>
+        <Route path="/dois" element={<NavFooter logged={true} page={'dois'} children={<DOIs />} />} />
         <Route path="*" element={<h1>Invalid address</h1>} />
       </Routes>
     </HashRouter>

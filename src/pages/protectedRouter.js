@@ -6,8 +6,7 @@ import Cookies from 'universal-cookie';
  */
 const ProtectedRoute = () => {
   const cookies = new Cookies();
-
-  if (!cookies.get('access_token')) {
+  if (!cookies.get('session')) {
     return <Navigate to="/login" replace />;
   }
 
