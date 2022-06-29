@@ -62,8 +62,8 @@ export function getAllValueField(fields) {
  */
 export function forceSlashAfterHash(path) {
   let pathname = window.location.pathname;
-  if (pathname[1] && pathname.includes('orcid_token')) {
-    pathname = pathname.replace('orcid_token', "")
+  if (pathname[1] && pathname.includes(path)) {
+    pathname = pathname.replace(path, "")
     window.location.href = window.location.origin + pathname + `#/${path}` + window.location.search;
   }
 }
