@@ -90,6 +90,7 @@ function DOIs() {
 
   // Handle submit form
   const handleSubmit = async (event) => {
+    const cookies = new Cookies();
     event.preventDefault();
     setLoading(!loading)
     // fetch the identifiers from endpoints
@@ -97,6 +98,7 @@ function DOIs() {
       'method': 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': cookies.get('session'),
       },
       'body': JSON.stringify(json_dict())
     })
