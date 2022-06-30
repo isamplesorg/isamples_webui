@@ -47,7 +47,6 @@ const NavBar = function (props) {
             case 'dois':
               return (
                 <>
-                  <div className='navbar-text'>Log as {cookies.get('name', { path: "/" }) !== "undefined" ? cookies.get('name', { path: "/" }) : ""}</div>
                   {btn_record}
                   {btn_logout}
                 </>);
@@ -108,10 +107,9 @@ const FooterBar = function () {
 }
 
 const NavFooter = function (props) {
-  const isLoginPage = props.children.type.name.toLowerCase() === 'login';
   return (
     <>
-      <NavBar page={props.page} logged={props.logged} logingPage={isLoginPage} />
+      <NavBar page={props.page} />
       {props.children}
       <FooterBar />
       <ScrollToTop />
