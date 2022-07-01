@@ -8,7 +8,7 @@ const config = {
   "solr_url": _server_base + "thing/select",
   "solr_stream": _server_base + "thing/stream",
   "thingpage": _server_base + "thingpage",
-  "dois_draft": _server_base + "mint_draft_identifiers",
+  "dois_draft": _server_base + "manage/mint_draft_identifiers",
   "login": _server_base + "manage/login",
   "analytics_src": "https://metrics.isample.xyz/js/plausible.js",
   "analytics_domain": "isamples.org",
