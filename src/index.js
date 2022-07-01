@@ -46,7 +46,6 @@ import {
 } from 'components/utilities';
 
 import NavFooter from "pages/navFooter";
-import Login from 'pages/login';
 import DOIs from 'pages/DOIs';
 
 // initializa a cookie instance
@@ -160,7 +159,6 @@ store.subscribe(() =>
     <HashRouter>
       <Routes>
         <Route path="/" element={<NavFooter page={'records'} children={<App />} />} />
-        <Route path="/login" element={<NavFooter page={'login'} children={<Login />} />} />
         <Route path="/dois" element={<NavFooter page={'dois'} children={<DOIs />} />} />
         <Route path="*" element={<h1>Invalid address</h1>} />
       </Routes>

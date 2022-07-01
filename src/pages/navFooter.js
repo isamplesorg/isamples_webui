@@ -13,11 +13,12 @@ const NavBar = function (props) {
   // initializa a cookie instance
   const cookies = new Cookies();
 
-  const btn_login = <button
-    className="btn btn-default navbar-btn"
-    onClick={() => { return navigate("/login") }}>
-    Login
-  </button>;
+  const btn_login = <a href={window.config.login}>
+    <button
+      className="btn btn-default navbar-btn">
+      Login
+    </button>
+  </a>;
 
   const btn_dois = <button
     className="btn btn-default navbar-btn"
@@ -32,7 +33,7 @@ const NavBar = function (props) {
   </button>;
 
   const btn_logout = <button className="btn btn-default navbar-btn" onClick={() => {
-    navigate("/login");
+    navigate("/");
     cookies.remove('logged', { path: "/" });
   }}>Logout</button>;
 
@@ -42,8 +43,6 @@ const NavBar = function (props) {
       {
         (() => {
           switch (props.page) {
-            case 'login':
-              return btn_record;
             case 'dois':
               return (
                 <>
