@@ -232,11 +232,14 @@ class CesiumMap extends React.Component {
     };
     // set time interval to check the current view every 5 seconds and update points
     this.checkPosition = setInterval(() => {
+      const loading = document.getElementById("loading").style.display;
       let diffDistance = distanceInKm(cameraLat, cameraLong, viewer.currentView.latitude, viewer.currentView.longitude);
       // update the points every 5 seconds if two points differ in 50km + scale of height.
       // I scale the current height by 15000000, the height of "View Global".
       // 4000 km is the distance that rotate half earth map on the height 15000000.
-      if (diffDistance > MINIMUM_REFRESH_DISTANCE + MAXIMUM_REFRESH_DISTANCE * viewer.currentView.height / MAXIMUM_ZOOM_DISTANCE) {
+      // Update:
+      //      A new parameter loading to indicate if the users cick somewhere and avoid intervel to check positions.
+      if (loading && diffDistance > MINIMUM_REFRESH_DISTANCE + MAXIMUM_REFRESH_DISTANCE * viewer.currentView.height / MAXIMUM_ZOOM_DISTANCE) {
         clearBoundingBox(true);
         this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
         // update camera position to the url
