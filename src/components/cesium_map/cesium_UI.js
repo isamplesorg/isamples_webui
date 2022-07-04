@@ -176,12 +176,16 @@ class CesiumMap extends React.Component {
               className="margin-right-xs Cesium-input"
               placeholder="Please enter"
               type="number"
+              min={-180}
+              max={180}
               step="any" ></input>
             <label className="margin-right-xs Cesium-label">Latitude: </label>
             <input id="latitudeInput"
               className="margin-right-xs Cesium-input"
               placeholder="Please enter"
               type="number"
+              min={-90}
+              max={90}
               step="any" ></input>
             <button className="btn btn-default btn-sm cesium-button"
               onClick={this.submitLL.bind(this)}>
@@ -297,7 +301,8 @@ class CesiumMap extends React.Component {
       oboePrimitive.abort();
     }
 
-    oboePrimitive = setPrimitive.load(facet, { Q: "producedBy_samplingSite_location_cesium_height%3A*", field: "source", lat: latitude, long: longitude, searchFields: searchFields, rows: NUMBER_OF_POINTS });
+    setPrimitive.load(facet, { Q: "producedBy_samplingSite_location_cesium_height%3A*", field: "source", lat: latitude, long: longitude, searchFields: searchFields, rows: NUMBER_OF_POINTS })
+      .then(res => oboePrimitive = res);
     cameraLat = latitude;
     cameraLong = longitude;
   }
