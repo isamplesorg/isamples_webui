@@ -17,17 +17,18 @@
   border-radius: 10px;
 }
 
-.other-login {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-bottom: 10px;
-  gap: 10px;
+.account-login dl {
+  margin-bottom: 0;
 }
 
-.other-login :hover {
-  box-shadow: 0 0 0 3px #606060;
-  border-radius: 50%;
+.account-login dt {
+  padding: 5px 5px 5px 0;
+}
+
+.account-login dd {
+  padding: 0 0 0 10px;
+  margin-bottom: 4px;
+  overflow-wrap: break-word;
 }
 
 .navbar-right {

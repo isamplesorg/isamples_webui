@@ -32,10 +32,16 @@ const NavBar = function (props) {
     Records
   </button>;
 
-  const btn_logout = <button className="btn btn-default navbar-btn" onClick={() => {
-    navigate("/");
-    cookies.remove('logged', { path: "/" });
-  }}>Logout</button>;
+  const btn_userinfo = <button
+    className='btn btn-default navbar-btn'
+    onClick={() => { return navigate("/userinfo") }}>
+    JWT
+  </button>
+
+  const btn_logout = <a href={window.config.logout}>
+    <button className="btn btn-default navbar-btn" onClick={() => {
+      cookies.remove('logged', { path: "/" });
+    }}>Logout</button></a>;
 
   // Create button group based on different pages
   const buttonGroup =
@@ -47,6 +53,7 @@ const NavBar = function (props) {
               return (
                 <>
                   {btn_record}
+                  {btn_userinfo}
                   {btn_logout}
                 </>);
             case 'records':
@@ -54,10 +61,19 @@ const NavBar = function (props) {
                 return (
                   <>
                     {btn_dois}
+                    {btn_userinfo}
                     {btn_logout}
                   </>)
               }
               return btn_login;
+            case 'userinfo':
+              return (
+                <>
+                  {btn_record}
+                  {btn_dois}
+                  {btn_logout}
+                </>
+              )
             default:
               return null;
           }
