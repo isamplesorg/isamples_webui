@@ -10,6 +10,8 @@ const config = {
   "thingpage": _server_base + "thingpage",
   "dois_draft": _server_base + "manage/mint_draft_identifiers",
   "login": _server_base + "manage/login",
+  "logout": _server_base + "manage/logout",
+  "userinfo": _server_base + "manage/userinfo",
   "analytics_src": "https://metrics.isample.xyz/js/plausible.js",
   "analytics_domain": "isamples.org",
   "datacite_prefix": "10.82273",
