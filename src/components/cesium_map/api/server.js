@@ -105,12 +105,12 @@ export class ISamplesAPI {
  *
  * @todo abort the fetch process
  */
-function pointStream(query, perdoc_cb = null, finaldoc_cb = null, error_cb = null) {
+async function pointStream(query, perdoc_cb = null, finaldoc_cb = null, error_cb = null) {
   // There is no documantation about it.
   // See the source code:
   //    https://github.com/jimhigson/oboe.js/blob/52d150dd78b20205bd26d63c807ac170c03f0f64/dist/oboe-browser.js#L2040
   // reture oboe instance so we could abort fetch
-  return oboe(window.config.solr_stream + "?" + setSolrQuery(query))
+  return await oboe(window.config.solr_stream + "?" + setSolrQuery(query))
     .node('docs.*', (doc) => {
       if (perdoc_cb !== null) {
         perdoc_cb(doc);

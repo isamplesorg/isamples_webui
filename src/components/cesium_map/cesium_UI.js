@@ -176,12 +176,16 @@ class CesiumMap extends React.Component {
               className="margin-right-xs Cesium-input"
               placeholder="Please enter"
               type="number"
+              min={-180}
+              max={180}
               step="any" ></input>
             <label className="margin-right-xs Cesium-label">Latitude: </label>
             <input id="latitudeInput"
               className="margin-right-xs Cesium-input"
               placeholder="Please enter"
               type="number"
+              min={-90}
+              max={90}
               step="any" ></input>
             <button className="btn btn-default btn-sm cesium-button"
               onClick={this.submitLL.bind(this)}>
@@ -228,11 +232,14 @@ class CesiumMap extends React.Component {
     };
     // set time interval to check the current view every 5 seconds and update points
     this.checkPosition = setInterval(() => {
+      const loading = document.getElementById("loading").style.display;
       let diffDistance = distanceInKm(cameraLat, cameraLong, viewer.currentView.latitude, viewer.currentView.longitude);
       // update the points every 5 seconds if two points differ in 50km + scale of height.
       // I scale the current height by 15000000, the height of "View Global".
       // 4000 km is the distance that rotate half earth map on the height 15000000.
-      if (diffDistance > MINIMUM_REFRESH_DISTANCE + MAXIMUM_REFRESH_DISTANCE * viewer.currentView.height / MAXIMUM_ZOOM_DISTANCE) {
+      // Update:
+      //      A new parameter loading to indicate if the users cick somewhere and avoid intervel to check positions.
+      if (loading && diffDistance > MINIMUM_REFRESH_DISTANCE + MAXIMUM_REFRESH_DISTANCE * viewer.currentView.height / MAXIMUM_ZOOM_DISTANCE) {
         clearBoundingBox(true);
         this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
         // update camera position to the url
@@ -297,7 +304,8 @@ class CesiumMap extends React.Component {
       oboePrimitive.abort();
     }
 
-    oboePrimitive = setPrimitive.load(facet, { Q: "producedBy_samplingSite_location_cesium_height%3A*", field: "source", lat: latitude, long: longitude, searchFields: searchFields, rows: NUMBER_OF_POINTS });
+    setPrimitive.load(facet, { Q: "producedBy_samplingSite_location_cesium_height%3A*", field: "source", lat: latitude, long: longitude, searchFields: searchFields, rows: NUMBER_OF_POINTS })
+      .then(res => oboePrimitive = res);
     cameraLat = latitude;
     cameraLong = longitude;
   }
