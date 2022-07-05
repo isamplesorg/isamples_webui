@@ -68,3 +68,13 @@ export function forceSlashAfterHash(path) {
   }
 }
 
+// Convert timestamp to string
+export function TStoDate(timestamp) {
+  if (!timestamp) {
+    return "";
+  }
+
+  const date = new Date(timestamp * 1000);
+  return date.toISOString();
+}
+

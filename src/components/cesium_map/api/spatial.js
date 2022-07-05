@@ -289,7 +289,7 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
   }
 
   // function to query results and add point into cesium
-  load(facet, params) {
+  async load(facet, params) {
     let locations = {};
     // display loading page
     this.loading = document.getElementById("loading");
@@ -299,7 +299,7 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
     const field = facet ? Object.keys(facet)[0] : 'source';
     const CV = facet ? facet[field] : source;
 
-    return pointStream(
+    return await pointStream(
       params,
       (doc) => {
         // Handle the data records, e.g. response.docs[0].doc
