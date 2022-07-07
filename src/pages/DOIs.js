@@ -153,16 +153,16 @@ function DOIs() {
 
   // Handle the required field inputs
   const inputGroupRequired = (field) => {
-    if (field === 'suffix') {
+    if (DOIFIELDS_REQUIRED[field]['type'] === 'null') {
       return <input name={field} type="text" onChange={handleChange} value={inputs[field] || ""} />
     }
 
     // Check if the fields have initial values.
-    if (Object.keys(DOIFIELDS_REQUIRED[field]).includes('value')) {
+    if (Object.keys(DOIFIELDS_REQUIRED[field]).includes('items')) {
       if (DOIFIELDS_REQUIRED[field]['type'] === 'string') {
-        return <input name={field} type="text" disabled value={DOIFIELDS_REQUIRED[field]['value']} />
+        return <input name={field} type="text" disabled value={DOIFIELDS_REQUIRED[field]['items']} />
       } else if (DOIFIELDS_REQUIRED[field]['type'] === 'array') {
-        const value = DOIFIELDS_REQUIRED[field]['value'];
+        const value = DOIFIELDS_REQUIRED[field]['items'];
         return (
           <>
             {
@@ -174,7 +174,7 @@ function DOIs() {
                   ))}
                 </select>
                 :
-                <input name={field} type="text" disabled value={DOIFIELDS_REQUIRED[field]['value'][0]} />
+                <input name={field} type="text" disabled value={DOIFIELDS_REQUIRED[field]['items'][0]} />
             }
           </>
         )

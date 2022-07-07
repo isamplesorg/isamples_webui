@@ -57,3 +57,8 @@
   right: 5px;
   top: 50px;
 }
+
+.Cesium__norecord {
+  padding: 10px;
+  font-size: 20px;
+}

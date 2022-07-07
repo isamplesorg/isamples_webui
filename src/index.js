@@ -22,7 +22,7 @@ import {
   sortFields,
   initialCamera
 } from 'fields';
-import 'css/index.css';
+import 'css/solrFaceted.css';
 import 'css/bootstrap5.css';
 
 import {

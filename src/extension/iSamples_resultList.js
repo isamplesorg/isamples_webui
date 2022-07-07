@@ -138,7 +138,7 @@ class ResultList extends React.Component {
                     newSearchFields={searchFields}
                     newBbox={bbox}
                     onSetFields={onChange} />
-                  : null
+                  : <div className='Cesium__norecord'>There is no record, Please clear query.</div>
               }
             </div>
           </>}

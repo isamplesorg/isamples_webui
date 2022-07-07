@@ -21,30 +21,45 @@ const geodist = (lat, long) => {
   return geoDistance;
 }
 
-const setSolrQuery = (param) => {
-  const fieldsParams = buildQuery(param.searchFields);
-  let baseQuery = `rows=${param.rows}` +
+/**
+ * A function to set up solr query parameter
+ * @param {Object} param would be deconstruted to multiple variables
+ * @returns
+ */
+const setSolrQuery = ({ Q, searchFields, rows, field, lat, long }) => {
+  const fieldsParams = buildQuery(searchFields);
+  let baseQuery = `rows=${rows}` +
     `${fieldsParams.length > 0 ? `&${fieldsParams}` : ""}`;
 
-  const baseReturnParam = `id,${param.field},x:producedBy_samplingSite_location_longitude,y:producedBy_samplingSite_location_latitude,z:producedBy_samplingSite_location_cesium_height`;
+  const baseReturnParam = `id,${field},x:producedBy_samplingSite_location_longitude,y:producedBy_samplingSite_location_latitude,z:producedBy_samplingSite_location_cesium_height`;
   // build query for primitive
-  if (param.lat && param.long) {
-    const geoDistParams = geodist(param.lat, param.long);
+  if (lat && long) {
+    const geoDistParams = geodist(lat, long);
     return baseQuery +
       `&fl=${baseReturnParam}` +
       geoDistParams +
       `&sort=$${encodeURIComponent("gdfunc asc")}`;
   }
 
-  return `q=${param.Q}&` + baseQuery +
+  return `q=${Q}&` + baseQuery +
     `&fl=${baseReturnParam},searchText`;
 };
 
+/**
+ * A function to form the solr query parameter for a specific identifier.
+ * @param {String} id
+ * @returns String
+ */
 const recordInfoQuery = (id) => {
   const returnParam = `searchText,producedBy_resultTime`;
   return `q=id:"${id}"&fl=${returnParam}`;
 };
 
+/**
+ * A function to form the solr query parameter for a field
+ * @param {String} field
+ * @returns
+ */
 const facetedQuery = (field) => {
   return `q=*:*&facet.field=${field}&rows=0&start=0&facet=on&wt=json`;
 }
