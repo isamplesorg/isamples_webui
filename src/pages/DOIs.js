@@ -264,7 +264,7 @@ function DOIs() {
         </div>
         <div className="panel panel-default">
           <div className="panel-heading"><h2 className="panel-title">Recommended Fields</h2></div>
-          {createInputsGroup(ISAMPLES_RECOMMENDED, "iSample Schema", false)}
+          {createInputsGroup(ISAMPLES_RECOMMENDED, "iSamples Schema", false)}
           {createInputsGroup(DOIFIELDS_RECOMMENDED, "DOIs Schema", false)}
         </div>
         <div className="panel panel-default">
