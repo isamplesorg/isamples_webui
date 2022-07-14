@@ -55,7 +55,7 @@ export class ISamplesAPI {
 
   /**
    * Number of records matching Q and FQs
-   * @param {*} query the string of solr query parameter
+   * @param {Object} query the object of solr query parameter
    * @returns integer
    */
   async countRecordsQuery(query) {
@@ -69,7 +69,7 @@ export class ISamplesAPI {
 
   /**
    * A method to fetch the information based on identifier
-   * @param {*} id the record identifier
+   * @param {String} id the record identifier
    * @returns an array contained result
    */
   async recordInformation(id) {
@@ -83,7 +83,7 @@ export class ISamplesAPI {
 
   /**
    * A method to fetch the facet information
-   * @param {*} field the facet field
+   * @param {String} field the facet field
    * @returns a hashtable
    */
   async facetInformation(field) {

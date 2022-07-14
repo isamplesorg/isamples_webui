@@ -74,16 +74,23 @@ const initialCamera = {
 
 // color bind schema Wong
 const colorbind = ["#D55E00", "#E69F00", "#009E73", "#56B4E9", "#CC79A7", "#F0E442"];
+// The default source if the solr cannot return faceted
 const source = ["GEOME", "OPENCONTEXT", "SESAR", "SMITHSONIAN"];
 // ----------------------------------------------------------------------------------------
 
 
 // For the DOIs
+// Rules:
+//  Object key is the field name
+//  Property:
+//    type: the field type
+//    items: the value of field (array || string)
+//    description: a string to describe the field
 // -------------------------s---------------------------------------------------------------
 const DOIFIELDS_REQUIRED = {
   'prefix': {
     'type': 'string',
-    'value': window.config.datacite_prefix,
+    'items': window.config.datacite_prefix,
   },
   'suffix': {
     'type': 'null'
@@ -96,14 +103,16 @@ const DOIFIELDS_REQUIRED = {
   },
   'publisher': {
     'type': 'array',
-    'value': window.config.datacite_publisher,
+    'items': window.config.datacite_publisher,
   },
   'publicationYear': {
     'type': 'number',
-    'value': 0
+    'items': 0
   }
 };
 
+// DOIs schema:
+//   https://support.datacite.org/docs/api-create-dois
 const DOIFIELDS_RECOMMENDED = {
   "subject": {
     "type": "string",
@@ -145,6 +154,8 @@ const DOIFIELDS_RECOMMENDED = {
   }
 }
 
+// iSamples Schema:
+//    https://github.com/isamplesorg/metadata/blob/main/iSamplesSchemaBasic0.3.2.json
 const ISAMPLES_RECOMMENDED = {
   "curation": {
     "type": "string",
@@ -251,8 +262,6 @@ const ISAMPLES_RECOMMENDED = {
     "type": "string"
   }
 }
-
-
 
 // ----------------------------------------------------------------------------------------
 

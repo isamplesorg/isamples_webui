@@ -61,19 +61,19 @@ let oboePrimitive = null;
  * @param {*} bb, a DRectangle instance to return bbox info
  * @returns
  */
-async function countRecordsInBB(bb) {
+const countRecordsInBB = async (bb) => {
   const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
   return await api.countRecordsQuery({ Q: Q, searchFields: searchFields, rows: 0 });
 }
 
 /**
- * A callback to track the mouse position in the map,
- * when use alt + left click
- * @param {*} lon
- * @param {*} lat
- * @param {*} height
- */
-function showCoordinates(lon, lat, height) {
+* A callback to track the mouse position in the map,
+* when use alt + left click
+* @param {*} lon
+* @param {*} lat
+* @param {*} height
+*/
+const showCoordinates = (lon, lat, height) => {
   let e = document.getElementById("position");
   e.innerText = `${lat.toFixed(4)}, ${lon.toFixed(4)}, ${height.toFixed(1)}`;
 }
@@ -84,7 +84,7 @@ function showCoordinates(lon, lat, height) {
  * @param {*} updated a bool parameter to indicate if we need to update
  *                    the information to left pane.
  */
-function clearBoundingBox(updated = false) {
+const clearBoundingBox = (updated = false) => {
   viewer.removeEntity(bbox);
   if (updated) { onChange("producedBy_samplingSite_location_rpt", []) };
   document.getElementById("clear-bb").style.display = "none";
@@ -98,9 +98,8 @@ function clearBoundingBox(updated = false) {
  * @param {*} updated a bool parameter to indicate if we need to update
  *                    the information to left pane
  */
-async function selectedBoxCallbox(bb, updated = false) {
+const selectedBoxCallbox = async (bb, updated = false) => {
   let text = `Record count : ${await countRecordsInBB(bb)}`;
-
   viewer.removeEntity(bbox);
   bbox = viewer.addRectangle(bb, text);
 
@@ -110,12 +109,6 @@ async function selectedBoxCallbox(bb, updated = false) {
   const btn = document.getElementById("clear-bb");
   btn.style.display = "block";
   btn.onclick = () => (clearBoundingBox(true));
-}
-
-async function getFacetInfo(field) {
-  const facet = await api.facetInformation(field);
-  const result = { [field]: facet[field].filter((cv) => isNaN(cv)) };
-  return result;
 }
 
 /**
@@ -147,24 +140,24 @@ class CesiumMap extends React.Component {
                   <td>
                     <button
                       className="btn btn-default btm-sm  margin-right-xs cesium-button"
-                      onClick={this.visitLocation.bind(this, moorea)}>Visit Moorea</button>
+                      onClick={() => this.visitLocation(moorea)}>Visit Moorea</button>
                   </td>
                   <td>
                     <button
                       className="btn btn-default btm-sm  margin-right-xs cesium-button"
-                      onClick={this.visitLocation.bind(this, patagonia)}>Visit Patagonia</button>
+                      onClick={() => this.visitLocation(patagonia)}>Visit Patagonia</button>
                   </td>
                 </tr>
                 <tr>
                   <td>
                     <button
                       className="btn btn-default btm-sm  margin-right-xs cesium-button"
-                      onClick={this.changeView.bind(this, true)}>Visit Global</button>
+                      onClick={() => this.changeView(true)}>Visit Global</button>
                   </td>
                   <td>
                     <button
                       className="btn btn-default btm-sm  margin-right-xs cesium-button"
-                      onClick={this.changeView.bind(this, false)}>Visit horizon</button>
+                      onClick={() => this.changeView(false)}>Visit horizon</button>
                   </td>
                 </tr>
               </tbody>
@@ -188,13 +181,120 @@ class CesiumMap extends React.Component {
               max={90}
               step="any" ></input>
             <button className="btn btn-default btn-sm cesium-button"
-              onClick={this.submitLL.bind(this)}>
+              onClick={this.submitLL}>
               <span className="glyphicon glyphicon-search" />
             </button>
           </div>
         </div>
-        <button className="cesium-visit-button cesium-button" onClick={this.toggle.bind(this)}>Viewer Change</button>
+        <button className="cesium-visit-button cesium-button" onClick={this.toggle}>Viewer Change</button>
       </>;
+  };
+
+  /**
+ * A function to get all field from solr for legend
+ * @param {String} field
+ * @returns
+ */
+  getFacetInfo = async (field) => {
+    const facet = await api.facetInformation(field);
+    const result = { [field]: facet[field].filter((cv) => isNaN(cv)) };
+    return result;
+  }
+
+  /**
+ * This method clear all objects in the map
+ * and render new point primitive based on new position
+ *
+ * @param {*} latitude
+ * @param {*} longitude
+ */
+  updatePrimitive(latitude, longitude) {
+    if (setPrimitive) {
+      setPrimitive.clear();
+    }
+    if (oboePrimitive) {
+      oboePrimitive.abort();
+    }
+
+    setPrimitive.load(facet, {
+      Q: "producedBy_samplingSite_location_cesium_height%3A*",
+      field: "source",
+      lat: latitude,
+      long: longitude,
+      searchFields: searchFields,
+      rows: NUMBER_OF_POINTS
+    })
+      .then(res => oboePrimitive = res);
+    cameraLat = latitude;
+    cameraLong = longitude;
+  }
+
+  /**
+   * The map view flies to new position
+   * @param {*} location, a SpatialView instance
+   */
+  visitLocation(location) {
+    viewer.visit(location);
+    clearBoundingBox(true);
+    this.updatePrimitive(location.latitude, location.longitude);
+    // when we use visit function, the currentview only return last camera position
+    // rather than the current one
+    if (!location.equalTo(this.props.mapInfo)) {
+      this.props.setCamera({ facet: "Map", ...location.viewDict });
+    }
+  };
+
+  /**
+   * The function to change the viewpoint
+   *
+   * @param {*} direct, a bool. true go to global, false go to horizon
+   */
+  changeView(direct) {
+    if (direct) {
+      viewer.visit(new SpatialView(
+        cameraLong,
+        cameraLat,
+        MAXIMUM_ZOOM_DISTANCE,
+        GLOBAL_HEADING,
+        GLOBAL_PITCH));
+    } else {
+      viewer.visit(new SpatialView(
+        cameraLong,
+        cameraLat,
+        moorea.height,
+        moorea.heading,
+        moorea.pitch));
+    }
+  }
+
+  /**
+   * Change viewpoint based on users' input
+   */
+  submitLL = () => {
+    const longitude = document.getElementById("longtitudeInput");
+    const latitude = document.getElementById("latitudeInput");
+
+    if (longitude.value !== "" && latitude.value !== "") {
+      const location = new SpatialView(
+        parseFloat(longitude.value),
+        parseFloat(latitude.value),
+        MAXIMUM_ZOOM_DISTANCE,
+        GLOBAL_HEADING,
+        GLOBAL_PITCH);
+      this.visitLocation(location);
+    };
+  };
+
+  /**
+   * toggle function for addiiton buttons.
+   */
+  toggle = () => {
+    const viewerChange = document.getElementById('viewerChange');
+    if (viewerChange.classList.contains("Cesium-popBox-out")) {
+      viewerChange.classList.remove('Cesium-popBox-out');
+    } else {
+      viewerChange.classList.add('Cesium-popBox-out');
+    };
   };
 
   // This is a initial function in react liftcycle.
@@ -202,8 +302,14 @@ class CesiumMap extends React.Component {
   componentDidMount() {
     const { mapInfo, setCamera, newSearchFields, newBbox, onSetFields } = this.props;
     // set the initial position based on the parameters from parent components
-    const initialPosition = new SpatialView(mapInfo.longitude, mapInfo.latitude, mapInfo.height, mapInfo.heading, mapInfo.pitch);
+    const initialPosition = new SpatialView(
+      mapInfo.longitude,
+      mapInfo.latitude,
+      mapInfo.height,
+      mapInfo.heading,
+      mapInfo.pitch);
     viewer = new ISamplesSpatial("cesiumContainer", initialPosition || moorea);
+
     // remove the Ceisum information with custom button group
     render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
     viewer.addHud("cesiumContainer");
@@ -213,8 +319,9 @@ class CesiumMap extends React.Component {
     viewer.addPointPrimitives(setPrimitive);
     searchFields = newSearchFields;
     onChange = onSetFields;
+
     // get the facet control vocabulary
-    getFacetInfo("source").then((res) => {
+    this.getFacetInfo("source").then((res) => {
       facet = res;
       addButton(facet['source'], viewer, this.updatePrimitive);
       if (searchFields) {
@@ -233,7 +340,11 @@ class CesiumMap extends React.Component {
     // set time interval to check the current view every 5 seconds and update points
     this.checkPosition = setInterval(() => {
       const loading = document.getElementById("loading").style.display;
-      let diffDistance = distanceInKm(cameraLat, cameraLong, viewer.currentView.latitude, viewer.currentView.longitude);
+      let diffDistance = distanceInKm(
+        cameraLat,
+        cameraLong,
+        viewer.currentView.latitude,
+        viewer.currentView.longitude);
       // update the points every 5 seconds if two points differ in 50km + scale of height.
       // I scale the current height by 15000000, the height of "View Global".
       // 4000 km is the distance that rotate half earth map on the height 15000000.
@@ -288,80 +399,6 @@ class CesiumMap extends React.Component {
   componentWillUnmount() {
     clearInterval(this.checkPosition);
   }
-
-  /**
- * This method clear all objects in the map
- * and render new point primitive based on new position
- *
- * @param {*} latitude
- * @param {*} longitude
- */
-  updatePrimitive(latitude, longitude) {
-    if (setPrimitive) {
-      setPrimitive.clear();
-    }
-    if (oboePrimitive) {
-      oboePrimitive.abort();
-    }
-
-    setPrimitive.load(facet, { Q: "producedBy_samplingSite_location_cesium_height%3A*", field: "source", lat: latitude, long: longitude, searchFields: searchFields, rows: NUMBER_OF_POINTS })
-      .then(res => oboePrimitive = res);
-    cameraLat = latitude;
-    cameraLong = longitude;
-  }
-
-  /**
-   * The map view flies to new position
-   * @param {*} location, a SpatialView instance
-   */
-  visitLocation(location) {
-    viewer.visit(location);
-    clearBoundingBox(true);
-    this.updatePrimitive(location.latitude, location.longitude);
-    // when we use visit function, the currentview only return last camera position
-    // rather than the current one
-    if (!location.equalTo(this.props.mapInfo)) {
-      this.props.setCamera({ facet: "Map", ...location.viewDict });
-    }
-  };
-
-  /**
-   * The function to change the viewpoint
-   *
-   * @param {*} direct, a bool. true go to global, false go to horizon
-   */
-  changeView(direct) {
-    if (direct) {
-      viewer.visit(new SpatialView(cameraLong, cameraLat, MAXIMUM_ZOOM_DISTANCE, GLOBAL_HEADING, GLOBAL_PITCH));
-    } else {
-      viewer.visit(new SpatialView(cameraLong, cameraLat, moorea.height, moorea.heading, moorea.pitch));
-    }
-  }
-
-  /**
-   * Change viewpoint based on users' input
-   */
-  submitLL() {
-    const longitude = document.getElementById("longtitudeInput");
-    const latitude = document.getElementById("latitudeInput");
-
-    if (longitude.value !== "" && latitude.value !== "") {
-      const location = new SpatialView(parseFloat(longitude.value), parseFloat(latitude.value), MAXIMUM_ZOOM_DISTANCE, GLOBAL_HEADING, GLOBAL_PITCH);
-      this.visitLocation(location);
-    };
-  };
-
-  /**
-   * toggle function for addiiton buttons.
-   */
-  toggle() {
-    const viewerChange = document.getElementById('viewerChange');
-    if (viewerChange.classList.contains("Cesium-popBox-out")) {
-      viewerChange.classList.remove('Cesium-popBox-out');
-    } else {
-      viewerChange.classList.add('Cesium-popBox-out');
-    };
-  };
 
   render() {
     return (

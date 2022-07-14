@@ -23,6 +23,59 @@ After set up all dependencies, run the below command to start the app. Open [htt
 npm start
 ```
 
+## Modify fields for the App
+[field.js](/src/fields.js) contains all default set up constant fields for this app. Currently, it contains three parts. 
+
+1) searchFields and sortFeidls for solr-faceted-search-react (the main record page).
+    * Required property: `field` and `type`
+    * Additional property: 
+      * `label` (the name would be shown in the page or default by field)
+      * `hidden` (if the fields would be shown in the left pane)
+      * `collapse` (if the shown fields would collapse, only work without `hidden:true`)
+2) Cesium Map:
+    * Initial map camera state (default moorea)
+    * The color schema
+    * Default source list, if we will have more organization, we could add them here
+3) DOIs Schemas: 
+    * DOIs required fields provided by the backend.
+    * DOIs default schema
+    * iSamples default schema
+    * Schema object rules
+      * Object key is the field name
+      * Property:
+          * type: the field type
+          * items: the value of field (array || string)
+          * description: a string to describe the field
+  
+
+## DOIs and UserInfo pages are unavailable locally
+DOIs abd UserInfo pages are unavaulable locally because of the `cross-origin` issue. We use `HttpOnly` cookie for the authorization, the cookie would be only sent by browser with the same domain or enabled `'credentials': 'include'`.
+
+In order to enable these two pages, two methods:
+1) Please run [iSamples_docker](https://github.com/isamplesorg/isamples_docker) locally after moving updated `isamples_webui` to `isamples_docker`.
+2) Please run [iSamples_inabox](https://github.com/isamplesorg/isamples_inabox), change `_server_base` in the [config.js](/public/config.js) to `isamples_inabox` server URL (http://localhost:8000), add `'credentials': 'include'` in the both headers of fetch functions of two pages, and modify `isb_web/main.py`:
+```
+From
+
+app.add_middleware(
+    fastapi.middleware.cors.CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+to 
+
+app.add_middleware(
+    fastapi.middleware.cors.CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=["http://localhost:3000"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
+
+
 
 ## Available Scripts
 
