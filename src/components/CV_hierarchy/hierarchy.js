@@ -1,3 +1,8 @@
+/**
+ * The example from Material UI lab:
+ * https://mui.com/material-ui/react-tree-view/
+ */
+
 import React, { useState, useEffect } from 'react';
 import { alpha, styled, Typography } from '@mui/material';
 import { TreeView, treeItemClasses } from '@mui/lab';
@@ -9,6 +14,7 @@ import material from 'CVJSON/material_hierarchy.json';
 import sampledFeature from "CVJSON/sampledFeature_hierarchy.json";
 import specimanType from "CVJSON/specimenType_hierarchy.json";
 
+// Use mui styled function to add style to TreeItem
 const StyledTreeItem = styled((props) => <CustomTreeItem {...props} />)(
   ({ theme }) => ({
     [`& .${treeItemClasses.iconContainer}`]: {
@@ -24,6 +30,12 @@ const StyledTreeItem = styled((props) => <CustomTreeItem {...props} />)(
   })
 );
 
+/**
+ * A function to wrap field and field number
+ * @param {String} label the term name
+ * @param {String} labelInfo the number of records
+ * @returns
+ */
 const labelContent = (label, labelInfo) => {
   return <>
     {label}{" "}
@@ -33,6 +45,11 @@ const labelContent = (label, labelInfo) => {
   </>
 }
 
+/**
+ * A function to create Tree view by recursion
+ * @param {Object} param0
+ * @returns
+ */
 const CreateTree = ({ data, onClick }) => {
   // The function to create tree items
   const treeItems = (json) => {
@@ -87,6 +104,10 @@ const findPath = (tree, target) => {
   return res;
 };
 
+/**
+ * Static json for now.
+ * Will use REST api to get json file from server
+ */
 const hierarchy = (label) => {
   switch (label) {
     case "Material":

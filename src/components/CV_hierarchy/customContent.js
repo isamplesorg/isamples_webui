@@ -1,3 +1,9 @@
+/**
+ * The example from Material UI lab:
+ * https://mui.com/material-ui/react-tree-view/
+ *
+ * The main purpose is to customize the behavior of tree items.
+ */
 import React from 'react';
 import PropTypes from 'prop-types';
 import TreeItem, { useTreeItem } from "@mui/lab/TreeItem";
@@ -52,14 +58,12 @@ const CustomContent = React.forwardRef(function CustomContent(props, ref) {
         </div>}
       <Typography
         onClick={handleSelectionClick}
-
         component="div"
         className={classes.label}
         style={{ fontSize: '14px' }}
       >
         {label}
       </Typography>
-
     </div>
   );
 });
