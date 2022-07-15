@@ -28,10 +28,15 @@ const CustomContent = React.forwardRef(function CustomContent(props, ref) {
     selected,
     focused,
     handleExpansion,
-    handleSelection
+    handleSelection,
+    preventSelection
   } = useTreeItem(nodeId);
 
   const icon = iconProp || expansionIcon || displayIcon;
+
+  const handleMouseDown = (event) => {
+    preventSelection(event);
+  };
 
   const handleExpansionClick = (event) => {
     handleExpansion(event);
@@ -42,6 +47,7 @@ const CustomContent = React.forwardRef(function CustomContent(props, ref) {
     onClick(nodeId)
   };
 
+
   return (
     <div
       className={clsx(className, classes.root, {
@@ -50,6 +56,7 @@ const CustomContent = React.forwardRef(function CustomContent(props, ref) {
         [classes.focused]: focused,
         [classes.disabled]: disabled
       }) + " list-facet__custom--item"}
+      onMouseDown={handleMouseDown}
       ref={ref}
     >
       {icon &&
@@ -101,7 +108,7 @@ CustomContent.propTypes = {
 };
 
 const CustomTreeItem = (props) => (
-  <TreeItem ContentComponent={CustomContent} {...props} />
+  <TreeItem ContentComponent={CustomContent} {...props} onKeyDown={(e) => console.log(e)} />
 );
 
 export default CustomTreeItem;

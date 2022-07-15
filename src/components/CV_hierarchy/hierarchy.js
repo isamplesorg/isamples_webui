@@ -130,6 +130,7 @@ function CustomizedTreeView(props) {
   const [expanded, setExpanded] = useState([firstLevel]);
   const [selected, setSelected] = useState(value);
 
+  // Update tree view based on the facet filter
   useEffect(() => {
     const path = Array.from(new Set(value.map(v => findPath(schema, v)).flat()));
     setExpanded(prevExpaned => path.length > prevExpaned.length ? path : prevExpaned)
@@ -137,10 +138,23 @@ function CustomizedTreeView(props) {
   }, [schema, value])
 
   const handleToggle = (event, nodeIds) => {
-    setExpanded(nodeIds);
+    const difference = nodeIds
+      .filter(x => !expanded.includes(x))
+      .concat(expanded.filter(x => !nodeIds.includes(x)));
+
+    // For toggle items, we could use ctrl + enter to select the tree item
+    if (event.ctrlKey && event.code === 'Enter') {
+      onClick(difference[0]);
+    } else {
+      setExpanded(nodeIds);
+    }
   };
 
   const handleSelect = (event, nodeIds) => {
+    const difference = nodeIds
+      .filter(x => !value.includes(x))
+      .concat(value.filter(x => !nodeIds.includes(x)));
+    onClick(difference[0]);
     setSelected(nodeIds);
   };
 
