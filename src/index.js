@@ -38,6 +38,7 @@ import ResultList from 'extension/iSamples_resultList';
 import ResultPagination from 'extension/iSamples_pagination';
 import iSamples_RangeFacet from 'extension/iSamples_rangeFacet';
 import SearchFieldContainer from 'extension/iSamples_containers';
+import ListFacet from 'extension/iSamples_listFacet';
 
 import {
   wellFormatField,
@@ -67,6 +68,7 @@ const iSamples_componentPack = {
   searchFields: {
     ...defaultComponentPack.searchFields,
     text: TextSearch,
+    "list-facet": ListFacet,
     container: SearchFieldContainer,
     "date-range-facet": iSamples_RangeFacet,
     "non-search": TextSearch,
