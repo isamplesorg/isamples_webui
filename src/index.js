@@ -160,13 +160,15 @@ store.subscribe(() =>
   // The inclusion of the HashRouter and Routes wrapping our APP is what allows the searchParams functionality to work.
   ReactDOM.render(
     <HashRouter>
-      <Routes>
-        <Route path="/" element={<NavFooter page={'records'} children={<App />} />} />
-        <Route path="/dois" element={<NavFooter page={'dois'} children={<DOIs />} />} />
-        <Route path="/userinfo" element={<NavFooter page={'userinfo'} children={<UserInfo />} />} />
-        <Route path="*" element={<h1>Invalid address</h1>} />
-      </Routes>
-    </HashRouter>
+      <NavFooter >
+        <Routes>
+          <Route path="/" element={<App />} />
+          <Route path="/dois" element={<DOIs />} />
+          <Route path="/userinfo" element={<UserInfo />} />
+          <Route path="*" element={<h1>Invalid address</h1>} />
+        </Routes>
+      </NavFooter>
+    </HashRouter >
     ,
     document.getElementById("app")
   )
