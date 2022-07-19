@@ -20,7 +20,7 @@ export function ResultWrapper(props) {
     })
   }
 
-  return field.field === 'id' ? <a href={"https://n2t.net/" + value}>{parse(text)}</a> : parse(text)
+  return field.field === 'id' ? <a href={window.config.thingpage + "/" + value} target="_blank" rel="noopener noreferrer">{parse(text)}</a> : parse(text)
 }
 
 // default function to convert field names to well format one

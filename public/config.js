@@ -5,6 +5,7 @@ const _server_base = "https://mars.cyverse.org/isamples_central/";
 const DATACITE_PUBLISHER = ['Sesar', 'Geome', "OpenContext", "Smithsonian"];
 
 const config = {
+  "origianl_source_prefix": "https://n2t.net",
   "solr_url": _server_base + "thing/select",
   "solr_stream": _server_base + "thing/stream",
   "thingpage": _server_base + "thingpage",
