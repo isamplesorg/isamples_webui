@@ -388,7 +388,7 @@ export class ISamplesSpatial {
       description += `<span style="font-size: 14px; font-weight: bold;">Full Record: </span>
                       <a href="${window.config.thingpage}/${selectPoint.id}" target="_blank" style=" word-wrap: break-word;">${window.config.thingpage}/${selectPoint.id}</a><br/>
                       <span style="font-size: 14px; font-weight: bold;">Source: </span>
-                      <a href="${window.config.origianl_source}/${selectPoint.id}" target="_blank">${window.config.origianl_source}/${selectPoint.id}</a><br/>`
+                      <a href="${window.config.original_source}/${selectPoint.id}" target="_blank">${window.config.original_source}/${selectPoint.id}</a><br/>`
       for (const [key, value] of Object.entries(info[0])) {
         description += `<span style="font-size: 14px; font-weight: bold;">${wellFormatField(key)}:</span>
                         <div style="word-wrap:break-word;">${value}</div>`;
