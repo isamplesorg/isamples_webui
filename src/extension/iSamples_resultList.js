@@ -152,4 +152,4 @@ ResultList.propTypes = {
   children: PropTypes.array
 };
 
-export default React.memo(ResultList);
+export default ResultList;

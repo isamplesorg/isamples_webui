@@ -27,8 +27,7 @@ Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
 
 // constant variables
 const REFRESH_TIME_MS = 5000;
-const MINIMUM_REFRESH_DISTANCE = 50;
-const MAXIMUM_REFRESH_DISTANCE = 4000;
+const UPDATE_RATIO = 0.7;
 const MAXIMUM_ZOOM_DISTANCE = 15000000;
 const NUMBER_OF_POINTS = 100000;
 const GLOBAL_HEADING = 90;
@@ -121,6 +120,9 @@ const selectedBoxCallbox = async (bb, updated = false) => {
  * @returns distance in kilometer
  */
 function distanceInKm(lat1, long1, lat2, long2) {
+  if (!lat1 || !long1 || !lat2 || !long2) {
+    return 0
+  }
   const p1 = Cesium.Cartographic.fromCartesian(Cesium.Cartesian3.fromDegrees(long1, lat1, 0));
   const p2 = Cesium.Cartographic.fromCartesian(Cesium.Cartesian3.fromDegrees(long2, lat2, 0));
   return new Cesium.EllipsoidGeodesic(p1, p2).surfaceDistance / 1000;
@@ -340,17 +342,22 @@ class CesiumMap extends React.Component {
     // set time interval to check the current view every 5 seconds and update points
     this.checkPosition = setInterval(() => {
       const loading = document.getElementById("loading").style.display;
-      let diffDistance = distanceInKm(
+      const diffDistanceMove = distanceInKm(
         cameraLat,
         cameraLong,
         viewer.currentView.latitude,
         viewer.currentView.longitude);
-      // update the points every 5 seconds if two points differ in 50km + scale of height.
-      // I scale the current height by 15000000, the height of "View Global".
-      // 4000 km is the distance that rotate half earth map on the height 15000000.
+      const diffDistanceFarthest = distanceInKm(
+        setPrimitive.farthest.y,
+        setPrimitive.farthest.x,
+        cameraLat,
+        cameraLong);
+      // update the points every 5 seconds
       // Update:
       //      A new parameter loading to indicate if the users cick somewhere and avoid intervel to check positions.
-      if (loading && diffDistance > MINIMUM_REFRESH_DISTANCE + MAXIMUM_REFRESH_DISTANCE * viewer.currentView.height / MAXIMUM_ZOOM_DISTANCE) {
+      // New method:
+      //      The update condition is based on if the move distance is larger than the ratio of radius of the primitive points.
+      if (loading && diffDistanceMove > diffDistanceFarthest * UPDATE_RATIO) {
         clearBoundingBox(true);
         this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
         // update camera position to the url
