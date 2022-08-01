@@ -134,13 +134,18 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
     this.removeAll();
   }
 
+  get farthest() {
+    return this.lastPos;
+  }
+
   // function to query results and add point into cesium
   async load(facet, params) {
     let locations = {};
     // display loading page
     this.loading = document.getElementById("loading");
     this.loading.style.removeProperty("display");
-    this.collection = []
+    this.collection = [];
+    this.lastPos = {};
 
     const field = facet ? Object.keys(facet)[0] : 'source';
     const CV = facet ? facet[field] : source;
@@ -169,6 +174,7 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
             disableDepthTestDistance: 1
           })
           this.collection.push(Cesium.Cartographic.fromDegrees(doc.x, doc.y))
+          this.lastPos = { x: doc.x, y: doc.y };
         }
       },
       (final) => {
