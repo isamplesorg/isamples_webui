@@ -3,11 +3,13 @@ import React from "react";
 import cx from "classnames";
 import Table from 'components/react_table';
 import CesiumMap from "components/cesium_map/cesium_UI";
+import { useStore } from 'react-redux';
 
 // Functional conponent to render button group
 const ButGroup = (props) => {
   const { switchFormat, bootstrapCss, active } = props;
-
+  const store = useStore();
+  console.log(store.getState())
   return (
     <div className={cx({ "paginationBox": bootstrapCss })}>
       <div className={cx({ "swithButtonBox": bootstrapCss })}>
