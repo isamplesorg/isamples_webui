@@ -9,6 +9,16 @@ import { store } from "redux/store";
 
 class ResultList extends React.Component {
 
+
+  // prevent unnecessary rerendering
+  shouldComponentUpdate(nextProps) {
+    this.switchView(store.getState()['query']['view']['facet']);
+    if (JSON.stringify(nextProps) !== JSON.stringify(this.props)) {
+      return true;
+    }
+    return false;
+  }
+
   switchView = (format) => {
     let paginateButton = document.getElementsByClassName('pagDisplay');
 
@@ -48,8 +58,6 @@ class ResultList extends React.Component {
 
     // view style
     const showView = (targetView) => ({ display: view['facet'] === targetView ? "block" : "none" });
-
-    this.switchView(view['facet']);
 
     return (
       <ButGroup

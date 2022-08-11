@@ -182,7 +182,10 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
       },
       (err) => {
         // remove loading spinner
-        this.loading.style.display = "none";
+        if (this.loading) {
+          this.loading.style.display = "none";
+        }
+
         console.error(err);
       })
   }
