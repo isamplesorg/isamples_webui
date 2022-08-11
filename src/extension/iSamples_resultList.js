@@ -3,78 +3,13 @@ import React from "react";
 import cx from "classnames";
 import Table from 'components/react_table';
 import CesiumMap from "components/cesium_map/cesium_UI";
-import { useStore } from 'react-redux';
+import ButGroup from 'components/ButGroup';
+import { store } from "redux/store";
 
-// Functional conponent to render button group
-const ButGroup = (props) => {
-  const { switchFormat, bootstrapCss, active } = props;
-  const store = useStore();
-  console.log(store.getState())
-  return (
-    <div className={cx({ "paginationBox": bootstrapCss })}>
-      <div className={cx({ "swithButtonBox": bootstrapCss })}>
-        <button className={cx({
-          "btn": bootstrapCss,
-          "btn-default": bootstrapCss,
-          "btn-sm": bootstrapCss,
-          "pull-left": bootstrapCss,
-          "margin-right-xs": bootstrapCss,
-          "active": active === 'List'
-        })} onClick={() => switchFormat("List")}>List</button>
-        <button className={cx({
-          "btn": bootstrapCss,
-          "btn-default": bootstrapCss,
-          "btn-sm": bootstrapCss,
-          "pull-left": bootstrapCss,
-          "margin-right-xs": bootstrapCss,
-          "active": active === 'Table'
-        })} onClick={() => switchFormat("Table")}>Table</button>
-        <button className={cx({
-          "btn": bootstrapCss,
-          "btn-default": bootstrapCss,
-          "btn-sm": bootstrapCss,
-          "pull-left": bootstrapCss,
-          "margin-right-xs": bootstrapCss,
-          "active": active === 'Map'
-        })} onClick={() => switchFormat("Map")}>Map</button>
-      </div>
-      {props.children}
-    </div>
-  );
-};
 
 class ResultList extends React.Component {
-  constructor() {
-    super();
-    this.state = { facet: "List" };
-  }
 
-  // set the initial camera position
-  componentDidMount() {
-    this.setState(this.props.view);
-  }
-
-  // React life cycle method to initialzie state
-  static getDerivedStateFromProps(props, state) {
-    return props.view;
-  }
-
-  shouldComponentUpdate(nextProps) {
-    if (JSON.stringify(this.props) !== JSON.stringify(nextProps)) {
-      this.switchView(nextProps.view.facet);
-      this.setState(nextProps.view);
-      return true;
-    }
-
-    return false;
-  }
-
-  // Clean up state to avoid memory leak
-  componentWillUnmount() {
-    this.setState({ facet: "List" })
-  }
-
-  switchView(format) {
+  switchView = (format) => {
     let paginateButton = document.getElementsByClassName('pagDisplay');
 
     // hide the pagination button by display property
@@ -87,17 +22,21 @@ class ResultList extends React.Component {
 
   // This function and shouldComponentUpdate are very similar.
   // Only view buttons need to set view to url.
-  switchFormat(format) {
-    this.switchView(format);
-    this.setState({ ...this.state, facet: format });
-    this.props.setView({ ...this.state, facet: format });
+  switchFormat = (format) => {
+    this.props.setView({ ...store.getState()['query']['view'], facet: format });
+  }
+
+  componentDidUpdate() {
+    this.switchView(store.getState()['query']['view']['facet'])
   }
 
   render() {
     const { bootstrapCss, onChange, setView } = this.props;
+    const view = store.getState()['query']['view'];
 
-    const doc = this.props.children[0].length !== 0 ? this.props.children[0].map((record) => (record['props']['doc'])) : [];
-    const fields = this.props.children[0].length !== 0 ? this.props.children[0][0]['props']['fields'] : [];
+    const doc = store.getState()['results']['docs'];
+    const fields = store.getState()['query']['searchFields'];
+
     // filter the searchFields with values
     const searchFields = fields
       .filter((field) => field.type !== "non-search" && field.type !== "spatialquery")
@@ -111,40 +50,43 @@ class ResultList extends React.Component {
 
     if (bbox) { delete bbox['error'] }
 
+    // view style
+    const showView = (targetView) => ({ display: view['facet'] === targetView ? "block" : "none" });
+
     return (
       <ButGroup
         bootstrapCss={bootstrapCss}
-        switchFormat={this.switchFormat.bind(this)}
-        active={this.state.facet}
-        children={
-          <>
-            <div style={{ display: this.state.facet === 'List' ? "block" : "none" }}>
-              <ul className={cx({ "list-group": bootstrapCss })}>
-                {this.props.children}
-              </ul>
-            </div>
-            <div style={{ display: this.state.facet === 'Table' ? "block" : "none" }}>
-              <Table
-                docs={doc}
-                fields={fields}
-              />
-            </div>
-            <div style={{ display: this.state.facet === 'Map' ? "block" : "none" }}>
-              {
-                // if there is no searchFields, don't render cesium.
-                searchFields.length > 0
-                  ?
-                  <CesiumMap
-                    mapInfo={this.state}
-                    setCamera={setView}
-                    newSearchFields={searchFields}
-                    newBbox={bbox}
-                    onSetFields={onChange} />
-                  : <div className='Cesium__norecord'>There is no record, Please clear query.</div>
-              }
-            </div>
-          </>}
-      />
+        switchFormat={this.switchFormat}
+        active={view['facet']}
+      >
+        <>
+          <div style={showView('List')}>
+            <ul className={cx({ "list-group": bootstrapCss })}>
+              {this.props.children}
+            </ul>
+          </div>
+          <div style={showView('Table')}>
+            <Table
+              docs={doc}
+              fields={fields}
+            />
+          </div>
+          <div style={showView('Map')}>
+            {
+              // if there is no searchFields, don't render cesium.
+              searchFields.length > 0
+                ?
+                <CesiumMap
+                  mapInfo={view}
+                  setCamera={setView}
+                  newSearchFields={searchFields}
+                  newBbox={bbox}
+                  onSetFields={onChange} />
+                : <div className='Cesium__norecord'>There is no record, Please clear query.</div>
+            }
+          </div>
+        </>
+      </ButGroup>
     );
   }
 }

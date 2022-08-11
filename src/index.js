@@ -14,8 +14,7 @@ import {
 } from 'react-router-dom';
 
 import reportWebVitals from 'reportWebVitals';
-import solrReducer from "solr-reducer";
-import { createStore } from "redux";
+import { store } from 'redux/store';
 import { Provider } from 'react-redux';
 
 import {
@@ -52,9 +51,6 @@ import UserInfo from 'pages/userInfo';
 
 // initializa a cookie instance
 const cookies = new Cookies();
-
-// Create a store for the reducer.
-const store = createStore(solrReducer);
 
 // Create a cutom component pack from the default component pack
 const iSamples_componentPack = {

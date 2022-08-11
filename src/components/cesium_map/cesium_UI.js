@@ -84,8 +84,8 @@ const showCoordinates = (lon, lat, height) => {
  *                    the information to left pane.
  */
 const clearBoundingBox = (updated = false) => {
+  if (updated && bbox) { onChange("producedBy_samplingSite_location_rpt", []) };
   viewer.removeEntity(bbox);
-  if (updated) { onChange("producedBy_samplingSite_location_rpt", []) };
   document.getElementById("clear-bb").style.display = "none";
 }
 

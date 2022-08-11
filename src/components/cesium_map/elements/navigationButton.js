@@ -21,7 +21,7 @@ const Labels = (id, color, text) =>
  */
 const InformationButton = (props) => {
 
-  function toggle() {
+  const toggle = () => {
     const legend = document.getElementById('legend');
     if (legend.classList.contains("cesium-navigation-help-visible")) {
       legend.classList.remove('cesium-navigation-help-visible')
@@ -35,13 +35,13 @@ const InformationButton = (props) => {
   return (
     <>
       <button className="cesium-button cesium-toolbar-button cesium-navigation-help-button"
-        onClick={() => toggle()}>
+        onClick={toggle}>
         <img src={info} alt="informatioin icon"></img>
       </button>
       <div id="legend"
         className="cesium-navigation-help"
         style={{ minWidth: "200px" }}>
-        <div className="cesium-click-navigation-help-visible" >
+        <div className="cesium-click-navigation-help-visible">
           <table className="cesium-navigation-help-instructions" >
             <tbody style={{ height: "400px", overflow: "auto", display: "block", border: "white solid 1px" }}>
               <tr>
@@ -103,7 +103,7 @@ export function addButton(facet, SpatialViewer, refresh) {
     const infoButton = document.createElement("span");
     infoButton.className = "cesium-navigationHelpButton-wrapper";
     infoButton.id = "isamples-legend";
-    toolbar.appendChild(infoButton);
+    toolbar?.appendChild(infoButton);
     render(<InformationButton facet={facet} />, infoButton);
   } else {
     const infoButton = document.querySelector("span#isamples-legend");
@@ -115,6 +115,6 @@ export function addButton(facet, SpatialViewer, refresh) {
   const viewer = document.querySelector("div.cesium-viewer");
   const refreshButton = document.createElement("span");
   refreshButton.className = "cesium-navigationHelpButton-wrapper Cesium-refresh";
-  viewer.insertBefore(refreshButton, viewer.firstChild.nextSibling);
+  viewer?.insertBefore(refreshButton, viewer.firstChild.nextSibling);
   render(<RefreshButton viewer={SpatialViewer} refresh={refresh} />, refreshButton);
 }
