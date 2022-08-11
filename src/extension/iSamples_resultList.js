@@ -26,10 +26,6 @@ class ResultList extends React.Component {
     this.props.setView({ ...store.getState()['query']['view'], facet: format });
   }
 
-  componentDidUpdate() {
-    this.switchView(store.getState()['query']['view']['facet'])
-  }
-
   render() {
     const { bootstrapCss, onChange, setView } = this.props;
     const view = store.getState()['query']['view'];
@@ -52,6 +48,8 @@ class ResultList extends React.Component {
 
     // view style
     const showView = (targetView) => ({ display: view['facet'] === targetView ? "block" : "none" });
+
+    this.switchView(view['facet']);
 
     return (
       <ButGroup
