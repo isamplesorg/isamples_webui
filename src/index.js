@@ -14,8 +14,8 @@ import {
 } from 'react-router-dom';
 
 import reportWebVitals from 'reportWebVitals';
-import solrReducer from "solr-reducer";
-import { createStore } from "redux";
+import { store } from 'redux/store';
+import { Provider } from 'react-redux';
 
 import {
   fields,
@@ -51,9 +51,6 @@ import UserInfo from 'pages/userInfo';
 
 // initializa a cookie instance
 const cookies = new Cookies();
-
-// Create a store for the reducer.
-const store = createStore(solrReducer);
 
 // Create a cutom component pack from the default component pack
 const iSamples_componentPack = {
@@ -158,12 +155,14 @@ store.subscribe(() =>
   // The inclusion of the HashRouter and Routes wrapping our APP is what allows the searchParams functionality to work.
   ReactDOM.render(
     <HashRouter>
-      <Routes>
-        <Route path="/" element={<NavFooter page={'records'} children={<App />} />} />
-        <Route path="/dois" element={<NavFooter page={'dois'} children={<DOIs />} />} />
-        <Route path="/userinfo" element={<NavFooter page={'userinfo'} children={<UserInfo />} />} />
-        <Route path="*" element={<h1>Invalid address</h1>} />
-      </Routes>
+      <Provider store={store}>
+        <Routes>
+          <Route path="/" element={<NavFooter page={'records'} children={<App />} />} />
+          <Route path="/dois" element={<NavFooter page={'dois'} children={<DOIs />} />} />
+          <Route path="/userinfo" element={<NavFooter page={'userinfo'} children={<UserInfo />} />} />
+          <Route path="*" element={<h1>Invalid address</h1>} />
+        </Routes>
+      </Provider>
     </HashRouter>
     ,
     document.getElementById("app")
