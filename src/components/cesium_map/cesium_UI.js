@@ -373,7 +373,6 @@ class CesiumMap extends React.Component {
     this.viewpoint = setInterval(() => {
       const loading = document.getElementById("loading").style.display;
       if (loading && JSON.stringify(viewer.currentView.viewDict) !== JSON.stringify(preView)) {
-        console.log(JSON.stringify(viewer.currentView.viewDict) !== JSON.stringify(preView));
         preView = viewer.currentView.viewDict;
         setCamera({ facet: "Map", ...viewer.currentView.viewDict });
       }
