@@ -81,6 +81,7 @@ const solrClient = new SolrClient({
   rows: 20,
   pageStrategy: "paginate",
   view: initialCamera,
+  filters: [{field: "-relation_target", value: "*"}],
 
   // Delegate change callback to redux dispatcher
   onChange: (state) => store.dispatch({ type: "SET_SOLR_STATE", state: state })
