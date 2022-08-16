@@ -219,12 +219,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const paramesDict = { 'searchFields': decodedSearchFields, 'sortFields': decodedSortFields };
 
     // Use solrClient built-in functions
+    // set view facet
+    solrClient.setView(decodedView);
     // set initial query. This function would not send a query.
     solrClient.setInitialQuery(paramesDict);
     // set page. This function will send a query.
     solrClient.setCurrentPage(decodedStart);
-    // set view facet
-    solrClient.setView(decodedView);
+
   } else {
     solrClient.initialize();
   }

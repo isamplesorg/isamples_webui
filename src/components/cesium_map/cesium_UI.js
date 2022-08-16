@@ -27,6 +27,7 @@ Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
 
 // constant variables
 const REFRESH_TIME_MS = 5000;
+const VIEWPOINT_TIME_MS = 2000;
 const UPDATE_RATIO = 0.7;
 const MAXIMUM_ZOOM_DISTANCE = 15000000;
 const NUMBER_OF_POINTS = 100000;
@@ -46,6 +47,7 @@ let viewer = null;
 let searchFields = null;
 let onChange = null;
 let facet = null;
+let preView = null;
 
 // this represents the pritimive class to handle data query.
 let setPrimitive = null;
@@ -366,6 +368,15 @@ class CesiumMap extends React.Component {
         setCamera({ facet: "Map", ...viewer.currentView.viewDict });
       };
     }, REFRESH_TIME_MS);
+
+    // store the users' viewpoint
+    this.viewpoint = setInterval(() => {
+      const loading = document.getElementById("loading").style.display;
+      if (loading && JSON.stringify(viewer.currentView.viewDict) !== JSON.stringify(preView)) {
+        preView = viewer.currentView.viewDict;
+        setCamera({ facet: "Map", ...viewer.currentView.viewDict });
+      }
+    }, [VIEWPOINT_TIME_MS])
   };
 
   // https://medium.com/@garrettmac/reactjs-how-to-safely-manipulate-the-dom-when-reactjs-cant-the-right-way-8a20928e8a6
@@ -407,6 +418,7 @@ class CesiumMap extends React.Component {
    */
   componentWillUnmount() {
     clearInterval(this.checkPosition);
+    clearInterval(this.viewpoint);
   }
 
   render() {
