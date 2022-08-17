@@ -44,7 +44,6 @@ const CsvExport = (props) => {
     const API = `${query.url}?${queryString}`;
 
     setIsLoading(true);
-    setDownloadStatus("")
 
     fetch(API).then(res => res.text()).then(res => {
       setDownloadData(res);
@@ -58,6 +57,8 @@ const CsvExport = (props) => {
 
   const handleClick = () => {
     setCollapse(prev => !prev);
+    setDownloadStatus("");
+    setFormInfo(prev => ({ ...prev, rows: MAX_ROWS }))
   }
 
   const handleChange = (e) => {
