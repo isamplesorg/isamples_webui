@@ -26,13 +26,13 @@ const CsvExport = (props) => {
     .concat([formInfo.start, store.getState()['results']['numFound'] > formInfo.rows ? formInfo.rows : store.getState()['results']['numFound']])
     .map(e => {
       if (typeof e === "object") {
-        return "bounding_box"
+        return "bounding_box";
       }
 
-      return e;
+      return e.toString().replace(/[^a-zA-Z0-9 ]/g, "");
     })
+    .filter(word => word.length)
     .join("_")}.csv`;
-
 
   const fetchCsvResult = async () => {
     const { query } = store.getState();
