@@ -38,6 +38,7 @@ import ResultList from 'extension/iSamples_resultList';
 import ResultPagination from 'extension/iSamples_pagination';
 import iSamples_RangeFacet from 'extension/iSamples_rangeFacet';
 import SearchFieldContainer from 'extension/iSamples_containers';
+import CsvExport from "extension/iSamples_csvExport";
 
 import {
   wellFormatField,
@@ -60,6 +61,7 @@ const iSamples_componentPack = {
     result: iSamplesResult,
     list: ResultList,
     paginate: ResultPagination,
+    csvExport: CsvExport,
   },
   searchFields: {
     ...defaultComponentPack.searchFields,

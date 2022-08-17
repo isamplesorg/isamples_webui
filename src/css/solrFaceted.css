@@ -147,6 +147,7 @@ input[type=number] {
   padding: 10px 0px 10px 0px;
   border-radius: 10px;
   font-size: small;
+  box-shadow: 0 6px 12px rgb(0 0 0 / 18%);
 }
 
 .recordTable {
@@ -209,6 +210,8 @@ td {
   padding: 15px;
   border-radius: 10px;
   white-space: nowrap;
+  box-shadow: 0 6px 12px rgb(0 0 0 / 18%);
+  user-select: none;
 }
 
 .fieldsSelect {
@@ -249,4 +252,40 @@ td {
 
 #cesiumContainer {
   height: 70vh;
+}
+
+
+.csv__choice {
+  position: absolute;
+  right: 100px;
+  top: 40px;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  box-sizing: border-box;
+  width: 250px;
+  background-color: white;
+  border-radius: 15px;
+  gap: 20px;
+  padding: 0 15px;
+  max-height: 0;
+  transition: all 0.2s ease-out;
+  overflow: hidden;
+}
+
+.csv__choice.active {
+  padding: 15px;
+  max-height: 300px;
+  transition: max-height 0.2s ease-in;
+  border: 1px solid rgba(0, 0, 0, .15);
+  box-shadow: 0 6px 12px rgb(0 0 0 / 18%);
+}
+
+.csv__choice label {
+  width: 50px;
+}
+
+.csv__choice button {
+  width: 100px;
+  align-self: end;
 }
