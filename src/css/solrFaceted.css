@@ -289,3 +289,26 @@ td {
   width: 100px;
   align-self: end;
 }
+
+.loadingExport {
+  width: 100%;
+  height: 10px;
+}
+
+.loadingTrack {
+  width: 0;
+  height: 100%;
+  border-radius: 10px;
+  animation: loadingExport 1.5s infinite;
+}
+
+@keyframes loadingExport {
+  0% {
+    width: 0;
+  }
+
+  100% {
+    width: 100%;
+  }
+
+}
