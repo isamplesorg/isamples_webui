@@ -6,6 +6,11 @@
   "dependencies": {
     "@craco/craco": "^7.0.0-alpha.3",
     "cesium": "^1.91.0",
+    "@emotion/react": "^11.9.3",
+    "@emotion/styled": "^11.9.3",
+    "@mui/icons-material": "^5.8.4",
+    "@mui/lab": "^5.0.0-alpha.90",
+    "@mui/material": "^5.9.0",
     "classnames": "^2.3.1",
     "craco-cesium": "^1.2.0",
     "html-react-parser": "^1.4.8",
