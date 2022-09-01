@@ -134,13 +134,18 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
     this.removeAll();
   }
 
+  get farthest() {
+    return this.lastPos;
+  }
+
   // function to query results and add point into cesium
   async load(facet, params) {
     let locations = {};
     // display loading page
     this.loading = document.getElementById("loading");
     this.loading.style.removeProperty("display");
-    this.collection = []
+    this.collection = [];
+    this.lastPos = {};
 
     const field = facet ? Object.keys(facet)[0] : 'source';
     const CV = facet ? facet[field] : source;
@@ -169,6 +174,7 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
             disableDepthTestDistance: 1
           })
           this.collection.push(Cesium.Cartographic.fromDegrees(doc.x, doc.y))
+          this.lastPos = { x: doc.x, y: doc.y };
         }
       },
       (final) => {
@@ -176,7 +182,10 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
       },
       (err) => {
         // remove loading spinner
-        this.loading.style.display = "none";
+        if (this.loading) {
+          this.loading.style.display = "none";
+        }
+
         console.error(err);
       })
   }
@@ -388,7 +397,7 @@ export class ISamplesSpatial {
       description += `<span style="font-size: 14px; font-weight: bold;">Full Record: </span>
                       <a href="${window.config.thingpage}/${selectPoint.id}" target="_blank" style=" word-wrap: break-word;">${window.config.thingpage}/${selectPoint.id}</a><br/>
                       <span style="font-size: 14px; font-weight: bold;">Source: </span>
-                      <a href="https://n2t.net/${selectPoint.id}" target="_blank">https://n2t.net/${selectPoint.id}</a><br/>`
+                      <a href="${window.config.original_source}/${selectPoint.id}" target="_blank">${window.config.original_source}/${selectPoint.id}</a><br/>`
       for (const [key, value] of Object.entries(info[0])) {
         description += `<span style="font-size: 14px; font-weight: bold;">${wellFormatField(key)}:</span>
                         <div style="word-wrap:break-word;">${value}</div>`;

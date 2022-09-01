@@ -4,12 +4,8 @@ import cx from "classnames";
 import CheckBoxes from 'components/checkBoxes';
 
 class SearchFieldContainer extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      collapse: false,
-    };
+  state = {
+    collapse: false,
   }
 
   toggleExpand() {
@@ -43,7 +39,7 @@ class SearchFieldContainer extends React.Component {
             </button>
             <label>Search</label>
           </header>
-          {this.state.collapse ? <CheckBoxes {...this.props} /> : null}
+          <CheckBoxes collapse={this.state.collapse} onSetFields={this.props.onSetFields} />
           <ul className={cx("solr-search-fields", { "list-group": bootstrapCss })}>
             {this.props.children}
           </ul>

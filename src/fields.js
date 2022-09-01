@@ -37,6 +37,7 @@ const fields = [
   { label: "All text fields", field: "searchText", type: "text" },
   { field: "source", type: "list-facet", facetSort: "index", collapse: true },
   { field: "sourceUpdatedTime", type: "non-search", collapse: true },
+  { field: "authorizedBy", type: "list-facet", collapse: true , hidden: true},
   // for spatial query
   { label: "Spatial Query", field: "producedBy_samplingSite_location_rpt", type: "spatialquery" },
 ];
