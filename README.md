@@ -1,5 +1,5 @@
 # iSamples Web UI
-A web app to search and discover iSamples records. The app is based on [solr-faceted-search-react](https://www.npmjs.com/package/solr-faceted-search-react) react library and [CesiumJS](https://cesium.com/platform/cesiumjs/) Javascript library.
+A web app to search and discover iSamples records. The app is based on [solr-faceted-search-react](https://www.npmjs.com/package/solr-faceted-search-react) react library and [CesiumJS](https://cesium.com/platform/cesiumjs/) Javascript library. The record data is managed by redux library.
 
 ## npm initialization
 In order to get all the necessary javascript packages installed, make sure you run the following command in the terminal after first checkout.
@@ -135,6 +135,8 @@ To learn Cesium, check out the [CesiumJS documentation](https://cesium.com/learn
 The useful sources about the logic of how to deploy CeisumJS in the React app. Since the CesiumJS is not a react library, we need to use uncontrolled component to manipulate the DOM outside of the React Model.
 1) [Manipulate the DOM outside of the React Model](https://medium.com/@garrettmac/reactjs-how-to-safely-manipulate-the-dom-when-reactjs-cant-the-right-way-8a20928e8a6)
 2) [Controlled and uncontrolled react component](https://goshacmd.com/controlled-vs-uncontrolled-inputs-react/)
+
+For the future development, it's a good idea to keep using [redux](https://redux.js.org/) framework to manage global states. 
 
 ### Code Splitting
 

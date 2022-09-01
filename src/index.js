@@ -39,6 +39,7 @@ import ResultPagination from 'extension/iSamples_pagination';
 import iSamples_RangeFacet from 'extension/iSamples_rangeFacet';
 import SearchFieldContainer from 'extension/iSamples_containers';
 import ListFacet from 'extension/iSamples_listFacet';
+import CsvExport from "extension/iSamples_csvExport";
 
 import {
   wellFormatField,
@@ -61,6 +62,7 @@ const iSamples_componentPack = {
     result: iSamplesResult,
     list: ResultList,
     paginate: ResultPagination,
+    csvExport: CsvExport,
   },
   searchFields: {
     ...defaultComponentPack.searchFields,
@@ -83,6 +85,7 @@ const solrClient = new SolrClient({
   rows: 20,
   pageStrategy: "paginate",
   view: initialCamera,
+  filters: [{field: "-relation_target", value: "*"}],
 
   // Delegate change callback to redux dispatcher
   onChange: (state) => store.dispatch({ type: "SET_SOLR_STATE", state: state })

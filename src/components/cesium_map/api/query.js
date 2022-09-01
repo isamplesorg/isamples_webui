@@ -27,7 +27,7 @@ const geodist = (lat, long) => {
  * @returns
  */
 const setSolrQuery = ({ Q, searchFields, rows, field, lat, long }) => {
-  const fieldsParams = buildQuery(searchFields);
+  const fieldsParams = buildQuery(searchFields.concat([{field: "-relation_target", value: "*"}]));
   let baseQuery = `rows=${rows}` +
     `${fieldsParams.length > 0 ? `&${fieldsParams}` : ""}`;
 
@@ -52,7 +52,7 @@ const setSolrQuery = ({ Q, searchFields, rows, field, lat, long }) => {
  */
 const recordInfoQuery = (id) => {
   const returnParam = `searchText,producedBy_resultTime`;
-  return `q=id:"${id}"&fl=${returnParam}`;
+  return `q=id:"${id}"&fl=${returnParam}&fq=-relation_target:*`;
 };
 
 /**
@@ -61,7 +61,7 @@ const recordInfoQuery = (id) => {
  * @returns
  */
 const facetedQuery = (field) => {
-  return `q=*:*&facet.field=${field}&rows=0&start=0&facet=on&wt=json`;
+  return `q=*:* AND -relation_target:*&facet.field=${field}&rows=0&start=0&facet=on&wt=json`;
 }
 
 export {
