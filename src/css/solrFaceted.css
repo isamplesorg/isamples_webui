@@ -15,7 +15,11 @@ a {
 
 .list-facet ul {
   overflow-y: auto;
-  max-height: 200px;
+}
+
+.list-facet__custom--height {
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 .list-facet ul li {
@@ -23,6 +27,27 @@ a {
 }
 
 .list-facet ul li:hover {
+  text-decoration: underline;
+}
+
+.list-facet__custom input {
+  margin-top: 20px;
+}
+
+.list-facet__custom ul li:hover {
+  text-decoration: none !important;
+}
+
+.list-facet__custom ul li {
+  padding-top: 5px;
+  vertical-align: bottom;
+}
+
+.list-facet__custom .facet-item-amount {
+  color: #AAAAAA;
+}
+
+.list-facet__custom--item:hover {
   text-decoration: underline;
 }
 

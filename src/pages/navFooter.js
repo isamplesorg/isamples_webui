@@ -122,9 +122,10 @@ const FooterBar = function () {
 }
 
 const NavFooter = function (props) {
+  const page = window.location.hash.split('?')[0].slice(2) || 'records';
   return (
     <>
-      <NavBar page={props.page} />
+      <NavBar page={page} />
       {props.children}
       <FooterBar />
       <ScrollToTop />
