@@ -5,7 +5,8 @@ import Table from 'components/react_table';
 import CesiumMap from "components/cesium_map/cesium_UI";
 import ButGroup from 'components/ButGroup';
 import { store } from "redux/store";
-
+import {connect} from "react-redux";
+import FadeLoader from "react-spinners/FadeLoader";
 
 class ResultList extends React.Component {
 
@@ -36,8 +37,32 @@ class ResultList extends React.Component {
     this.props.setView({ ...store.getState()['query']['view'], facet: format });
   }
 
+  spinner = () => {
+    let color = "slategray";
+    const override = {
+      display: "flex",
+      height: "100%",
+    };
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        margin:"2em",
+    }}>
+        <FadeLoader
+        color={color}
+        loading={true}
+        cssOverride={override}
+        aria-label="Loading Spinner"
+        data-testid="loader"
+        />
+      </div>
+    );   
+  }
+  
   render() {
-    const { bootstrapCss, onChange, setView } = this.props;
+    const { bootstrapCss, onChange, setView, pending} = this.props;
     const view = store.getState()['query']['view'];
 
     const doc = store.getState()['results']['docs'];
@@ -60,39 +85,45 @@ class ResultList extends React.Component {
     const showView = (targetView) => ({ display: view['facet'] === targetView ? "block" : "none" });
 
     return (
-      <ButGroup
+     <ButGroup
         bootstrapCss={bootstrapCss}
         switchFormat={this.switchFormat}
         active={view['facet']}
       >
         <>
-          <div style={showView('List')}>
-            <ul className={cx({ "list-group": bootstrapCss })}>
-              {this.props.children}
-            </ul>
-          </div>
-          <div style={showView('Table')}>
-            <Table
-              docs={doc}
-              fields={fields}
-            />
-          </div>
-          <div style={showView('Map')}>
-            {
-              // if there is no searchFields, don't render cesium.
-              searchFields.length > 0
-                ?
-                <CesiumMap
-                  mapInfo={view}
-                  setCamera={setView}
-                  newSearchFields={searchFields}
-                  newBbox={bbox}
-                  onSetFields={onChange} />
-                : <div className='Cesium__norecord'>There is no record, Please clear query.</div>
-            }
-          </div>
+        {pending ? this.spinner() :
+          (
+            <>
+              <div style={showView('List')}>
+                <ul className={cx({ "list-group": bootstrapCss })}>
+                  {this.props.children}
+                </ul>
+              </div>
+              <div style={showView('Table')}>
+                <Table
+                  docs={doc}
+                  fields={fields}
+                />
+              </div>
+              <div style={showView('Map')}>
+                {
+                  // if there is no searchFields, don't render cesium.
+                  searchFields.length > 0
+                    ?
+                    <CesiumMap
+                      mapInfo={view}
+                      setCamera={setView}
+                      newSearchFields={searchFields}
+                      newBbox={bbox}
+                      onSetFields={onChange} />
+                    : <div className='Cesium__norecord'>There is no record, Please clear query.</div>
+                }
+              </div>
+            </>
+          ) 
+        } 
         </>
-      </ButGroup>
+    </ButGroup>
     );
   }
 }
@@ -102,4 +133,11 @@ ResultList.propTypes = {
   children: PropTypes.array
 };
 
-export default ResultList;
+// connect this component with redux store 
+const mapStateToProps = (state) =>{
+  return {
+    // pending state of fetch
+    'pending' : state.results.pending,
+  }
+}
+export default connect(mapStateToProps)(ResultList);
