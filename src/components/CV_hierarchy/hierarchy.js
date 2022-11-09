@@ -132,32 +132,47 @@ function CustomizedTreeView(props) {
   const [countMap, setCountMap] = useState(new Map());
   
   /** 
-    calculate the total counts of a label 
-    we also account for the child labels and include those records when getting the total count
+    recursively sets the count of a label
+    1. if leaf node : get the count directly by comparing to facetCnt
+    2. if non-leaf node: get the count by adding up the childNode counts using countMap 
     @param currSchema an object that is used for recursion 
   */ 
   const calculateCounts = (currSchema) => {
-    let totalCnt = 0 
-    // when all the facet values are fetched
+    // when all facetValues are fetched
     if(Array.isArray(facetValues)){
       for (const key in currSchema){
+        const childLabels = []; // the child labels of this label 
         for (const childSchema of currSchema[key]["children"]){
-          totalCnt += calculateCounts(childSchema)
+          // recursively save the counts in countMap
+          // and get the child node labels
+          let childLabel = calculateCounts(childSchema);
+          if (childLabel){
+            childLabels.push(childLabel);
+          } 
         }
-       // no children labels exists anymore 
-        const label = currSchema[key]["label"]["en"]
-        // search for this label in facetValues
-        for (const idx in facetValues){
-          const facetValue = facetValues[idx].toLocaleLowerCase()
-          if (facetValue.includes(label.toLocaleLowerCase())){
-            totalCnt += facetCounts[idx];
+        const label = currSchema[key]["label"]["en"];
+        let totalCnt = 0; // total cnt of this label 
+        // leaf node
+        if (childLabels.length == 0) {
+          // get the count by directly comparing to facetValues
+          for (const idx in facetValues){
+            const facetValue = facetValues[idx].toLocaleLowerCase()
+            if (facetValue.includes(label.toLocaleLowerCase())){
+              totalCnt += facetCounts[idx];
+            }
+          }
+        } else{
+          // non - leaf node
+          for (const childLabel of childLabels){
+            // add up the count from child labels
+            totalCnt += countMap.get(childLabel); 
           }
         }
-        setCountMap(countMap.set(label, totalCnt)); 
+        setCountMap(countMap.set(label, totalCnt))
+        return label;
       }
-      return totalCnt;
     } else {
-      return 0;
+      return null;
     }
   }
 
@@ -166,11 +181,14 @@ function CustomizedTreeView(props) {
     const path = Array.from(new Set(value.map(v => findPath(schema, v)).flat()));
     setExpanded(prevExpaned => path.length > prevExpaned.length ? path : prevExpaned)
     setSelected(value)
+  }, [schema, value])
+
+  useEffect (() => {
     // calculate the count of labels when full facet values are fetched
     if (Array.isArray(facetValues)){
       calculateCounts(schema);
     }
-  }, [schema, value, facetValues, facetCounts])
+  }, [facetValues])
 
   const handleToggle = (event, nodeIds) => {
     const difference = nodeIds
