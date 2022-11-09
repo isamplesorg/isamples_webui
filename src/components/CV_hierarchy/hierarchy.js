@@ -50,17 +50,18 @@ const labelContent = (label, labelInfo) => {
  * @param {Object} param0
  * @returns
  */
-const CreateTree = ({ data, onClick }) => {
+const CreateTree = ({ data, onClick, countMap }) => {
   // The function to create tree items
   const treeItems = (json) => {
     return Object.entries(json).map(([key, val]) => {
       const label = val["label"]["en"];
+      let labelCnt = countMap && countMap.get(label) ? countMap.get(label) : 0 ;
       if (val["children"].length === 0) {
-        return <StyledTreeItem key={label} nodeId={label} label={labelContent(label, 0)} onClick={onClick} />;
+        return <StyledTreeItem key={label} nodeId={label} label={labelContent(label, labelCnt)} onClick={onClick} />;
       } else {
         return (
-          <StyledTreeItem key={label} nodeId={label} label={labelContent(label, 0)} onClick={onClick}>
-            <CreateTree data={val["children"]} onClick={onClick} />
+          <StyledTreeItem key={label} nodeId={label} label={labelContent(label, labelCnt)} onClick={onClick}>
+            <CreateTree data={val["children"]} onClick={onClick} countMap={countMap}/>
           </StyledTreeItem>
         );
       }
@@ -122,20 +123,54 @@ const hierarchy = (label) => {
 }
 
 function CustomizedTreeView(props) {
-  const { label, value, onClick } = props;
+  const { label, value, onClick, facetCounts, facetValues} = props;
   const schema = hierarchy(label);
   const firstLevel = schema[Object.keys(schema)[0]]["label"]["en"];
-
   const [filter, setFilter] = useState("");
   const [expanded, setExpanded] = useState([firstLevel]);
   const [selected, setSelected] = useState(value);
+  const [countMap, setCountMap] = useState(new Map());
+  
+  /** 
+    calculate the total counts of a label 
+    we also account for the child labels and include those records when getting the total count
+    @param currSchema an object that is used for recursion 
+  */ 
+  const calculateCounts = (currSchema) => {
+    let totalCnt = 0 
+    // when all the facet values are fetched
+    if(Array.isArray(facetValues)){
+      for (const key in currSchema){
+        for (const childSchema of currSchema[key]["children"]){
+          totalCnt += calculateCounts(childSchema)
+        }
+       // no children labels exists anymore 
+        const label = currSchema[key]["label"]["en"]
+        // search for this label in facetValues
+        for (const idx in facetValues){
+          const facetValue = facetValues[idx].toLocaleLowerCase()
+          if (facetValue.includes(label.toLocaleLowerCase())){
+            totalCnt += facetCounts[idx];
+          }
+        }
+        setCountMap(countMap.set(label, totalCnt)); 
+      }
+      return totalCnt;
+    } else {
+      return 0;
+    }
+  }
 
   // Update tree view based on the facet filter
   useEffect(() => {
     const path = Array.from(new Set(value.map(v => findPath(schema, v)).flat()));
     setExpanded(prevExpaned => path.length > prevExpaned.length ? path : prevExpaned)
     setSelected(value)
-  }, [schema, value])
+    // calculate the count of labels when full facet values are fetched
+    if (Array.isArray(facetValues)){
+      calculateCounts(schema);
+    }
+  }, [schema, value, facetValues, facetCounts])
 
   const handleToggle = (event, nodeIds) => {
     const difference = nodeIds
@@ -169,22 +204,24 @@ function CustomizedTreeView(props) {
   };
 
   return (
-    <div className='list-facet__custom'>
-      <TreeView
-        aria-label="customized"
-        defaultCollapseIcon={<ExpandLessIcon />}
-        defaultExpandIcon={<ExpandMoreIcon />}
-        expanded={expanded}
-        selected={selected}
-        onNodeToggle={handleToggle}
-        onNodeSelect={handleSelect}
-        multiSelect
-      >
-        <CreateTree data={schema} onClick={onClick} />
-      </TreeView>
-      <input onChange={handleFilter} value={filter} placeholder="Filter..." />
-    </div>
-  );
+  <div className='list-facet__custom'>
+    
+     <TreeView
+          aria-label="customized"
+          defaultCollapseIcon={<ExpandLessIcon />}
+          defaultExpandIcon={<ExpandMoreIcon />}
+          expanded={expanded}
+          selected={selected}
+          onNodeToggle={handleToggle}
+          onNodeSelect={handleSelect}
+          multiSelect
+        >
+          <CreateTree data={schema} onClick={onClick} countMap={countMap} />
+        </TreeView>
+        <input onChange={handleFilter} value={filter} placeholder="Filter..." />
+   
+    </div> 
+  )
 }
 
 export default CustomizedTreeView;
