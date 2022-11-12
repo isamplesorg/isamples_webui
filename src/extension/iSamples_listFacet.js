@@ -2,6 +2,10 @@ import PropTypes from 'prop-types';
 import React from "react";
 import cx from "classnames";
 import CustomizedTreeView from 'components/CV_hierarchy/hierarchy';
+import material from 'CVJSON/material_hierarchy.json';
+import sampledFeature from "CVJSON/sampledFeature_hierarchy.json";
+import specimanType from "CVJSON/specimenType_hierarchy.json";
+
 
 const CheckedIcon = () => {
   return <span className='glyphicon glyphicon-check' />
@@ -21,12 +25,78 @@ class ListFacet extends React.Component {
     };
   }
 
+
+  // helper function
+  // adds all the children label of this key 
+ expandLabelSelectedHelper = (currSchema, childLabels) => {
+    for (const key in currSchema){
+      if (currSchema[key]["children"].length > 0){
+        for (const childSchema of currSchema[key]["children"]){
+          // recursively call to add other child labels 
+          for (const childKey in childSchema){
+            const childLabel = childSchema[childKey]["label"]["en"]
+            if (!childLabels.includes(childLabel)){
+              childLabels.push(childLabel)
+            }
+          }
+          this.expandLabelSelectedHelper(childSchema, childLabels)
+        }
+      }
+    }
+    
+  }
+
+  expandLabelSelected = (selected, currSchema, childLabels) => {
+    for (const key in currSchema){
+      const label = currSchema[key]["label"]["en"];
+      if (label == selected){
+        // get all the children nodes from here
+        this.expandLabelSelectedHelper(currSchema,childLabels);
+      }
+      for (const childSchema of currSchema[key]["children"]){
+        // recursively call to find the selected label 
+        this.expandLabelSelected(selected, childSchema, childLabels)
+      }
+    }
+  }
+
+  /**
+ * Static json for now.
+ * Will use REST api to get json file from server
+ */
+  hierarchy = (label) => {
+    switch (label) {
+      case "Material":
+        return material;
+      case "Context":
+        return sampledFeature;
+      case "Specimen":
+        return specimanType;
+      default:
+        return null;
+    }
+  }
+
   handleClick = (value) => {
     const foundIdx = this.props.value.indexOf(value);
+
+    // whenever a new label is clicked select all of the children labels 
+    const expandedLabels = [value]
+    const currSchema = this.hierarchy(this.props.label);
+    // get all children labels of this selected label 
+    this.expandLabelSelected(value, currSchema, expandedLabels);
+    expandedLabels.filter((item) => {
+      return this.props.value.indexOf(item) == -1 // filter out labels that are already existing
+    })
     if (foundIdx < 0) {
-      this.props.onChange(this.props.field, this.props.value.concat(value));
+      this.props.onChange(this.props.field, this.props.value.concat(expandedLabels));
+      console.log("handleClick ", expandedLabels, this.props.value)
     } else {
-      this.props.onChange(this.props.field, this.props.value.filter((v, i) => i !== foundIdx));
+      // remove the selected label or all the children labels
+      this.props.onChange(this.props.field, this.props.value.filter((v, i) => i!= foundIdx ));
+      // remove all children labels
+      this.props.onChange(this.props.field, this.props.value.filter((v, i) => {return expandedLabels.indexOf(v) == -1} ));
+      console.log("handleClick ", this.props.value, value, foundIdx)
     }
   }
 
@@ -37,10 +107,8 @@ class ListFacet extends React.Component {
   render() {
     const { query, label, facets, field, value, bootstrapCss, facetSort, collapse } = this.props;
     const { truncateFacetListsAt } = this.state;
-
     const facetCounts = facets.filter((facet, i) => i % 2 === 1);
     const facetValues = facets.filter((facet, i) => i % 2 === 0);
-
     const facetSortValue = facetSort ? facetSort :
       query.facetSort ? query.facetSort :
         (query.facetLimit && query.facetLimit > -1 ? "count" : "index");
@@ -116,7 +184,7 @@ class ListFacet extends React.Component {
 
         {expanded ?
           (customList ?
-            <CustomizedTreeView label={label} value={value} onClick={this.handleClick} />
+            <CustomizedTreeView label={label} value={value} facetCounts={facetCounts} facetValues={facetValues} onClick={this.handleClick} hierarchy= {this.hierarchy}/>
             : prevNode)
           : null}
       </li>

@@ -10,10 +10,6 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import CustomTreeItem from './customContent';
 
-import material from 'CVJSON/material_hierarchy.json';
-import sampledFeature from "CVJSON/sampledFeature_hierarchy.json";
-import specimanType from "CVJSON/specimenType_hierarchy.json";
-
 // Use mui styled function to add style to TreeItem
 const StyledTreeItem = styled((props) => <CustomTreeItem {...props} />)(
   ({ theme }) => ({
@@ -105,32 +101,15 @@ const findPath = (tree, target) => {
   return res;
 };
 
-/**
- * Static json for now.
- * Will use REST api to get json file from server
- */
-const hierarchy = (label) => {
-  switch (label) {
-    case "Material":
-      return material;
-    case "Context":
-      return sampledFeature;
-    case "Specimen":
-      return specimanType;
-    default:
-      return null;
-  }
-}
-
 function CustomizedTreeView(props) {
-  const { label, value, onClick, facetCounts, facetValues} = props;
+  const { label, value, onClick, facetCounts, facetValues, hierarchy} = props;
   const schema = hierarchy(label);
   const firstLevel = schema[Object.keys(schema)[0]]["label"]["en"];
   const [filter, setFilter] = useState("");
   const [expanded, setExpanded] = useState([firstLevel]);
   const [selected, setSelected] = useState(value);
   const [countMap, setCountMap] = useState(new Map());
-  
+
   /** 
     recursively sets the count of a label
     1. if leaf node : get the count directly by comparing to facetCnt
@@ -180,7 +159,9 @@ function CustomizedTreeView(props) {
   useEffect(() => {
     const path = Array.from(new Set(value.map(v => findPath(schema, v)).flat()));
     setExpanded(prevExpaned => path.length > prevExpaned.length ? path : prevExpaned)
-    setSelected(value)
+    console.log("useEffect ",value, "selected")
+    setSelected(value);
+    // select to expand to children nodes 
   }, [schema, value])
 
   useEffect (() => {
@@ -194,7 +175,6 @@ function CustomizedTreeView(props) {
     const difference = nodeIds
       .filter(x => !expanded.includes(x))
       .concat(expanded.filter(x => !nodeIds.includes(x)));
-
     // For toggle items, we could use ctrl + enter to select the tree item
     if (event.ctrlKey && event.code === 'Enter') {
       onClick(difference[0]);
@@ -207,8 +187,8 @@ function CustomizedTreeView(props) {
     const difference = nodeIds
       .filter(x => !value.includes(x))
       .concat(value.filter(x => !nodeIds.includes(x)));
-    onClick(difference[0]);
     setSelected(nodeIds);
+    onClick(difference[0])
   };
 
   const handleFilter = (event) => {
