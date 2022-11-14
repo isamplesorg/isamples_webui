@@ -77,26 +77,25 @@ class ListFacet extends React.Component {
     }
   }
 
-  handleClick = (value) => {
-    const foundIdx = this.props.value.indexOf(value);
-
+  handleClick = (value, mode) => {
     // whenever a new label is clicked select all of the children labels 
-    const expandedLabels = [value]
     const currSchema = this.hierarchy(this.props.label);
-    // get all children labels of this selected label 
-    this.expandLabelSelected(value, currSchema, expandedLabels);
+    const expandedLabels = [value]
+    this.expandLabelSelected(value, currSchema, expandedLabels); // expand recursively
+    // filter out labels that are already existing
     expandedLabels.filter((item) => {
-      return this.props.value.indexOf(item) == -1 // filter out labels that are already existing
+      return this.props.value.indexOf(item) == -1
     })
-    if (foundIdx < 0) {
+    if (mode == "delete"){
+      // value is the node to be deleted
+      const foundIdx = this.props.value.indexOf(value);
+      // delete the node and the expanded children nodes 
+      this.props.value =  this.props.value.filter((v, i) => i != foundIdx && expandedLabels.indexOf(v) == -1);
+      this.props.onChange(this.props.field, this.props.value);
+    }
+    else if (mode == "add") {
+      // add the node and the expanded children nodes
       this.props.onChange(this.props.field, this.props.value.concat(expandedLabels));
-      console.log("handleClick ", expandedLabels, this.props.value)
-    } else {
-      // remove the selected label or all the children labels
-      this.props.onChange(this.props.field, this.props.value.filter((v, i) => i!= foundIdx ));
-      // remove all children labels
-      this.props.onChange(this.props.field, this.props.value.filter((v, i) => {return expandedLabels.indexOf(v) == -1} ));
-      console.log("handleClick ", this.props.value, value, foundIdx)
     }
   }
 

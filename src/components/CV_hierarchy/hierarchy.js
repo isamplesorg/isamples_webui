@@ -9,6 +9,7 @@ import { TreeView, treeItemClasses } from '@mui/lab';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import CustomTreeItem from './customContent';
+import { FactCheck } from '@mui/icons-material';
 
 // Use mui styled function to add style to TreeItem
 const StyledTreeItem = styled((props) => <CustomTreeItem {...props} />)(
@@ -135,8 +136,14 @@ function CustomizedTreeView(props) {
         if (childLabels.length == 0) {
           // get the count by directly comparing to facetValues
           for (const idx in facetValues){
-            const facetValue = facetValues[idx].toLocaleLowerCase()
-            if (facetValue.includes(label.toLocaleLowerCase())){
+            const facetValue = facetValues[idx];
+            if (value.length == 0 && facetValue.toLocaleLowerCase()== label.toLocaleLowerCase()){ 
+              // when no labels are selected for search,
+              // display all label count
+              totalCnt += facetCounts[idx];
+            }
+            else if (value.indexOf(facetValue) !== -1 && facetValue.toLocaleLowerCase()== label.toLocaleLowerCase() ){
+              // display only selected labels cnt 
               totalCnt += facetCounts[idx];
             }
           }
@@ -159,17 +166,13 @@ function CustomizedTreeView(props) {
   useEffect(() => {
     const path = Array.from(new Set(value.map(v => findPath(schema, v)).flat()));
     setExpanded(prevExpaned => path.length > prevExpaned.length ? path : prevExpaned)
-    console.log("useEffect ",value, "selected")
-    setSelected(value);
-    // select to expand to children nodes 
-  }, [schema, value])
-
-  useEffect (() => {
-    // calculate the count of labels when full facet values are fetched
+    // calculate the counts 
     if (Array.isArray(facetValues)){
+      setCountMap(new Map()); // initialize counts 
       calculateCounts(schema);
     }
-  }, [facetValues])
+    setSelected(value);
+  }, [schema, value, facetValues])
 
   const handleToggle = (event, nodeIds) => {
     const difference = nodeIds
@@ -184,11 +187,17 @@ function CustomizedTreeView(props) {
   };
 
   const handleSelect = (event, nodeIds) => {
+    // nodeIds[0] is the selected label 
     const difference = nodeIds
       .filter(x => !value.includes(x))
       .concat(value.filter(x => !nodeIds.includes(x)));
-    setSelected(nodeIds);
-    onClick(difference[0])
+    if (value.includes(nodeIds[0])){
+      // remove the selected label
+      onClick(nodeIds[0], "delete");
+    } else{
+      // add the selected label
+      onClick(nodeIds[0], "add" )
+    }
   };
 
   const handleFilter = (event) => {
