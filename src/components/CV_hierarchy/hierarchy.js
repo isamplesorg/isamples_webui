@@ -133,16 +133,16 @@ function CustomizedTreeView(props) {
         const label = currSchema[key]["label"]["en"];
         let totalCnt = 0; // total cnt of this label 
         // leaf node
-        if (childLabels.length == 0) {
+        if (childLabels.length === 0) {
           // get the count by directly comparing to facetValues
           for (const idx in facetValues){
             const facetValue = facetValues[idx];
-            if (value.length == 0 && facetValue.toLocaleLowerCase()== label.toLocaleLowerCase()){ 
+            if (value.length === 0 && facetValue.toLocaleLowerCase() === label.toLocaleLowerCase()){ 
               // when no labels are selected for search,
               // display all label count
               totalCnt += facetCounts[idx];
             }
-            else if (value.indexOf(facetValue) !== -1 && facetValue.toLocaleLowerCase()== label.toLocaleLowerCase() ){
+            else if (value.indexOf(facetValue) !== -1 && facetValue.toLocaleLowerCase() === label.toLocaleLowerCase() ){
               // display only selected labels cnt 
               totalCnt += facetCounts[idx];
             }
@@ -172,12 +172,9 @@ function CustomizedTreeView(props) {
       calculateCounts(schema);
     }
     setSelected(value);
-  }, [schema, value, facetValues])
+  }, [schema, value, facetValues, calculateCounts])
 
   const handleToggle = (event, nodeIds) => {
-    const difference = nodeIds
-      .filter(x => !expanded.includes(x))
-      .concat(expanded.filter(x => !nodeIds.includes(x)));
     // For toggle items, we could use ctrl + enter to select the tree item
     if (event.ctrlKey && event.code === 'Enter') {
       onClick(difference[0]);

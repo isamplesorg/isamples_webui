@@ -86,14 +86,14 @@ class ListFacet extends React.Component {
     expandedLabels.filter((item) => {
       return this.props.value.indexOf(item) == -1
     })
-    if (mode == "delete"){
+    if (mode === "delete"){
       // value is the node to be deleted
       const foundIdx = this.props.value.indexOf(value);
       // delete the node and the expanded children nodes 
       this.props.value =  this.props.value.filter((v, i) => i != foundIdx && expandedLabels.indexOf(v) == -1);
       this.props.onChange(this.props.field, this.props.value);
     }
-    else if (mode == "add") {
+    else if (mode === "add") {
       // add the node and the expanded children nodes
       this.props.onChange(this.props.field, this.props.value.concat(expandedLabels));
     }
