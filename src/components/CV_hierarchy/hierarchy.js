@@ -9,7 +9,6 @@ import { TreeView, treeItemClasses } from '@mui/lab';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import CustomTreeItem from './customContent';
-import { FactCheck } from '@mui/icons-material';
 
 // Use mui styled function to add style to TreeItem
 const StyledTreeItem = styled((props) => <CustomTreeItem {...props} />)(
@@ -160,7 +159,7 @@ function CustomizedTreeView(props) {
     } else {
       return null;
     }
-  }, [facetValues, value]);
+  }, [facetValues,facetCounts, value, countMap]);
 
   // Update tree view based on the facet filter
   useEffect(() => {
@@ -172,7 +171,7 @@ function CustomizedTreeView(props) {
       calculateCounts(schema);
     }
     setSelected(value);
-  }, [schema, value, facetValues])
+  }, [schema, value, facetValues, calculateCounts])
 
   const handleToggle = (event, nodeIds) => {
     const difference = nodeIds
