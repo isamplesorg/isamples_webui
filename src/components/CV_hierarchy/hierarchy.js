@@ -3,16 +3,12 @@
  * https://mui.com/material-ui/react-tree-view/
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { alpha, styled, Typography } from '@mui/material';
 import { TreeView, treeItemClasses } from '@mui/lab';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import CustomTreeItem from './customContent';
-
-import material from 'CVJSON/material_hierarchy.json';
-import sampledFeature from "CVJSON/sampledFeature_hierarchy.json";
-import specimanType from "CVJSON/specimenType_hierarchy.json";
 
 // Use mui styled function to add style to TreeItem
 const StyledTreeItem = styled((props) => <CustomTreeItem {...props} />)(
@@ -50,17 +46,18 @@ const labelContent = (label, labelInfo) => {
  * @param {Object} param0
  * @returns
  */
-const CreateTree = ({ data, onClick }) => {
+const CreateTree = ({ data, onClick, countMap }) => {
   // The function to create tree items
   const treeItems = (json) => {
     return Object.entries(json).map(([key, val]) => {
       const label = val["label"]["en"];
+      let labelCnt = countMap && countMap.get(label) ? countMap.get(label) : 0 ;
       if (val["children"].length === 0) {
-        return <StyledTreeItem key={label} nodeId={label} label={labelContent(label, 0)} onClick={onClick} />;
+        return <StyledTreeItem key={label} nodeId={label} label={labelContent(label, labelCnt)} onClick={onClick} />;
       } else {
         return (
-          <StyledTreeItem key={label} nodeId={label} label={labelContent(label, 0)} onClick={onClick}>
-            <CreateTree data={val["children"]} onClick={onClick} />
+          <StyledTreeItem key={label} nodeId={label} label={labelContent(label, labelCnt)} onClick={onClick}>
+            <CreateTree data={val["children"]} onClick={onClick} countMap={countMap}/>
           </StyledTreeItem>
         );
       }
@@ -104,44 +101,82 @@ const findPath = (tree, target) => {
   return res;
 };
 
-/**
- * Static json for now.
- * Will use REST api to get json file from server
- */
-const hierarchy = (label) => {
-  switch (label) {
-    case "Material":
-      return material;
-    case "Context":
-      return sampledFeature;
-    case "Specimen":
-      return specimanType;
-    default:
-      return null;
-  }
-}
-
 function CustomizedTreeView(props) {
-  const { label, value, onClick } = props;
+  const { label, value, onClick, facetCounts, facetValues, hierarchy} = props;
   const schema = hierarchy(label);
   const firstLevel = schema[Object.keys(schema)[0]]["label"]["en"];
-
   const [filter, setFilter] = useState("");
   const [expanded, setExpanded] = useState([firstLevel]);
   const [selected, setSelected] = useState(value);
+  const [countMap, setCountMap] = useState(new Map());
+
+  /** 
+    recursively sets the count of a label
+    1. if leaf node : get the count directly by comparing to facetCnt
+    2. if non-leaf node: get the count by adding up the childNode counts using countMap 
+    @param currSchema an object that is used for recursion 
+  */ 
+  const calculateCounts = useCallback( (currSchema) => {
+    // when all facetValues are fetched
+    if(Array.isArray(facetValues)){
+      for (const key in currSchema){
+        const childLabels = []; // the child labels of this label 
+        for (const childSchema of currSchema[key]["children"]){
+          // recursively save the counts in countMap
+          // and get the child node labels
+          let childLabel = calculateCounts(childSchema);
+          if (childLabel){
+            childLabels.push(childLabel);
+          } 
+        }
+        const label = currSchema[key]["label"]["en"];
+        let totalCnt = 0; // total cnt of this label 
+        // leaf node
+        if (childLabels.length === 0) {
+          // get the count by directly comparing to facetValues
+          for (const idx in facetValues){
+            const facetValue = facetValues[idx];
+            if (value.length === 0 && facetValue.toLocaleLowerCase()=== label.toLocaleLowerCase()){ 
+              // when no labels are selected for search,
+              // display all label count
+              totalCnt += facetCounts[idx];
+            }
+            else if (value.indexOf(facetValue) !== -1 && facetValue.toLocaleLowerCase()=== label.toLocaleLowerCase() ){
+              // display only selected labels cnt 
+              totalCnt += facetCounts[idx];
+            }
+          }
+        } else{
+          // non - leaf node
+          for (const childLabel of childLabels){
+            // add up the count from child labels
+            totalCnt += countMap.get(childLabel); 
+          }
+        }
+        setCountMap(countMap.set(label, totalCnt))
+        return label;
+      }
+    } else {
+      return null;
+    }
+  }, [facetValues,facetCounts, value, countMap]);
 
   // Update tree view based on the facet filter
   useEffect(() => {
     const path = Array.from(new Set(value.map(v => findPath(schema, v)).flat()));
     setExpanded(prevExpaned => path.length > prevExpaned.length ? path : prevExpaned)
-    setSelected(value)
-  }, [schema, value])
+    // calculate the counts 
+    if (Array.isArray(facetValues)){
+      setCountMap(new Map()); // initialize counts 
+      calculateCounts(schema);
+    }
+    setSelected(value);
+  }, [schema, value, facetValues, calculateCounts])
 
   const handleToggle = (event, nodeIds) => {
     const difference = nodeIds
       .filter(x => !expanded.includes(x))
       .concat(expanded.filter(x => !nodeIds.includes(x)));
-
     // For toggle items, we could use ctrl + enter to select the tree item
     if (event.ctrlKey && event.code === 'Enter') {
       onClick(difference[0]);
@@ -151,11 +186,14 @@ function CustomizedTreeView(props) {
   };
 
   const handleSelect = (event, nodeIds) => {
-    const difference = nodeIds
-      .filter(x => !value.includes(x))
-      .concat(value.filter(x => !nodeIds.includes(x)));
-    onClick(difference[0]);
-    setSelected(nodeIds);
+    // nodeIds[0] is the selected label 
+    if (value.includes(nodeIds[0])){
+      // remove the selected label
+      onClick(nodeIds[0], "delete");
+    } else{
+      // add the selected label
+      onClick(nodeIds[0], "add" )
+    }
   };
 
   const handleFilter = (event) => {
@@ -169,22 +207,24 @@ function CustomizedTreeView(props) {
   };
 
   return (
-    <div className='list-facet__custom'>
-      <TreeView
-        aria-label="customized"
-        defaultCollapseIcon={<ExpandLessIcon />}
-        defaultExpandIcon={<ExpandMoreIcon />}
-        expanded={expanded}
-        selected={selected}
-        onNodeToggle={handleToggle}
-        onNodeSelect={handleSelect}
-        multiSelect
-      >
-        <CreateTree data={schema} onClick={onClick} />
-      </TreeView>
-      <input onChange={handleFilter} value={filter} placeholder="Filter..." />
-    </div>
-  );
+  <div className='list-facet__custom'>
+    
+     <TreeView
+          aria-label="customized"
+          defaultCollapseIcon={<ExpandLessIcon />}
+          defaultExpandIcon={<ExpandMoreIcon />}
+          expanded={expanded}
+          selected={selected}
+          onNodeToggle={handleToggle}
+          onNodeSelect={handleSelect}
+          multiSelect
+        >
+          <CreateTree data={schema} onClick={onClick} countMap={countMap} />
+        </TreeView>
+        <input onChange={handleFilter} value={filter} placeholder="Filter..." />
+   
+    </div> 
+  )
 }
 
 export default CustomizedTreeView;
