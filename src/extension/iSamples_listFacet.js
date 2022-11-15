@@ -49,7 +49,7 @@ class ListFacet extends React.Component {
   expandLabelSelected = (selected, currSchema, childLabels) => {
     for (const key in currSchema){
       const label = currSchema[key]["label"]["en"];
-      if (label == selected){
+      if (label === selected){
         // get all the children nodes from here
         this.expandLabelSelectedHelper(currSchema,childLabels);
       }
@@ -84,13 +84,13 @@ class ListFacet extends React.Component {
     this.expandLabelSelected(value, currSchema, expandedLabels); // expand recursively
     // filter out labels that are already existing
     expandedLabels.filter((item) => {
-      return this.props.value.indexOf(item) == -1
+      return this.props.value.indexOf(item) === -1
     })
     if (mode === "delete"){
       // value is the node to be deleted
       const foundIdx = this.props.value.indexOf(value);
       // delete the node and the expanded children nodes 
-      this.props.value =  this.props.value.filter((v, i) => i != foundIdx && expandedLabels.indexOf(v) == -1);
+      this.props.value =  this.props.value.filter((v, i) => i !== foundIdx && expandedLabels.indexOf(v) === -1);
       this.props.onChange(this.props.field, this.props.value);
     }
     else if (mode === "add") {

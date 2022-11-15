@@ -3,7 +3,7 @@
  * https://mui.com/material-ui/react-tree-view/
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { alpha, styled, Typography } from '@mui/material';
 import { TreeView, treeItemClasses } from '@mui/lab';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -117,7 +117,7 @@ function CustomizedTreeView(props) {
     2. if non-leaf node: get the count by adding up the childNode counts using countMap 
     @param currSchema an object that is used for recursion 
   */ 
-  const calculateCounts = (currSchema) => {
+  const calculateCounts = useCallback( (currSchema) => {
     // when all facetValues are fetched
     if(Array.isArray(facetValues)){
       for (const key in currSchema){
@@ -133,7 +133,7 @@ function CustomizedTreeView(props) {
         const label = currSchema[key]["label"]["en"];
         let totalCnt = 0; // total cnt of this label 
         // leaf node
-        if (childLabels.length == 0) {
+        if (childLabels.length === 0) {
           // get the count by directly comparing to facetValues
           for (const idx in facetValues){
             const facetValue = facetValues[idx];
@@ -160,7 +160,7 @@ function CustomizedTreeView(props) {
     } else {
       return null;
     }
-  }
+  }, [facetValues, value]);
 
   // Update tree view based on the facet filter
   useEffect(() => {
@@ -172,7 +172,7 @@ function CustomizedTreeView(props) {
       calculateCounts(schema);
     }
     setSelected(value);
-  }, [schema, value, facetValues, calculateCounts])
+  }, [schema, value, facetValues])
 
   const handleToggle = (event, nodeIds) => {
     const difference = nodeIds
