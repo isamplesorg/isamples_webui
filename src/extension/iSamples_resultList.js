@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { useState } from "react";
+import React from "react";
 import cx from "classnames";
 import Table from 'components/react_table';
 import CesiumMap from "components/cesium_map/cesium_UI";
@@ -22,7 +22,7 @@ class ResultList extends React.Component {
     // update hidden columns array 
     const updatedHiddenCols = this.state.hiddenCols;
     // add only if it did not exist in the previous state
-    if(updatedHiddenCols.indexOf(col['id']) == -1){
+    if(updatedHiddenCols.indexOf(col['id']) === -1){
       updatedHiddenCols.push(col['id']);
     }
     // set the view, and this will invoke the solr client to save the updated state in redux store 
