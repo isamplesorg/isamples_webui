@@ -53,7 +53,8 @@ function Table(props) {
     prepareRow,
     allColumns,
     getToggleHideAllColumnsProps,
-  } = useTable({ columns, data, initialState : { hiddenColumns:  store.getState()['query']['view']['hiddenColumns'] } });
+  } = useTable({ columns, data, initialState : { hiddenColumns:  store.getState()['query']['view']['hiddenColumns'] ?  store.getState()['query']['view']['hiddenColumns'] : []
+  } });
 
   const toggleExpand = () => {
     setCollapse(!collapse)
