@@ -2,12 +2,11 @@ import React, { useState } from "react";
 import { useTable } from "react-table";
 import { ResultWrapper } from "./utilities";
 import cx from "classnames";
-
+import { store } from "redux/store";
 function Table(props) {
 
-  const { docs, fields } = props;
+  const { docs, fields, handleHiddenCols  } = props;
   const [collapse, setCollapse] = useState(false);
-
   // https://react-table.tanstack.com/docs/quick-start
   // Setup data and columns for react table
   // We must use "data", "columns" variable names for the useTable
@@ -54,12 +53,19 @@ function Table(props) {
     prepareRow,
     allColumns,
     getToggleHideAllColumnsProps,
-  } = useTable({ columns, data });
+  } = useTable({ columns, data, initialState : { hiddenColumns:  store.getState()['query']['view']['hiddenColumns'] } });
 
   const toggleExpand = () => {
     setCollapse(!collapse)
   };
 
+  // handler function that is invoked when user clicks the checkbox
+  // this will receive the selected field and pass it to the parent component
+  // in the parent component, this selected field will be stored in redux store
+  const handleClick = (e, column) =>{
+    handleHiddenCols(column);
+  }
+  
   return (
     <>
       <div className="field_select_group">
@@ -78,7 +84,7 @@ function Table(props) {
             {allColumns.map(column => (
               <div key={column.id}>
                 <label>
-                  <input type="checkbox" {...column.getToggleHiddenProps()} />{' '}
+                  <input type="checkbox" {...column.getToggleHiddenProps()}  onClick={(e) => handleClick(e, column)} />{' '}
                   {column.Header}
                 </label>
               </div>
