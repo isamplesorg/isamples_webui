@@ -9,7 +9,27 @@ import {connect} from "react-redux";
 import FadeLoader from "react-spinners/FadeLoader";
 
 class ResultList extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      hiddenCols: [], // initial state
+      facet:""
+    }
+  }
 
+  // handler function that is invoked from child component
+  handleHiddenCols = (col) => {
+    // update hidden columns array 
+    const updatedHiddenCols = this.state.hiddenCols;
+    // add only if it did not exist in the previous state
+    if(updatedHiddenCols.indexOf(col['id']) === -1){
+      updatedHiddenCols.push(col['id']);
+    }
+    // set the view, and this will invoke the solr client to save the updated state in redux store 
+    this.props.setView({ ...store.getState()['query']['view'], facet:this.state.facet, "hiddenColumns": this.state.hiddenCols});
+    // rerender the component
+    this.setState({hiddenCols : updatedHiddenCols}) 
+  }
 
   // prevent unnecessary rerendering
   shouldComponentUpdate(nextProps) {
@@ -34,7 +54,8 @@ class ResultList extends React.Component {
   // This function and shouldComponentUpdate are very similar.
   // Only view buttons need to set view to url.
   switchFormat = (format) => {
-    this.props.setView({ ...store.getState()['query']['view'], facet: format });
+    this.setState({hiddenCols:this.state.hiddenCols, facet:format})
+    this.props.setView({ ...store.getState()['query']['view'], facet: format, "hiddenColumns": store.getState()['query']['view']['hiddenCols']});
   }
 
   spinner = () => {
@@ -103,6 +124,7 @@ class ResultList extends React.Component {
                 <Table
                   docs={doc}
                   fields={fields}
+                  handleHiddenCols = {this.handleHiddenCols.bind(this)}
                 />
               </div>
               <div style={showView('Map')}>
