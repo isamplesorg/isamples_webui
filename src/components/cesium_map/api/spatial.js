@@ -165,13 +165,17 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
           } else {
             locations[location] = 1;
           }
+          if (Array.isArray(doc.z)){
+            doc.z = doc.z[0] // get integer value if multivalue field
+          }
           const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, (doc.z || DEFAULT_ELEVATION) + locations[location]);
           this.add({
             id: doc.id,
             position: p0,
             color: Cesium.Color.fromCssColorString(colorbind[CV.indexOf(doc[field]) % colorbind.length]),
             pixelSize: 8,
-            disableDepthTestDistance: 1
+            // disable the depth test
+            disableDepthTestDistance: Number.POSITIVE_INFINITY,
           })
           this.collection.push(Cesium.Cartographic.fromDegrees(doc.x, doc.y))
           this.lastPos = { x: doc.x, y: doc.y };
@@ -223,6 +227,7 @@ export class ISamplesSpatial {
     // 10 the minimum height for the points so the users wouldn't zoom to the ground.
     this.viewer.scene.screenSpaceCameraController.maximumZoomDistance = MAXIMUM_ZOOM_DISTANCE;
     this.viewer.scene.screenSpaceCameraController.minimumZoomDistance = MINIMUM_ZOOM_DISTANCE;
+
     // set camera inital position
     if (initialLocation) {
       this.viewer.camera.setView(initialLocation.getView);
@@ -426,6 +431,7 @@ export class ISamplesSpatial {
       this.pointprimitive.primitive.outlineColor = Cesium.Color.TRANSPARENT;
       this.pointprimitive.primitive.outlineWidth = 0;
     }
+ 
     if (Cesium.defined(selectPoint) && selectPoint.hasOwnProperty("primitive") && typeof selectPoint.id === 'string') {
       this.pointLabel.position = selectPoint.primitive.position;
       this.pointLabel.label.show = true;
@@ -456,7 +462,6 @@ export class ISamplesSpatial {
         }
       }
     } else {
-      console.log("start tracking");
       this.tracking_info.tracking = true;
       const _this = this;
       this.tracking_info.polyline = this.viewer.entities.add({
