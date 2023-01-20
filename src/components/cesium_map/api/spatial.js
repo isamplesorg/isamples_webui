@@ -17,6 +17,7 @@ import { wellFormatField } from 'components/utilities';
 const MAXIMUM_ZOOM_DISTANCE = 20000000;
 const MINIMUM_ZOOM_DISTANCE = 10;
 const DEFAULT_ELEVATION = 1;
+const DEBUG = false;
 /**
  * Describes a camera viewpoint for Cesium.
  * All units are degrees.
@@ -584,7 +585,7 @@ export class ISamplesSpatial {
     // see link:
     //    https://loading.io/css/
     let hud = html`<div class="spatial-hud" style="position: absolute; top: 0px; left: 0;">
-                    <p><code id='position'>0, 0, 0</code></p>
+                    ${DEBUG?  html`<p><code id='position'>0, 0, 0</code></p>`: ""}
                     <p><button id='clear-bb' class="cesium-button" style='display:none'>Clear BB</button></p>
                     <div id="selected-record"></div>
                   </div>
