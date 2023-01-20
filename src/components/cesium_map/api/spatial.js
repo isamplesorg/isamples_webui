@@ -262,6 +262,13 @@ export class ISamplesSpatial {
     // but this might not be a safe way if we don't trust the link source
     this.viewer.infoBox.frame.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms');
     this.viewer.infoBox.frame.removeAttribute("src");
+
+    // enable esc key support for closing the info box
+    document.addEventListener("keydown", ({key}) =>{
+      if (key === "Escape"){
+        this.viewer.selectedEntity = undefined; // close the info box
+      }
+    })
   }
 
   get canvas() {
