@@ -101,7 +101,7 @@ class HierarchyFacet extends React.Component{
         const expanded = !(collapse || false);
 
         return (
-        <li className={cx("hierarchy-facet", { "list-group-item": bootstrapCss })} id={`solr-list-facet-${field}`}>
+        <li className={cx("hierarchy-facet", { "hierarchy-group-item": bootstrapCss })} id={`solr-hierarchy-facet-${field}`}>
             <header onClick={this.toggleExpand.bind(this)}>
             <h5>
                 {bootstrapCss ? (<span>
