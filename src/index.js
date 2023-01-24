@@ -50,6 +50,7 @@ import {
 import NavFooter from "pages/navFooter";
 import DOIs from 'pages/DOIs';
 import UserInfo from 'pages/userInfo';
+import HierarchyFacet from 'extension/iSamples_hierarchyFacet';
 
 // initializa a cookie instance
 const cookies = new Cookies();
@@ -68,6 +69,7 @@ const iSamples_componentPack = {
     ...defaultComponentPack.searchFields,
     text: TextSearch,
     "list-facet": ListFacet,
+    "hierarchy-facet" : HierarchyFacet,
     container: SearchFieldContainer,
     "date-range-facet": iSamples_RangeFacet,
     "non-search": TextSearch,
@@ -112,7 +114,7 @@ function App() {
       const searchFields = encode(JSON.stringify(getAllValueField(query['searchFields'])));
       searchParamsDict['searchFields'] = searchFields;
     }
-
+    
     if (checkAllValue(query['sortFields'])) {
       const sortFields = encode(JSON.stringify(getAllValueField(query['sortFields'])));
       searchParamsDict['sortFields'] = sortFields;
@@ -127,7 +129,6 @@ function App() {
       const view = encode(JSON.stringify(query['view']));
       searchParamsDict['view'] = view;
     }
-
     setSearchParams(searchParamsDict);
 
     // cookie library:
