@@ -25,7 +25,7 @@ const fields = [
   { field: "producedBy_label", type: "non-search", hidden: true },
   { field: "producedBy_responsibility", type: "non-search", hidden: true },
   { field: "producedBy_resultTime", type: "non-search" },
-  { label: "Collection Date", field: "producedBy_resultTimeRange", type: "date-range-facet", minValue: 1800, maxValue: new Date().getFullYear() },
+  { label: "Collection Date", field: "producedBy_resultTimeRange", type: "date-range-facet", minValue: 1800, maxValue: new Date().getFullYear() , value:[1800, new Date().getFullYear()]},
   { field: "producedBy_samplingSite_description_text", type: "non-search", hidden: true },
   { field: "producedBy_samplingSite_label", type: "non-search", hidden: true },
   { field: "producedBy_samplingSite_location_elevationInMeters", type: "non-search", hidden: true },
