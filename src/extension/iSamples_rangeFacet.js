@@ -4,7 +4,7 @@ import cx from "classnames";
 import {
   defaultComponentPack
 } from "solr-faceted-search-react";
-
+import { MIN_YEAR, MAX_YEAR } from "fields.js";
 
 class iSamples_RangeFacet extends React.Component {
 
@@ -78,8 +78,15 @@ class iSamples_RangeFacet extends React.Component {
 
   getCount(rangeValues, rangeCounts){
     const newCounts = {};
-    for (let i = 0; i < rangeValues.length; i++)
-      newCounts[rangeValues[i]] = rangeCounts[i];
+    for (let i = MIN_YEAR; i <= MAX_YEAR; i++){
+      let idx = rangeValues.indexOf(i);
+      if ( idx !== -1) {
+        newCounts[i] = rangeCounts[idx];
+      } 
+      else {
+        newCounts[i] = 0;
+      }
+    }
     return newCounts;
   }
   
@@ -94,12 +101,8 @@ class iSamples_RangeFacet extends React.Component {
 
     const filterRange = value.length > 0 ? value : range;
 
-    const counts = {}
     const rangeCounts = facets.filter((facet, i) => i % 2 === 1);
-    const rangeValues = facets.filter((facet, i) => i % 2 === 0);
-    const dummy_highlight = [1800, 2023] // TODO : change to dynamic value
-    for (let i = 0; i < rangeValues.length; i++)
-    counts[rangeValues[i]] = rangeCounts[i]
+    const rangeValues = facets.filter((facet, i) => i % 2 === 0).map(range => parseInt(range.substring(0,4)));
 
     return (
       <li className={cx("range-facet", { "list-group-item": bootstrapCss })} id={`solr-range-facet-${field}`}>
@@ -127,7 +130,7 @@ class iSamples_RangeFacet extends React.Component {
 
         </header>
         <div style={{ display: collapse ? "none" : "block" }}>
-              <defaultComponentPack.searchFields.barChart data = {this.getCount(rangeValues, rangeCounts)} highlight = {dummy_highlight} barDataValues={rangeCounts} /> 
+              <defaultComponentPack.searchFields.barChart data = {this.getCount(rangeValues, rangeCounts)} barDataValues={rangeCounts} /> 
               <defaultComponentPack.searchFields.rangeSlider lowerLimit={this.getPercentage(range, filterRange[0])} onChange={this.onRangeChange.bind(this)}upperLimit={this.getPercentage(range, filterRange[1])} />
               <label>{filterRange[0]}</label>
               <label className={cx({ "pull-right": bootstrapCss })}>{filterRange[1]}</label>
