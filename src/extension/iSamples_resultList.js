@@ -34,7 +34,7 @@ class ResultList extends React.Component {
   // prevent unnecessary rerendering
   shouldComponentUpdate(nextProps) {
     this.switchView(store.getState()['query']['view']['facet']);
-    if (JSON.stringify(nextProps) !== JSON.stringify(this.props)) {
+    if (nextProps != this.props) {
       return true;
     }
     return false;
