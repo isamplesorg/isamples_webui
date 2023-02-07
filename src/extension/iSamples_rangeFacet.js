@@ -52,7 +52,6 @@ class iSamples_RangeFacet extends React.Component {
         Math.ceil(range.upperLimit * realRange) + lowerBound
       ]
     };
-
     if (range.refresh) {
       this.props.onChange(this.props.field, newState.value);
     } else {
@@ -89,11 +88,20 @@ class iSamples_RangeFacet extends React.Component {
     }
     return newCounts;
   }
-  
+
+  getBarData(rangeValues, rangeCounts){
+    const data = this.getCount(rangeValues, rangeCounts);
+    const newBarData = [];
+    if (rangeCounts.length > 0) {
+        const ranges = Object.keys(data); // year (keys) of objects
+        ranges.forEach((range) => newBarData.push(data[range]));
+    }
+    return newBarData;
+  }
+
   render() {
     const { label, facets, field, bootstrapCss, collapse } = this.props;
     const { value } = this.state;
-
     // Original line was:
     // const range = this.facetsToRange();
     // Instead, make our UI range always conform to min/max values rather than the returned facets.
@@ -130,7 +138,7 @@ class iSamples_RangeFacet extends React.Component {
 
         </header>
         <div style={{ display: collapse ? "none" : "block" }}>
-              <defaultComponentPack.searchFields.barChart data = {this.getCount(rangeValues, rangeCounts)} barDataValues={rangeCounts} /> 
+              <defaultComponentPack.searchFields.barChart data = {this.getBarData(rangeValues, rangeCounts)} minYear = {MIN_YEAR} /> 
               <defaultComponentPack.searchFields.rangeSlider lowerLimit={this.getPercentage(range, filterRange[0])} onChange={this.onRangeChange.bind(this)}upperLimit={this.getPercentage(range, filterRange[1])} />
               <label>{filterRange[0]}</label>
               <label className={cx({ "pull-right": bootstrapCss })}>{filterRange[1]}</label>
