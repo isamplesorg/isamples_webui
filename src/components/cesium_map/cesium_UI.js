@@ -303,6 +303,13 @@ class CesiumMap extends React.Component {
     };
   };
 
+  // function that updates the points of the layer 
+  redrawPointLayer = (mapInfo, newSearchFields) => {
+    searchFields = newSearchFields; 
+    clearBoundingBox(true);
+    this.updatePrimitive(mapInfo.latitude, mapInfo.longitude);
+  }
+
   // This is a initial function in react liftcycle.
   // Only call once when this component first render
   componentDidMount() {

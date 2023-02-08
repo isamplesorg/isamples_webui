@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React from "react";
+import React, { useCallback } from "react";
 import cx from "classnames";
 import Table from 'components/react_table';
 import CesiumMap from "components/cesium_map/cesium_UI";
@@ -13,8 +13,11 @@ class ResultList extends React.Component {
     super(props)
     this.state = {
       hiddenCols: [], // initial state
-      facet:""
+      facet:"",
+      view:{},
+      searchFields: []
     }
+    this.cesiumMapRef = React.createRef();
   }
 
   // handler function that is invoked from child component
@@ -31,10 +34,42 @@ class ResultList extends React.Component {
     this.setState({hiddenCols : updatedHiddenCols}) 
   }
 
+  // compare two arrays and checks equality 
+  arraysEqual(a, b) {
+    if (a === b) return true;
+    if (a == null || b == null) return false;
+    if (a.length !== b.length) return false;
+  
+    for (var i = 0; i < a.length; ++i) {
+      if (a[i] !== b[i]) return false;
+    }
+    return true;
+  }
+
   // prevent unnecessary rerendering
   shouldComponentUpdate(nextProps) {
     this.switchView(store.getState()['query']['view']['facet']);
-    if (JSON.stringify(nextProps) !== JSON.stringify(this.props)) {
+
+    // compare only the necessary fields that require this component to re-render
+    const doUpdate = (nextProps.view !== this.props.view) || (nextProps.bootstrapCss !== this.props.bootstrapCss); 
+
+    // check if the cesium map point layer should be changed
+    // if it does, then invoke the child component's function  
+    const newView = store.getState()['query']['view'];
+    const fields = store.getState()['query']['searchFields'];
+    const newSearchFields = fields
+      .filter((field) => field.type !== "non-search" && field.type !== "spatialquery")
+      .map(({ collapse, hidden, ...rest }) => rest);
+
+    let pointLayerUpdate = JSON.stringify(this.state.view) !== JSON.stringify(newView) 
+                            || this.arraysEqual(this.state.searchFields, newSearchFields) ; 
+
+    if (pointLayerUpdate){
+      // redraw the cesium map point layer 
+      this.cesiumMapRef.current.redrawPointLayer(newView, newSearchFields)  
+    }
+
+    if (doUpdate){
       return true;
     }
     return false;
@@ -104,7 +139,6 @@ class ResultList extends React.Component {
 
     // view style
     const showView = (targetView) => ({ display: view['facet'] === targetView ? "block" : "none" });
-
     return (
      <ButGroup
         bootstrapCss={bootstrapCss}
@@ -133,11 +167,13 @@ class ResultList extends React.Component {
                   searchFields.length > 0
                     ?
                     <CesiumMap
+                      ref={this.cesiumMapRef}
                       mapInfo={view}
                       setCamera={setView}
                       newSearchFields={searchFields}
                       newBbox={bbox}
-                      onSetFields={onChange} />
+                      onSetFields={onChange} 
+                    />
                     : <div className='Cesium__norecord'>There is no record, Please clear query.</div>
                 }
               </div>
