@@ -303,13 +303,6 @@ class CesiumMap extends React.Component {
     };
   };
 
-  // function that updates the points of the layer 
-  redrawPointLayer = (mapInfo, newSearchFields) => {
-    searchFields = newSearchFields; 
-    clearBoundingBox(true);
-    this.updatePrimitive(mapInfo.latitude, mapInfo.longitude);
-  }
-
   // This is a initial function in react liftcycle.
   // Only call once when this component first render
   componentDidMount() {
@@ -389,15 +382,12 @@ class CesiumMap extends React.Component {
   // https://medium.com/@garrettmac/reactjs-how-to-safely-manipulate-the-dom-when-reactjs-cant-the-right-way-8a20928e8a6
   // manipulate Dom outside the react model
   shouldComponentUpdate(nextProps) {
-    // update point primitive based on searchFields
-    const sf1 = JSON.stringify(nextProps.newSearchFields);
-    const sf2 = JSON.stringify(this.props.newSearchFields);
-    if (sf1 !== sf2) {
-      // clear all element in cesium
-      searchFields = nextProps.newSearchFields;
-      clearBoundingBox(true);
-      this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
-    };
+    // this method will be called when the search field facet changed 
+    // clear all element in cesium
+    searchFields = nextProps.newSearchFields;
+    clearBoundingBox(true);
+    // update the point layer
+    this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
 
     // update bounding box based on bbox
     const bb1 = JSON.stringify(nextProps.newBbox);
