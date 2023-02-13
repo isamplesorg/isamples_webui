@@ -1,22 +1,20 @@
 import PropTypes from 'prop-types';
 import React from "react";
 import cx from "classnames";
-
 import {
   defaultComponentPack
 } from "solr-faceted-search-react";
-
+import { MIN_YEAR, MAX_YEAR } from "fields.js";
 
 class iSamples_RangeFacet extends React.Component {
 
   constructor(props) {
     super(props);
-
     this.state = {
       value: props.value,
       // New state values for min and max range for slider UI.
       minValue: props.minValue,
-      maxValue: props.maxValue
+      maxValue: props.maxValue,
     };
   }
 
@@ -54,7 +52,6 @@ class iSamples_RangeFacet extends React.Component {
         Math.ceil(range.upperLimit * realRange) + lowerBound
       ]
     };
-
     if (range.refresh) {
       this.props.onChange(this.props.field, newState.value);
     } else {
@@ -78,11 +75,33 @@ class iSamples_RangeFacet extends React.Component {
     }
   }
 
+  getCount(rangeValues, rangeCounts){
+    const newCounts = {};
+    for (let i = MIN_YEAR; i <= MAX_YEAR; i++){
+      let idx = rangeValues.indexOf(i);
+      if ( idx !== -1) {
+        newCounts[i] = rangeCounts[idx];
+      } 
+      else {
+        newCounts[i] = 0;
+      }
+    }
+    return newCounts;
+  }
+
+  getBarData(rangeValues, rangeCounts){
+    const data = this.getCount(rangeValues, rangeCounts);
+    const newBarData = [];
+    if (rangeCounts.length > 0) {
+        const ranges = Object.keys(data); // year (keys) of objects
+        ranges.forEach((range) => newBarData.push(data[range]));
+    }
+    return newBarData;
+  }
 
   render() {
-    const { label, field, bootstrapCss, collapse } = this.props;
+    const { label, facets, field, bootstrapCss, collapse } = this.props;
     const { value } = this.state;
-
     // Original line was:
     // const range = this.facetsToRange();
     // Instead, make our UI range always conform to min/max values rather than the returned facets.
@@ -90,6 +109,8 @@ class iSamples_RangeFacet extends React.Component {
 
     const filterRange = value.length > 0 ? value : range;
 
+    const rangeCounts = facets.filter((facet, i) => i % 2 === 1);
+    const rangeValues = facets.filter((facet, i) => i % 2 === 0).map(range => parseInt(range.substring(0,4)));
 
     return (
       <li className={cx("range-facet", { "list-group-item": bootstrapCss })} id={`solr-range-facet-${field}`}>
@@ -116,12 +137,11 @@ class iSamples_RangeFacet extends React.Component {
           </h5>
 
         </header>
-
         <div style={{ display: collapse ? "none" : "block" }}>
-          <defaultComponentPack.searchFields.rangeSlider lowerLimit={this.getPercentage(range, filterRange[0])} onChange={this.onRangeChange.bind(this)}
-            upperLimit={this.getPercentage(range, filterRange[1])} />
-          <label>{filterRange[0]}</label>
-          <label className={cx({ "pull-right": bootstrapCss })}>{filterRange[1]}</label>
+              <defaultComponentPack.searchFields.barChart data = {this.getBarData(rangeValues, rangeCounts)} minYear = {MIN_YEAR} /> 
+              <defaultComponentPack.searchFields.rangeSlider lowerLimit={this.getPercentage(range, filterRange[0])} onChange={this.onRangeChange.bind(this)}upperLimit={this.getPercentage(range, filterRange[1])} />
+              <label>{filterRange[0]}</label>
+              <label className={cx({ "pull-right": bootstrapCss })}>{filterRange[1]}</label>
         </div>
       </li>
     );

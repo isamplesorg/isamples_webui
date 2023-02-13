@@ -6,6 +6,9 @@
 
 // For the solr faceted search variables
 // ----------------------------------------------------------------------------------------
+const MIN_YEAR = 1800;
+const MAX_YEAR = new Date().getFullYear();
+
 const fields = [
   { field: "curation_accessContraints", type: "non-search", hidden: true },
   { field: "curation_description_text", type: "non-search", hidden: true },
@@ -25,7 +28,7 @@ const fields = [
   { field: "producedBy_label", type: "non-search", hidden: true },
   { field: "producedBy_responsibility", type: "non-search", hidden: true },
   { field: "producedBy_resultTime", type: "non-search" },
-  { label: "Collection Date", field: "producedBy_resultTimeRange", type: "date-range-facet", minValue: 1800, maxValue: new Date().getFullYear() },
+  { label: "Collection Date", field: "producedBy_resultTimeRange", type: "date-range-facet", minValue: MIN_YEAR, maxValue: MAX_YEAR , value:[MIN_YEAR, MAX_YEAR]},
   { field: "producedBy_samplingSite_description_text", type: "non-search", hidden: true },
   { field: "producedBy_samplingSite_label", type: "non-search", hidden: true },
   { field: "producedBy_samplingSite_location_elevationInMeters", type: "non-search", hidden: true },
@@ -274,5 +277,7 @@ export {
   source,
   DOIFIELDS_REQUIRED,
   DOIFIELDS_RECOMMENDED,
-  ISAMPLES_RECOMMENDED
+  ISAMPLES_RECOMMENDED,
+  MIN_YEAR,
+  MAX_YEAR
 }
