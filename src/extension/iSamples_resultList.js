@@ -13,7 +13,9 @@ class ResultList extends React.Component {
     super(props)
     this.state = {
       hiddenCols: [], // initial state
-      facet:""
+      facet:"",
+      view:{},
+      numFound: 0,
     }
   }
 
@@ -33,8 +35,13 @@ class ResultList extends React.Component {
 
   // prevent unnecessary rerendering
   shouldComponentUpdate(nextProps) {
+    const { results } = this.props
     this.switchView(store.getState()['query']['view']['facet']);
-    if (nextProps !== this.props) {
+
+    // do an update of points only when the number of points change     
+    let doUpdate = !results.pending && results.numFound !== this.state.numFound; 
+    if (doUpdate){
+      this.setState({numFound: results.numFound});
       return true;
     }
     return false;
@@ -83,7 +90,7 @@ class ResultList extends React.Component {
   }
   
   render() {
-    const { bootstrapCss, onChange, setView, pending} = this.props;
+    const { bootstrapCss, onChange, setView, pending, results } = this.props;
     const view = store.getState()['query']['view'];
 
     const doc = store.getState()['results']['docs'];
@@ -101,10 +108,8 @@ class ResultList extends React.Component {
       : {}
 
     if (bbox) { delete bbox['error'] }
-
     // view style
     const showView = (targetView) => ({ display: view['facet'] === targetView ? "block" : "none" });
-
     return (
      <ButGroup
         bootstrapCss={bootstrapCss}
@@ -133,11 +138,13 @@ class ResultList extends React.Component {
                   searchFields.length > 0
                     ?
                     <CesiumMap
+                      numFound={results.numFound}
                       mapInfo={view}
                       setCamera={setView}
                       newSearchFields={searchFields}
                       newBbox={bbox}
-                      onSetFields={onChange} />
+                      onSetFields={onChange} 
+                    />
                     : <div className='Cesium__norecord'>There is no record, Please clear query.</div>
                 }
               </div>
