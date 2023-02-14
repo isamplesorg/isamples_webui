@@ -38,15 +38,15 @@ class HierarchyFacet extends React.Component{
 
     expandLabelSelected = (selected, currSchema, childLabels) => {
         for (const key in currSchema){
-        const label = currSchema[key]["label"]["en"];
-        if (label === selected){
-            // get all the children nodes from here
-            this.expandLabelSelectedHelper(currSchema,childLabels);
-        }
-        for (const childSchema of currSchema[key]["children"]){
-            // recursively call to find the selected label 
-            this.expandLabelSelected(selected, childSchema, childLabels)
-        }
+            const label = currSchema[key]["label"]["en"];
+            if (label === selected){
+                // get all the children nodes from here
+                this.expandLabelSelectedHelper(currSchema,childLabels);
+            }
+            for (const childSchema of currSchema[key]["children"]){
+                // recursively call to find the selected label 
+                this.expandLabelSelected(selected, childSchema, childLabels)
+            }
         }
     }
 
@@ -80,8 +80,8 @@ class HierarchyFacet extends React.Component{
             // value is the node to be deleted
             const foundIdx = this.props.value.indexOf(value);
             // delete the node and the expanded children nodes 
-            this.props.value =  this.props.value.filter((v, i) => i !== foundIdx && expandedLabels.indexOf(v) === -1);
-            this.props.onChange(this.props.field, this.props.value);
+            const updated =  this.props.value.filter((v, i) => i !== foundIdx && expandedLabels.indexOf(v) === -1);
+            this.props.onChange(this.props.field, updated);
         }
         else if (mode === "add") {
             // add the node and the expanded children nodes

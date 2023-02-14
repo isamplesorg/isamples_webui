@@ -13,8 +13,8 @@ class ResultList extends React.Component {
     super(props)
     this.state = {
       hiddenCols: [], // initial state
-      facet:"",
-      view:{},
+      facet: store.getState()['query']['view']['facet'], 
+      prevFacet:"",
       numFound: 0,
     }
   }
@@ -36,20 +36,22 @@ class ResultList extends React.Component {
   // prevent unnecessary rerendering
   shouldComponentUpdate(nextProps) {
     const { results } = this.props
-    this.switchView(store.getState()['query']['view']['facet']);
+    const newFacet = store.getState()['query']['view']['facet'];
+    this.switchView(newFacet);
 
-    // do an update of points only when the number of points change     
-    let doUpdate = !results.pending && results.numFound !== this.state.numFound; 
-    if (doUpdate){
+    let pointUpdate = !results.pending && results.numFound !== this.state.numFound 
+    let viewUpdate =  newFacet && this.state.facet !== newFacet; 
+
+    // do an update when facet view is changed or when the number of points to render have changed 
+    if (viewUpdate || pointUpdate) {
       this.setState({numFound: results.numFound});
-      return true;
+      return true; 
     }
     return false;
   }
 
   switchView = (format) => {
     let paginateButton = document.getElementsByClassName('pagDisplay');
-
     // hide the pagination button by display property
     if (format === "Map") {
       [...paginateButton].forEach((paginate) => paginate.style.display = "none");
