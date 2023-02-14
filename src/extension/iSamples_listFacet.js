@@ -1,11 +1,6 @@
 import PropTypes from 'prop-types';
 import React from "react";
 import cx from "classnames";
-import CustomizedTreeView from 'components/CV_hierarchy/hierarchy';
-import material from 'CVJSON/material_hierarchy.json';
-import sampledFeature from "CVJSON/sampledFeature_hierarchy.json";
-import specimanType from "CVJSON/specimenType_hierarchy.json";
-
 
 const CheckedIcon = () => {
   return <span className='glyphicon glyphicon-check' />
@@ -25,77 +20,12 @@ class ListFacet extends React.Component {
     };
   }
 
-
-  // helper function
-  // adds all the children label of this key 
- expandLabelSelectedHelper = (currSchema, childLabels) => {
-    for (const key in currSchema){
-      if (currSchema[key]["children"].length > 0){
-        for (const childSchema of currSchema[key]["children"]){
-          // recursively call to add other child labels 
-          for (const childKey in childSchema){
-            const childLabel = childSchema[childKey]["label"]["en"]
-            if (!childLabels.includes(childLabel)){
-              childLabels.push(childLabel)
-            }
-          }
-          this.expandLabelSelectedHelper(childSchema, childLabels)
-        }
-      }
-    }
-    
-  }
-
-  expandLabelSelected = (selected, currSchema, childLabels) => {
-    for (const key in currSchema){
-      const label = currSchema[key]["label"]["en"];
-      if (label === selected){
-        // get all the children nodes from here
-        this.expandLabelSelectedHelper(currSchema,childLabels);
-      }
-      for (const childSchema of currSchema[key]["children"]){
-        // recursively call to find the selected label 
-        this.expandLabelSelected(selected, childSchema, childLabels)
-      }
-    }
-  }
-
-  /**
- * Static json for now.
- * Will use REST api to get json file from server
- */
-  hierarchy = (label) => {
-    switch (label) {
-      case "Material":
-        return material;
-      case "Context":
-        return sampledFeature;
-      case "Specimen":
-        return specimanType;
-      default:
-        return null;
-    }
-  }
-
-  handleClick = (value, mode) => {
-    // whenever a new label is clicked select all of the children labels 
-    const currSchema = this.hierarchy(this.props.label);
-    const expandedLabels = [value]
-    this.expandLabelSelected(value, currSchema, expandedLabels); // expand recursively
-    // filter out labels that are already existing
-    expandedLabels.filter((item) => {
-      return this.props.value.indexOf(item) === -1
-    })
-    if (mode === "delete"){
-      // value is the node to be deleted
-      const foundIdx = this.props.value.indexOf(value);
-      // delete the node and the expanded children nodes 
-      this.props.value =  this.props.value.filter((v, i) => i !== foundIdx && expandedLabels.indexOf(v) === -1);
-      this.props.onChange(this.props.field, this.props.value);
-    }
-    else if (mode === "add") {
-      // add the node and the expanded children nodes
-      this.props.onChange(this.props.field, this.props.value.concat(expandedLabels));
+  handleClick = (value) => {
+    const foundIdx = this.props.value.indexOf(value);
+    if (foundIdx < 0) {
+      this.props.onChange(this.props.field, this.props.value.concat(value));
+    } else {
+      this.props.onChange(this.props.field, this.props.value.filter((v, i) => i !== foundIdx));
     }
   }
 
@@ -114,15 +44,13 @@ class ListFacet extends React.Component {
 
     const expanded = !(collapse || false);
 
-    const customList = ['Material', 'Specimen', 'Context'].includes(label);
-
     const showMoreLink = truncateFacetListsAt > -1 && truncateFacetListsAt < facetValues.length ?
       <li className={cx({ "list-group-item": bootstrapCss })} onClick={() => this.setState({ truncateFacetListsAt: -1 })}>
         Show all ({facetValues.length})
       </li> : null;
 
     const prevNode = <div>
-      <ul className={cx({ "list-group": bootstrapCss, "list-facet__custom--height": !customList })}>
+      <ul className={cx({ "list-group": bootstrapCss, "list-facet__custom--height": true})}>
         {facetValues.filter((facetValue, i) => truncateFacetListsAt < 0 || i < truncateFacetListsAt).map((facetValue, i) =>
           this.state.filter.length === 0 || facetValue.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1 ? (
             <li className={cx(`facet-item-type-${field}`, { "list-group-item": bootstrapCss })}
@@ -180,12 +108,7 @@ class ListFacet extends React.Component {
             {label}
           </h5>
         </header>
-
-        {expanded ?
-          (customList ?
-            <CustomizedTreeView label={label} value={value} facetCounts={facetCounts} facetValues={facetValues} onClick={this.handleClick} hierarchy= {this.hierarchy}/>
-            : prevNode)
-          : null}
+        {expanded ? prevNode : null}
       </li>
     );
   }

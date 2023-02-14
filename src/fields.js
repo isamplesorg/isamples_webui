@@ -17,8 +17,8 @@ const fields = [
   { field: "curation_responsibility", type: "non-search", hidden: true },
   { field: "description_text", type: "non-search", hidden: true },
   { label: "Context", field: "hasContextCategory", type: "list-facet", facetSort: "count", collapse: true },
-  { label: "Material", field: "hasMaterialCategory", type: "list-facet", facetSort: "count", collapse: true },
-  { label: "Specimen", field: "hasSpecimenCategory", type: "list-facet", facetSort: "count", collapse: true },
+  { label: "Material", field: "hasMaterialCategory", type: "hierarchy-facet", collapse: true },
+  { label: "Specimen", field: "hasSpecimenCategory", type: "hierarchy-facet", collapse: true },
   { label: "Identifier", field: "id", type: "text" },
   { field: "informalClassification", type: "non-search", hidden: true },
   { field: "keywords", type: "text" },
@@ -50,8 +50,6 @@ const sortFields = [
   { label: "Identifier", field: "id" },
   { label: "Source", field: "source" },
   { label: "Context", field: "hasContextCategory" },
-  { label: "Material", field: "hasMaterialCategory" },
-  { label: "Specimen", field: "hasSpecimenCategory" },
   { label: "Registrant", field: "registrant" },
   { label: "Collection Time", field: "producedBy_resultTime" }
 ];
