@@ -56,6 +56,9 @@ let setPrimitive = null;
 // we might abort the stream fetch
 let oboePrimitive = null;
 
+// initial display is false - do not render points
+let display = false; 
+
 /**
  * This method queries the record amount in the bbox
  *
@@ -192,6 +195,7 @@ class CesiumMap extends React.Component {
             </button>
           </div>
         </div>
+        <p className="cesium-checkbox"><input type="checkbox" id="display" onChange={this.handleChange}/> <label for="display">Display Points </label></p>
         <button className="cesium-visit-button cesium-button" onClick={this.toggle}>Viewer Change</button>
       </>;
   };
@@ -303,6 +307,22 @@ class CesiumMap extends React.Component {
     };
   };
 
+  /**
+   * Change whether the display flag is true/false 
+   */
+  handleChange = (e) => {
+    display = e.target.checked;
+    if (!e.target.checked){
+      setPrimitive.clear();  // clear all points
+      setPrimitive.disableDisplay(); // disable display
+    }
+    else{
+      setPrimitive.enableDisplay(); 
+      // fetch back all points 
+      this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
+    }
+  }
+
   // This is a initial function in react liftcycle.
   // Only call once when this component first render
   componentDidMount() {
@@ -315,13 +335,13 @@ class CesiumMap extends React.Component {
       mapInfo.heading,
       mapInfo.pitch);
     viewer = new ISamplesSpatial("cesiumContainer", initialPosition || moorea);
-
+  
     // remove the Ceisum information with custom button group
     render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
     viewer.addHud("cesiumContainer");
     viewer.trackMouseCoordinates(showCoordinates);
     viewer.enableTracking(api, (bb) => selectedBoxCallbox(bb, true));
-    setPrimitive = new PointStreamPrimitiveCollection(viewer.terrain);
+    setPrimitive = new PointStreamPrimitiveCollection(viewer.terrain, display);
     viewer.addPointPrimitives(setPrimitive);
     searchFields = newSearchFields;
     onChange = onSetFields;
@@ -388,7 +408,6 @@ class CesiumMap extends React.Component {
     clearBoundingBox(true);
     // update the point layer
     this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
-
     // update bounding box based on bbox
     const bb1 = JSON.stringify(nextProps.newBbox);
     const bb2 = JSON.stringify(this.props.newBbox);
