@@ -368,7 +368,7 @@ class CesiumMap extends React.Component {
 
         if (startHeight > endHeight && exceedMaxPoints) {
             this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude)
-        } else if (!exceedMaxPoints) {
+        } else if (startHeight < endHeight && !exceedMaxPoints) {
             this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude)
         }
     });
