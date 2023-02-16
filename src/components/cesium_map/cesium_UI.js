@@ -30,7 +30,7 @@ const REFRESH_TIME_MS = 5000;
 const VIEWPOINT_TIME_MS = 2000;
 const UPDATE_RATIO = 0.7;
 const MAXIMUM_ZOOM_DISTANCE = 15000000;
-const NUMBER_OF_POINTS = 100000;
+const MAXIMUM_NUMBER_OF_POINTS = 100000;
 const GLOBAL_HEADING = 90;
 const GLOBAL_PITCH = -90;
 const api = new ISamplesAPI();
@@ -58,6 +58,7 @@ let oboePrimitive = null;
 
 // initial display is false - do not render points
 let display = false; 
+let currNumPoints = 0 ;
 
 /**
  * This method queries the record amount in the bbox
@@ -218,25 +219,35 @@ class CesiumMap extends React.Component {
  * @param {*} latitude
  * @param {*} longitude
  */
-  updatePrimitive(latitude, longitude) {
+  updatePrimitive = async(latitude, longitude) => {
+    cameraLat = latitude;
+    cameraLong = longitude;
+    if (!display) return ; // do not fetch when display flag off 
+    
     if (setPrimitive) {
       setPrimitive.clear();
     }
     if (oboePrimitive) {
       oboePrimitive.abort();
     }
+    // calculate number of points of entire bounding box 
+    let entire_bbox = viewer.currentBounds
+    currNumPoints = await countRecordsInBB(entire_bbox);
 
-    setPrimitive.load(facet, {
+    if (currNumPoints > MAXIMUM_NUMBER_OF_POINTS){
+      // do not fetch 
+      return; 
+    }
+
+    const res = await setPrimitive.load(facet, {
       Q: "producedBy_samplingSite_location_cesium_height%3A*",
       field: "source",
       lat: latitude,
       long: longitude,
       searchFields: searchFields,
-      rows: NUMBER_OF_POINTS
+      rows: MAXIMUM_NUMBER_OF_POINTS
     })
-      .then(res => oboePrimitive = res);
-    cameraLat = latitude;
-    cameraLong = longitude;
+    oboePrimitive = res;
   }
 
   /**
@@ -246,7 +257,6 @@ class CesiumMap extends React.Component {
   visitLocation(location) {
     viewer.visit(location);
     clearBoundingBox(true);
-    this.updatePrimitive(location.latitude, location.longitude);
     // when we use visit function, the currentview only return last camera position
     // rather than the current one
     if (!location.equalTo(this.props.mapInfo)) {
