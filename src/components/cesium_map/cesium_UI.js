@@ -217,7 +217,7 @@ class CesiumMap extends React.Component {
   /**
  * This method clear all objects in the map
  * and render new point primitive based on new position
- *
+ * Rendering will be done only if the number of points in the current view is smaller than the maximum limit
  * @param {*} latitude
  * @param {*} longitude
  */
@@ -323,6 +323,11 @@ class CesiumMap extends React.Component {
     };
   };
 
+  /**
+   * Check box handler function
+   * When disabled display (default value), no query will be sent to the server to fetch and render points
+   * @param {*} e 
+   */
   handleChange = (e) => {
     display = e.target.checked;
     if (!e.target.checked){
@@ -336,6 +341,12 @@ class CesiumMap extends React.Component {
     }
   }
 
+  /**
+   * Updating the points based on zoom in/zoom out event
+   * When zoom in, check if we need to render the points
+   * and when zoom out, checks if we need to stop rendering the points 
+   * @param {*} spatial 
+   */
   enableZoomTracking(spatial){
     const camera = spatial.camera;
 
@@ -356,10 +367,8 @@ class CesiumMap extends React.Component {
         const endHeight = Cesium.Cartographic.fromCartesian(endPos).height;
 
         if (startHeight > endHeight && exceedMaxPoints) {
-            // if zooming in, check if we can render new points
             this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude)
         } else if (!exceedMaxPoints) {
-          // if zooming out, check if we exceeded the maximum possible points to render 
             this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude)
         }
     });
