@@ -290,6 +290,10 @@ export class ISamplesSpatial {
     return this.worldTerrain;
   }
 
+  get camera(){
+    return this.viewer.camera; 
+  }
+
   /**
    * Fly to the provided SpatialView
    *
@@ -622,6 +626,8 @@ export class ISamplesSpatial {
     c.width = cc.width;
     c.style.left = cc.style.left;
     c.style.top = cc.style.top;
+
+
   }
 
   getScreenPosition(longitude, latitude) {

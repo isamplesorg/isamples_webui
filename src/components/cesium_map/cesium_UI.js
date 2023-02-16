@@ -60,6 +60,7 @@ let oboePrimitive = null;
 // initial display is false - do not render points
 let display = false; 
 let currNumPoints = 0 ;
+let exceedMaxPoints = false; 
 
 /**
  * This method queries the record amount in the bbox
@@ -236,9 +237,10 @@ class CesiumMap extends React.Component {
     currNumPoints = await countRecordsInBB(entire_bbox);
     if (currNumPoints > MAXIMUM_NUMBER_OF_POINTS){
       // do not load points 
+      exceedMaxPoints = true; 
       return; 
     }
-
+    exceedMaxPoints = false; 
     const res = await setPrimitive.load(facet, {
       Q: "producedBy_samplingSite_location_cesium_height%3A*",
       field: "source",
@@ -321,9 +323,6 @@ class CesiumMap extends React.Component {
     };
   };
 
-  /**
-   * Change whether the display flag is true/false 
-   */
   handleChange = (e) => {
     display = e.target.checked;
     if (!e.target.checked){
@@ -336,6 +335,36 @@ class CesiumMap extends React.Component {
       this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
     }
   }
+
+  enableZoomTracking(spatial){
+    const camera = spatial.camera;
+
+    const scratchCartesian1 = new Cesium.Cartesian3();
+    const scratchCartesian2 = new Cesium.Cartesian3();
+
+    let startPos, endPos;
+
+    camera.moveStart.addEventListener((e) => {
+        startPos = camera.positionWC.clone(scratchCartesian1);
+
+    });
+
+    camera.moveEnd.addEventListener( (e) => {
+        endPos = camera.positionWC.clone(scratchCartesian2);
+
+        const startHeight = Cesium.Cartographic.fromCartesian(startPos).height;
+        const endHeight = Cesium.Cartographic.fromCartesian(endPos).height;
+
+        if (startHeight > endHeight && exceedMaxPoints) {
+            // if zooming in, check if we can render new points
+            this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude)
+        } else if (!exceedMaxPoints) {
+          // if zooming out, check if we exceeded the maximum possible points to render 
+            this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude)
+        }
+    });
+  }
+
 
   // This is a initial function in react liftcycle.
   // Only call once when this component first render
@@ -360,6 +389,8 @@ class CesiumMap extends React.Component {
     searchFields = newSearchFields;
     onChange = onSetFields;
 
+    // keep track of zoom in event and zoom out event to decide whether 
+    this.enableZoomTracking(viewer)
     // get the facet control vocabulary
     this.getFacetInfo("source").then((res) => {
       facet = res;
