@@ -300,6 +300,15 @@ export class ISamplesSpatial {
       destination: place.destination,
       orientation: place.orientation
     });
+    // update the camera position
+    const updatedSpatialView = new SpatialView(
+      place.viewDict.longitude,
+      place.viewDict.latitude,
+      place.viewDict.height,
+      place.viewDict.heading,
+      place.viewDict.pitch
+    )
+    this.viewer.camera.setView(updatedSpatialView.getView)
   }
 
   /**

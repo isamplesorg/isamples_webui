@@ -28,9 +28,10 @@ Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
 // constant variables
 const REFRESH_TIME_MS = 5000;
 const VIEWPOINT_TIME_MS = 2000;
-const UPDATE_RATIO = 0.7;
+const UPDATE_RATIO = 0.5;
 const MAXIMUM_ZOOM_DISTANCE = 15000000;
 const MAXIMUM_NUMBER_OF_POINTS = 100000;
+
 const GLOBAL_HEADING = 90;
 const GLOBAL_PITCH = -90;
 const api = new ISamplesAPI();
@@ -231,11 +232,10 @@ class CesiumMap extends React.Component {
       oboePrimitive.abort();
     }
     // calculate number of points of entire bounding box 
-    let entire_bbox = viewer.currentBounds
+    let entire_bbox = viewer.currentBounds;
     currNumPoints = await countRecordsInBB(entire_bbox);
-
     if (currNumPoints > MAXIMUM_NUMBER_OF_POINTS){
-      // do not fetch 
+      // do not load points 
       return; 
     }
 
@@ -262,6 +262,8 @@ class CesiumMap extends React.Component {
     if (!location.equalTo(this.props.mapInfo)) {
       this.props.setCamera({ facet: "Map", ...location.viewDict });
     }
+    // force an update of primitives whenever visiting location 
+    this.updatePrimitive(location.latitude, location.longitude); 
   };
 
   /**
@@ -285,6 +287,8 @@ class CesiumMap extends React.Component {
         moorea.heading,
         moorea.pitch));
     }
+    // force an update of primitives whenever changing view 
+    this.updatePrimitive(cameraLat, cameraLong);
   }
 
   /**
