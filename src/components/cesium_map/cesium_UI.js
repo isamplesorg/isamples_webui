@@ -200,9 +200,8 @@ class CesiumMap extends React.Component {
             </button>
           </div>
         </div>
-        <p className="cesium-checkbox"><input type="checkbox" id="display" onChange={this.handleChange}/> <label for="display">Display Points </label></p>
         <button className="cesium-visit-button cesium-button" onClick={this.toggle}>Viewer Change</button>
-        <p className="cesium-checkbox"><input type="checkbox" id="display" onChange={this.handleGrid}/> <label for="display">Display Grid </label></p>
+        <p className="cesium-checkbox"><input type="checkbox" id="display" onChange={this.handleChange}/> <label for="display">Display Points </label> &nbsp; <input type="checkbox" id="display" onChange={this.handleGrid}/> <label for="display">Display Grid </label></p>
       </>;
   };
 
