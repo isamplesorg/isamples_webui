@@ -1,3 +1,16 @@
+.cesium-checkbox {
+  border: solid 1px #444;
+  background-color: #303336;
+  color:#edfffe;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 5px;
+  border-radius: 5px;
+  box-sizing: border-box;
+  padding: 3px 12px;
+  font-weight: lighter;
+}
+
 .Cesium-popBox {
   position: absolute;
   top: -230px;

@@ -28,9 +28,10 @@ Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
 // constant variables
 const REFRESH_TIME_MS = 5000;
 const VIEWPOINT_TIME_MS = 2000;
-const UPDATE_RATIO = 0.7;
+const UPDATE_RATIO = 0.5;
 const MAXIMUM_ZOOM_DISTANCE = 15000000;
-const NUMBER_OF_POINTS = 100000;
+const MAXIMUM_NUMBER_OF_POINTS = 100000;
+
 const GLOBAL_HEADING = 90;
 const GLOBAL_PITCH = -90;
 const api = new ISamplesAPI();
@@ -55,6 +56,11 @@ let setPrimitive = null;
 // this represent the oboe stream callback.
 // we might abort the stream fetch
 let oboePrimitive = null;
+
+// initial display is false - do not render points
+let display = false; 
+let currNumPoints = 0 ;
+let exceedMaxPoints = false; 
 
 /**
  * This method queries the record amount in the bbox
@@ -192,6 +198,7 @@ class CesiumMap extends React.Component {
             </button>
           </div>
         </div>
+        <p className="cesium-checkbox"><input type="checkbox" id="display" onChange={this.handleChange}/> <label for="display">Display Points </label></p>
         <button className="cesium-visit-button cesium-button" onClick={this.toggle}>Viewer Change</button>
       </>;
   };
@@ -210,29 +217,39 @@ class CesiumMap extends React.Component {
   /**
  * This method clear all objects in the map
  * and render new point primitive based on new position
- *
+ * Rendering will be done only if the number of points in the current view is smaller than the maximum limit
  * @param {*} latitude
  * @param {*} longitude
  */
-  updatePrimitive(latitude, longitude) {
+  updatePrimitive = async(latitude, longitude) => {
+    cameraLat = latitude;
+    cameraLong = longitude;
+    if (!display) return ; // do not fetch when display flag off 
+    
     if (setPrimitive) {
       setPrimitive.clear();
     }
     if (oboePrimitive) {
       oboePrimitive.abort();
     }
-
-    setPrimitive.load(facet, {
+    // calculate number of points of entire bounding box 
+    let entire_bbox = viewer.currentBounds;
+    currNumPoints = await countRecordsInBB(entire_bbox);
+    if (currNumPoints > MAXIMUM_NUMBER_OF_POINTS){
+      // do not load points 
+      exceedMaxPoints = true; 
+      return; 
+    }
+    exceedMaxPoints = false; 
+    const res = await setPrimitive.load(facet, {
       Q: "producedBy_samplingSite_location_cesium_height%3A*",
       field: "source",
       lat: latitude,
       long: longitude,
       searchFields: searchFields,
-      rows: NUMBER_OF_POINTS
+      rows: MAXIMUM_NUMBER_OF_POINTS
     })
-      .then(res => oboePrimitive = res);
-    cameraLat = latitude;
-    cameraLong = longitude;
+    oboePrimitive = res;
   }
 
   /**
@@ -242,12 +259,13 @@ class CesiumMap extends React.Component {
   visitLocation(location) {
     viewer.visit(location);
     clearBoundingBox(true);
-    this.updatePrimitive(location.latitude, location.longitude);
     // when we use visit function, the currentview only return last camera position
     // rather than the current one
     if (!location.equalTo(this.props.mapInfo)) {
       this.props.setCamera({ facet: "Map", ...location.viewDict });
     }
+    // force an update of primitives whenever visiting location 
+    this.updatePrimitive(location.latitude, location.longitude); 
   };
 
   /**
@@ -271,6 +289,8 @@ class CesiumMap extends React.Component {
         moorea.heading,
         moorea.pitch));
     }
+    // force an update of primitives whenever changing view 
+    this.updatePrimitive(cameraLat, cameraLong);
   }
 
   /**
@@ -303,6 +323,58 @@ class CesiumMap extends React.Component {
     };
   };
 
+  /**
+   * Check box handler function
+   * When disabled display (default value), no query will be sent to the server to fetch and render points
+   * @param {*} e 
+   */
+  handleChange = (e) => {
+    display = e.target.checked;
+    if (!e.target.checked){
+      setPrimitive.clear();  // clear all points
+      setPrimitive.disableDisplay(); // disable display
+    }
+    else{
+      setPrimitive.enableDisplay(); 
+      // fetch back all points 
+      this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
+    }
+  }
+
+  /**
+   * Updating the points based on zoom in/zoom out event
+   * When zoom in, check if we need to render the points
+   * and when zoom out, checks if we need to stop rendering the points 
+   * @param {*} spatial 
+   */
+  enableZoomTracking(spatial){
+    const camera = spatial.camera;
+
+    const scratchCartesian1 = new Cesium.Cartesian3();
+    const scratchCartesian2 = new Cesium.Cartesian3();
+
+    let startPos, endPos;
+
+    camera.moveStart.addEventListener((e) => {
+        startPos = camera.positionWC.clone(scratchCartesian1);
+
+    });
+
+    camera.moveEnd.addEventListener( (e) => {
+        endPos = camera.positionWC.clone(scratchCartesian2);
+
+        const startHeight = Cesium.Cartographic.fromCartesian(startPos).height;
+        const endHeight = Cesium.Cartographic.fromCartesian(endPos).height;
+
+        if (startHeight > endHeight && exceedMaxPoints) {
+            this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude)
+        } else if (startHeight < endHeight && !exceedMaxPoints) {
+            this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude)
+        }
+    });
+  }
+
+
   // This is a initial function in react liftcycle.
   // Only call once when this component first render
   componentDidMount() {
@@ -315,17 +387,19 @@ class CesiumMap extends React.Component {
       mapInfo.heading,
       mapInfo.pitch);
     viewer = new ISamplesSpatial("cesiumContainer", initialPosition || moorea);
-
+  
     // remove the Ceisum information with custom button group
     render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
     viewer.addHud("cesiumContainer");
     viewer.trackMouseCoordinates(showCoordinates);
     viewer.enableTracking(api, (bb) => selectedBoxCallbox(bb, true));
-    setPrimitive = new PointStreamPrimitiveCollection(viewer.terrain);
+    setPrimitive = new PointStreamPrimitiveCollection(viewer.terrain, display);
     viewer.addPointPrimitives(setPrimitive);
     searchFields = newSearchFields;
     onChange = onSetFields;
 
+    // keep track of zoom in event and zoom out event to decide whether 
+    this.enableZoomTracking(viewer)
     // get the facet control vocabulary
     this.getFacetInfo("source").then((res) => {
       facet = res;
@@ -388,7 +462,6 @@ class CesiumMap extends React.Component {
     clearBoundingBox(true);
     // update the point layer
     this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
-
     // update bounding box based on bbox
     const bb1 = JSON.stringify(nextProps.newBbox);
     const bb2 = JSON.stringify(this.props.newBbox);
