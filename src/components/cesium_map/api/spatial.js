@@ -13,6 +13,7 @@ import { html, render } from "lit";
 import { pointStream } from 'components/cesium_map/api/server';
 import { colorbind, source } from 'fields';
 import { wellFormatField } from 'components/utilities';
+import { H3GridManager } from "components/cesium_map/cesiumh3";
 
 const MAXIMUM_ZOOM_DISTANCE = 20000000;
 const MINIMUM_ZOOM_DISTANCE = 10;
@@ -599,6 +600,23 @@ export class ISamplesSpatial {
 
   removeDataSource(dataSource, destroy = false) {
     return this.viewer.dataSources.remove(dataSource, destroy);
+  }
+
+  addGrid() {
+      // Add Cesium OSM Buildings, a global 3D buildings layer.
+      const buildingTileset = this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
+      const gridder = new H3GridManager();
+      const viewer = this.viewer;
+      // add grid to current view 
+      let scratchRectangle = new Cesium.Rectangle();
+      let rect = viewer.camera.computeViewRectangle(viewer.scene.globe.ellipsoid, scratchRectangle);
+      gridder.update(viewer, rect);
+      // add event listener that is triggered on camera move end 
+      viewer.camera.moveEnd.addEventListener(function() {
+        scratchRectangle = new Cesium.Rectangle();
+        rect = viewer.camera.computeViewRectangle(viewer.scene.globe.ellipsoid, scratchRectangle);
+        gridder.update(viewer, rect);
+     });
   }
 
   //TODO: This should be a separate class for managing the HUD

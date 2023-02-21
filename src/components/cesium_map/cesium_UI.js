@@ -61,6 +61,8 @@ let oboePrimitive = null;
 let display = false; 
 let currNumPoints = 0 ;
 let exceedMaxPoints = false; 
+// flag to indicate whether it is grid point view
+let showGrid = false; 
 
 /**
  * This method queries the record amount in the bbox
@@ -200,6 +202,7 @@ class CesiumMap extends React.Component {
         </div>
         <p className="cesium-checkbox"><input type="checkbox" id="display" onChange={this.handleChange}/> <label for="display">Display Points </label></p>
         <button className="cesium-visit-button cesium-button" onClick={this.toggle}>Viewer Change</button>
+        <p className="cesium-checkbox"><input type="checkbox" id="display" onChange={this.handleGrid}/> <label for="display">Display Grid </label></p>
       </>;
   };
 
@@ -224,8 +227,9 @@ class CesiumMap extends React.Component {
   updatePrimitive = async(latitude, longitude) => {
     cameraLat = latitude;
     cameraLong = longitude;
-    if (!display) return ; // do not fetch when display flag off 
-    
+    if (!display | showGrid){
+      return;
+    }
     if (setPrimitive) {
       setPrimitive.clear();
     }
@@ -291,6 +295,16 @@ class CesiumMap extends React.Component {
     }
     // force an update of primitives whenever changing view 
     this.updatePrimitive(cameraLat, cameraLong);
+  }
+
+  handleGrid = (e) => {
+    // turn on showing the grid option
+    showGrid = e.target.checked;
+    // update the state so the map can re-render
+    if (e.target.checked && setPrimitive){
+      setPrimitive.clear(); // clear the points 
+      viewer.addGrid();
+    }
   }
 
   /**
