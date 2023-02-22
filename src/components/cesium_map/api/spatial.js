@@ -281,6 +281,8 @@ export class ISamplesSpatial {
         this.viewer.selectedEntity = undefined; // close the info box
       }
     })
+
+    this.gridTrackerListener = null;
   }
 
   get canvas() {
@@ -602,21 +604,33 @@ export class ISamplesSpatial {
     return this.viewer.dataSources.remove(dataSource, destroy);
   }
 
+  gridTracker(viewer, gridder){
+    let scratchRectangle = new Cesium.Rectangle();
+    let rect = viewer.camera.computeViewRectangle(viewer.scene.globe.ellipsoid, scratchRectangle);
+    gridder.update(viewer, rect);
+  }
+
   addGrid() {
       // Add Cesium OSM Buildings, a global 3D buildings layer.
       const buildingTileset = this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
       const gridder = new H3GridManager();
       const viewer = this.viewer;
       // add grid to current view 
-      let scratchRectangle = new Cesium.Rectangle();
-      let rect = viewer.camera.computeViewRectangle(viewer.scene.globe.ellipsoid, scratchRectangle);
-      gridder.update(viewer, rect);
+      this.gridTracker(viewer, gridder);
       // add event listener that is triggered on camera move end 
-      viewer.camera.moveEnd.addEventListener(function() {
-        scratchRectangle = new Cesium.Rectangle();
-        rect = viewer.camera.computeViewRectangle(viewer.scene.globe.ellipsoid, scratchRectangle);
-        gridder.update(viewer, rect);
-     });
+      this.gridTrackerListener = (e) => {this.gridTracker(viewer,gridder)}
+      viewer.camera.moveEnd.addEventListener(this.gridTrackerListener);
+  }
+
+  removeGrid(){
+    // remove the grid
+    const gridder = new H3GridManager();
+    const viewer = this.viewer;
+    gridder.remove(viewer);
+    if(this.gridTrackerListener) {
+      viewer.camera.moveEnd.removeEventListener(this.gridTrackerListener);
+      this.gridTrackerListener = null;
+    }
   }
 
   //TODO: This should be a separate class for managing the HUD

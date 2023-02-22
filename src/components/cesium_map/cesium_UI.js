@@ -226,7 +226,7 @@ class CesiumMap extends React.Component {
   updatePrimitive = async(latitude, longitude) => {
     cameraLat = latitude;
     cameraLong = longitude;
-    if (!display | showGrid){
+    if (!display){
       return;
     }
     if (setPrimitive) {
@@ -300,9 +300,11 @@ class CesiumMap extends React.Component {
     // turn on showing the grid option
     showGrid = e.target.checked;
     // update the state so the map can re-render
-    if (e.target.checked && setPrimitive){
-      setPrimitive.clear(); // clear the points 
+    if (showGrid && setPrimitive){
       viewer.addGrid();
+    }
+    else {
+      viewer.removeGrid();
     }
   }
 

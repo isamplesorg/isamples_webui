@@ -134,4 +134,16 @@ export class H3GridManager {
             }
         });
     }
+
+    remove(cview){
+        if(!cview.dataSources._dataSources){
+            // no datasource to remove 
+            return;
+        } 
+        else {
+            let toDelete = cview.dataSources._dataSources[0];
+            cview.dataSources._dataSources.splice(0,1);
+            cview.dataSources.dataSourceRemoved.raiseEvent(cview, toDelete);
+        }
+    }
 }
