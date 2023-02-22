@@ -612,7 +612,7 @@ export class ISamplesSpatial {
 
   addGrid() {
       // Add Cesium OSM Buildings, a global 3D buildings layer.
-      const buildingTileset = this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
+      this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
       const gridder = new H3GridManager();
       const viewer = this.viewer;
       // add grid to current view 
