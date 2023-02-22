@@ -39,7 +39,7 @@ function v2color(v) {
 
 export class H3Grid {
     constructor() {
-        this._service = window.config.h3_count + "/?";
+        this._service = window.config.h3_count
         this.rect_str = "";
         this.data = null;
     }
@@ -52,12 +52,13 @@ export class H3Grid {
         }
         this.rect_str = rstr;
         this.loading = true;
-        let url = this._service;
+        let url = new URL(this._service + "/");
         if (this.rect_str !== GLOBAL_RECT) {
-            url = url + "&bb=" + this.rect_str;
+            url.searchParams.set('bb', this.rect_str);
         } else {
-            url = url + "&resolution=1";
+            url.searchParams.set('resolution', 1);
         }
+        url = decodeURIComponent(url);
         const options = {
             clampToGround: true,
             disableDepthTestDistance: Number.POSITIVE_INFINITY
