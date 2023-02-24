@@ -434,6 +434,7 @@ class CesiumMap extends React.Component {
     };
     // set time interval to check the current view every 5 seconds and update points
     this.checkPosition = setInterval(() => {
+      if (!display) return ; 
       const loading = document.getElementById("loading").style.display;
       const diffDistanceMove = distanceInKm(
         cameraLat,
@@ -460,6 +461,7 @@ class CesiumMap extends React.Component {
 
     // store the users' viewpoint
     this.viewpoint = setInterval(() => {
+      if (!display) return; 
       const loading = document.getElementById("loading").style.display;
       if (loading && JSON.stringify(viewer.currentView.viewDict) !== JSON.stringify(preView)) {
         preView = viewer.currentView.viewDict;

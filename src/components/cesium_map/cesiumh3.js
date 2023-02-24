@@ -111,24 +111,24 @@ export class H3GridManager {
 
     update(cview, rect) {
         const rstr = r2str(rect);
-        console.log(`update: ${rstr}`);
         const existing = cview.dataSources.getByName(rstr);
         if (existing.length > 0) {
             console.log(`Grid ${rstr} already in collection`);
             return;
         }
-        let g = this.global_grid;
         if (rect !== GLOBAL_RECT) {
-            g = new H3Grid();
+            this.global_grid = new H3Grid();
         }
+        this.global_grid.rect_str = rstr;
         const _this = this;
-        g.load(rstr).then((ds) => {
+        this.global_grid.load(rstr).then((ds) => {
             // delete existing grid
             try {
-                cview.dataSources.remove(_this.current_grid.data, true);
+                cview.dataSources.remove(_this.old_grid_data, true);
                 cview.dataSources.add(ds);
-                _this.current_grid = g;
+                _this.current_grid = this.global_grid;
                 _this.current_rect = rect;
+                _this.old_grid_data = this.global_grid.data; 
             } catch (err) {
                 console.log(err);
             }
