@@ -141,9 +141,7 @@ export class H3GridManager {
             return;
         } 
         else {
-            let toDelete = cview.dataSources._dataSources[0];
-            cview.dataSources._dataSources.splice(0,1);
-            cview.dataSources.dataSourceRemoved.raiseEvent(cview, toDelete);
+            cview.dataSources.removeAll(true)
         }
     }
 }
