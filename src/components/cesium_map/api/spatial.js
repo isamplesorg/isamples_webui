@@ -284,7 +284,6 @@ export class ISamplesSpatial {
 
     this.gridder = false; // save the grid manager
     this.gridTrackerListener = null;
-    this.displayGrid = false; 
   }
 
   get canvas() {
@@ -619,7 +618,6 @@ export class ISamplesSpatial {
 }
 
   gridTracker(viewer, gridder){
-    if (!this.displayGrid) return; 
     let scratchRectangle = new Cesium.Rectangle();
     let rect = viewer.camera.computeViewRectangle(viewer.scene.globe.ellipsoid, scratchRectangle);
     if (this.r2str(rect) === this.gridder.global_grid.rect_str){
@@ -630,11 +628,9 @@ export class ISamplesSpatial {
 
   addGrid() {
       // Add Cesium OSM Buildings, a global 3D buildings layer.
-      this.displayGrid = true; 
       this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
       this.gridder = new H3GridManager();
       const viewer = this.viewer;
-      // add grid to current view 
       this.gridTracker(viewer, this.gridder);
       // add event listener that is triggered on camera move end 
       let _this = this;
@@ -650,7 +646,6 @@ export class ISamplesSpatial {
       this.viewer.camera.moveEnd.removeEventListener(this.gridTrackerListener)
       this.gridTrackerListener = null; 
     }
-    this.displayGrid = false;
     this.gridder = null; 
   }
 
