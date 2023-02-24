@@ -124,7 +124,7 @@ export class H3GridManager {
         this.global_grid.load(rstr).then((ds) => {
             // delete existing grid
             try {
-                cview.dataSources.remove(_this.old_grid_data, true);
+                cview.dataSources.remove(_this.current_grid.data, true);
                 cview.dataSources.add(ds);
                 _this.current_grid = this.global_grid;
                 _this.current_rect = rect;
