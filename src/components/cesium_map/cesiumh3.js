@@ -1,3 +1,4 @@
+import { AttractionsOutlined } from '@mui/icons-material';
 import * as Cesium from 'cesium';
 import chroma from "chroma-js";
 
@@ -66,8 +67,8 @@ export class H3Grid {
         try {
             console.log(`Loading ${url} ...`);
             const ds = await Cesium.GeoJsonDataSource.load(url, options);
-            console.log("Loaded. ", ds);
             ds.name = this.rect_str;
+            console.log("Loaded. ", ds);
             this.data = ds;
             let entities = ds.entities.values;
             for (var i = 0; i < entities.length; i++) {
@@ -107,6 +108,7 @@ export class H3GridManager {
         this.global_grid = new H3Grid();
         this.current_grid = this.global_grid;
         this.current_rect = GLOBAL_RECT;
+        this.old_grid_rstr = "";
     }
 
     update(cview, rect) {
@@ -120,19 +122,30 @@ export class H3GridManager {
             this.global_grid = new H3Grid();
         }
         this.global_grid.rect_str = rstr;
+        // delete old grid
+        let toRemove = cview.dataSources.getByName(this.old_grid_rstr)[0];
+        cview.dataSources.remove(toRemove, true);
         const _this = this;
         this.global_grid.load(rstr).then((ds) => {
-            // delete existing grid
             try {
-                cview.dataSources.remove(_this.current_grid.data, true);
                 cview.dataSources.add(ds);
                 _this.current_grid = this.global_grid;
                 _this.current_rect = rect;
-                _this.old_grid_data = this.global_grid.data; 
+                _this.old_grid_rstr = ds.name; // update 
             } catch (err) {
                 console.log(err);
             }
-        });
+            console.log("then loop: ",cview.dataSources)
+        }).then(()=>{
+            // remove all the sources that are not the current grid layer 
+            for (var i  = 0 ; i < cview.dataSources._dataSources.length ; i++){
+                let dataSource = cview.dataSources._dataSources[i];
+                if (dataSource.name !== _this.global_grid.rect_str){
+                    cview.dataSources.remove(dataSource, true);
+                }
+            }
+        })
+        
     }
 
     remove(cview){
