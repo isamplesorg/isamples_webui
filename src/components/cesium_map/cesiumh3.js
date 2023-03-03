@@ -1,4 +1,3 @@
-import { AttractionsOutlined } from '@mui/icons-material';
 import * as Cesium from 'cesium';
 import chroma from "chroma-js";
 
