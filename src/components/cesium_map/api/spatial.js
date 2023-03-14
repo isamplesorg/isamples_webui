@@ -13,6 +13,7 @@ import { html, render } from "lit";
 import { pointStream } from 'components/cesium_map/api/server';
 import { colorbind, source } from 'fields';
 import { wellFormatField } from 'components/utilities';
+import { H3GridManager } from "components/cesium_map/cesiumh3";
 
 const MAXIMUM_ZOOM_DISTANCE = 20000000;
 const MINIMUM_ZOOM_DISTANCE = 10;
@@ -273,13 +274,16 @@ export class ISamplesSpatial {
     // but this might not be a safe way if we don't trust the link source
     this.viewer.infoBox.frame.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms');
     this.viewer.infoBox.frame.removeAttribute("src");
-
+    
     // enable esc key support for closing the info box
     document.addEventListener("keydown", ({key}) =>{
       if (key === "Escape"){
         this.viewer.selectedEntity = undefined; // close the info box
       }
     })
+
+    this.gridder = false; // save the grid manager
+    this.gridTrackerListener = null;
   }
 
   get canvas() {
@@ -599,6 +603,50 @@ export class ISamplesSpatial {
 
   removeDataSource(dataSource, destroy = false) {
     return this.viewer.dataSources.remove(dataSource, destroy);
+  }
+
+  d(rd) {
+    return Cesium.Math.toDegrees(rd);
+  }
+
+  r2str(r) {
+    let x0 = this.d(r.west);
+    let x1 = this.d(r.east);
+    let y0 = this.d(r.south);
+    let y1 = this.d(r.north);
+    return `${x0},${y0},${x1},${y1}`;
+}
+
+  gridTracker(viewer, gridder){
+    let scratchRectangle = new Cesium.Rectangle();
+    let rect = viewer.camera.computeViewRectangle(viewer.scene.globe.ellipsoid, scratchRectangle);
+    if (this.r2str(rect) === this.gridder.global_grid.rect_str){
+      return; // no need to update 
+    }
+    gridder.update(viewer, rect);
+  }
+
+  addGrid() {
+      // Add Cesium OSM Buildings, a global 3D buildings layer.
+      this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
+      this.gridder = new H3GridManager();
+      const viewer = this.viewer;
+      this.gridTracker(viewer, this.gridder);
+      // add event listener that is triggered on camera move end 
+      let _this = this;
+      this.gridTrackerListener = function() {_this.gridTracker(viewer, _this.gridder)}
+      this.viewer.camera.moveEnd.addEventListener(this.gridTrackerListener);
+  }
+
+  removeGrid(){
+    // remove the grid
+    const viewer = this.viewer;
+    this.gridder.remove(viewer);
+    if(this.gridTrackerListener){
+      this.viewer.camera.moveEnd.removeEventListener(this.gridTrackerListener)
+      this.gridTrackerListener = null; 
+    }
+    this.gridder = null; 
   }
 
   //TODO: This should be a separate class for managing the HUD

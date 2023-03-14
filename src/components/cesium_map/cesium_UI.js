@@ -61,6 +61,8 @@ let oboePrimitive = null;
 let display = false; 
 let currNumPoints = 0 ;
 let exceedMaxPoints = false; 
+// flag to indicate whether it is grid point view
+let showGrid = false; 
 
 /**
  * This method queries the record amount in the bbox
@@ -198,8 +200,8 @@ class CesiumMap extends React.Component {
             </button>
           </div>
         </div>
-        <p className="cesium-checkbox"><input type="checkbox" id="display" onChange={this.handleChange}/> <label for="display">Display Points </label></p>
         <button className="cesium-visit-button cesium-button" onClick={this.toggle}>Viewer Change</button>
+        <p className="cesium-checkbox"><input type="checkbox" id="display" onChange={this.handleChange}/> <label for="display">Display Points </label> &nbsp; <input type="checkbox" id="display" onChange={this.handleGrid}/> <label for="display">Display Grid </label></p>
       </>;
   };
 
@@ -224,8 +226,9 @@ class CesiumMap extends React.Component {
   updatePrimitive = async(latitude, longitude) => {
     cameraLat = latitude;
     cameraLong = longitude;
-    if (!display) return ; // do not fetch when display flag off 
-    
+    if (!display){
+      return;
+    }
     if (setPrimitive) {
       setPrimitive.clear();
     }
@@ -291,6 +294,18 @@ class CesiumMap extends React.Component {
     }
     // force an update of primitives whenever changing view 
     this.updatePrimitive(cameraLat, cameraLong);
+  }
+
+  handleGrid = (e) => {
+    // turn on showing the grid option
+    showGrid = e.target.checked;
+    // update the state so the map can re-render
+    if (showGrid && setPrimitive){
+      viewer.addGrid();
+    }
+    else {
+      viewer.removeGrid();
+    }
   }
 
   /**
@@ -419,6 +434,7 @@ class CesiumMap extends React.Component {
     };
     // set time interval to check the current view every 5 seconds and update points
     this.checkPosition = setInterval(() => {
+      if (!display) return ; 
       const loading = document.getElementById("loading").style.display;
       const diffDistanceMove = distanceInKm(
         cameraLat,
@@ -445,6 +461,7 @@ class CesiumMap extends React.Component {
 
     // store the users' viewpoint
     this.viewpoint = setInterval(() => {
+      if (!display) return; 
       const loading = document.getElementById("loading").style.display;
       if (loading && JSON.stringify(viewer.currentView.viewDict) !== JSON.stringify(preView)) {
         preView = viewer.currentView.viewDict;
