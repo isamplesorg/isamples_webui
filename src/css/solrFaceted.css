@@ -13,6 +13,20 @@ a {
   min-height: calc(100vh - 170px);
 }
 
+.hierarchy-facet {
+  overflow-y: auto;
+}
+.hierarchy-facet h5,h6 {
+  display: inline;
+}
+
+.switch {
+  
+  float:right;
+  margin-left: auto; 
+  margin-right: 0;
+}
+
 .list-facet ul {
   overflow-y: auto;
 }

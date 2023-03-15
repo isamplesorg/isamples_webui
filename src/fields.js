@@ -16,7 +16,7 @@ const fields = [
   { field: "curation_location", type: "non-search", hidden: true },
   { field: "curation_responsibility", type: "non-search", hidden: true },
   { field: "description_text", type: "non-search", hidden: true },
-  { label: "Context", field: "hasContextCategory", type: "list-facet", facetSort: "count", collapse: true },
+  { label: "Context", field: "hasContextCategory", type: "hierarchy-facet", collapse: true },
   { label: "Material", field: "hasMaterialCategory", type: "hierarchy-facet", collapse: true },
   { label: "Specimen", field: "hasSpecimenCategory", type: "hierarchy-facet", collapse: true },
   { label: "Identifier", field: "id", type: "text" },
