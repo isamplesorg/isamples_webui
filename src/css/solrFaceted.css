@@ -168,7 +168,7 @@ svg.search-icon {
   margin: 0 20px 0 0;
   width: 108px;
   color: #666;
-  overflow-y: scroll;
+  overflow-y: auto;
   white-space: nowrap;
   vertical-align: bottom;
 }
