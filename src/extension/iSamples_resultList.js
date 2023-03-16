@@ -16,6 +16,7 @@ class ResultList extends React.Component {
       facet: store.getState()['query']['view']['facet'], 
       prevFacet:"",
       numFound: 0,
+      page:null
     }
   }
 
@@ -37,15 +38,20 @@ class ResultList extends React.Component {
   shouldComponentUpdate(nextProps) {
     const { results } = this.props
     const newFacet = store.getState()['query']['view']['facet'];
+    const newPage = store.getState()['query']['view']['page'];
     this.switchView(newFacet);
 
     let pointUpdate = !results.pending && results.numFound !== this.state.numFound 
     let viewUpdate =  newFacet && this.state.facet !== newFacet; 
-
+    let pageUpdate = newFacet !== 'Map' && newPage>=0 ;
     // do an update when facet view is changed or when the number of points to render have changed 
     if (viewUpdate || pointUpdate) {
       this.setState({numFound: results.numFound});
       return true; 
+    }
+    // do an update when list/table page number has changed 
+    if (pageUpdate){
+      return true;
     }
     return false;
   }
