@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from "react";
 import cx from "classnames";
-
+import { store } from "redux/store";
 
 class Pagination extends React.Component {
 
@@ -10,6 +10,7 @@ class Pagination extends React.Component {
       return;
     }
     this.props.onChange(page);
+    this.props.setView({ ...store.getState()['query']['view'],'page':page})
   }
 
   renderPage(page, currentPage, key) {
