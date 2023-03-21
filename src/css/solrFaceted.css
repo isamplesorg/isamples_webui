@@ -120,6 +120,16 @@ a {
   padding: 0;
 }
 
+.solr-search-results ul li ul li{
+  display: table-row;
+}
+
+.solr-search-results ul li ul li label{
+  display: table-cell;
+  width: 350px;
+  vertical-align:top;
+}
+
 svg.search-icon {
   stroke: #595959;
   fill: #595959;
