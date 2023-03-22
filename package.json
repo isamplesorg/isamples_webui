@@ -30,7 +30,8 @@
     "react-table": "^7.7.0",
     "redux": "^4.1.2",
     "universal-cookie": "^4.0.4",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "solr-faceted-search-react" : "https://github.com/isamplesorg/solr-faceted-search-react.git#develop"
   },
   "scripts": {
     "start": "craco start",
