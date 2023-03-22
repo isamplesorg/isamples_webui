@@ -13,12 +13,12 @@ const NavBar = function (props) {
   // initializa a cookie instance
   const cookies = new Cookies();
 
-  const btn_login = <a href={window.config.login}>
+  const btn_login = window.config.enable_login ? <a href={window.config.login}>
     <button
       className="btn btn-default navbar-btn">
-      Login
+      Login 
     </button>
-  </a>;
+  </a> : <></>;
 
   const btn_dois = <button
     className="btn btn-default navbar-btn"
