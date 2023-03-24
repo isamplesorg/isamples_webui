@@ -17,6 +17,45 @@ git submodule init
 git submodule update --remote
 ```
 
+## Development with `solr-faceted-search-react`
+We use the `solr-faceted-search-react` repository as a npm dependency in this web app. As default, this webapp fetches the `develop` branch of the repository and uses that version for the component. 
+To do local development with the component in this app, follow the below steps:
+
+1) Build the component library `solr-faceted-search-react`
+
+Install the dependencies of the component to do local development. Inside the component library, 
+```
+npm install
+npm run build
+```
+
+2) Link the component to this project
+
+Create a symlink so that the webapp's component is pointing to the local repository we are working for development.
+```
+cd /path/to/component/library
+npm link
+cd /path/to/webapp
+npm link /path/to/component/library
+```
+
+
+3) Handle multiple versions of react
+
+Installing the dependencies in the component library can lead two versions of react to exist, and you might see an error related to this.
+If so, resolve this by specifying to use only the webapp's version of react in both the webapp and the component.
+```
+cd /path/to/webapp
+cd node_modules/react && npm link
+cd ../react-dom && npm link react
+cd /path/to/component/library
+npm link react
+```
+
+Now, do development in the component and see how it works with the webapp by running `npm run watch` in the component. 
+
+
+
 ## Start the web app
 After set up all dependencies, run the below command to start the app. Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 ```
