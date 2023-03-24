@@ -7,16 +7,6 @@ In order to get all the necessary javascript packages installed, make sure you r
 npm install
 ``` 
 
-## Submodule Init
-1) The `solr-faceted-search-react` is a git submodule located in `src/node_modules`.  To initialize it when you check out, do 
-```
-git submodule init
-```
-2) If you've already done that, make sure that you are up to date with all of the remote branches specified in `.gitmodules`:
-```
-git submodule update --remote
-```
-
 ## Development with `solr-faceted-search-react`
 We use the `solr-faceted-search-react` repository as a npm dependency in this web app. As default, this webapp fetches the `develop` branch of the repository and uses that version for the component. 
 To do local development with the component in this app, follow the below steps:
