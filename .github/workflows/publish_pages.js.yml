@@ -15,6 +15,9 @@ jobs:
   build-and-deploy:
     concurrency: ci-${{ github.ref }} # Recommended if you intend to make multiple deployments in quick succession.
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+         python-version: [3.9]    
     container: lironavon/docker-puppeteer-container:14.16.0
     steps:
     - uses: actions/checkout@v3
@@ -23,8 +26,13 @@ jobs:
       run: |
         npm i
         npm run build
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}        
     - name: Run pyppeteer test
       run: |
+        
         pip install pyppeteer
         python pyppeteer_test.py
     - run: npm run build --if-present
