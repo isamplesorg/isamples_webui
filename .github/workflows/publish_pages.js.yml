@@ -27,12 +27,11 @@ jobs:
         npm i
         npm run build
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}        
     - name: Run pyppeteer test
       run: |
-        
         pip install pyppeteer
         python pyppeteer_test.py
     - run: npm run build --if-present
