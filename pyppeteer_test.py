@@ -18,6 +18,7 @@ async def main():
     selector = "ul.solr-search-fields"
     search_fields = await page.querySelector(selector)
     print(f"search fields are {search_fields}")
+    raise SystemExit
     if search_fields is None:
         print("Did not find solr search fields, build is bad!")
         raise SystemExit
