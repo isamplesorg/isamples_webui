@@ -74,7 +74,7 @@ function Table(props) {
           className={cx("glyphicon fieldsIcon", {
             "glyphicon-collapse-down": !collapse,
             "glyphicon-collapse-up": collapse
-          })} />
+          })} data-testid ="toggle-span"/>
         {collapse ?
           <div className="popBoxField">
             <div >
