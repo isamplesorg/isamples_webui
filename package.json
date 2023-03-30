@@ -37,7 +37,7 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
-    "test": "react-scripts test --env=jsdom --coverage --watchAll --transformIgnorePatterns \"<rootDir>/node_modules/(?!(lit|cesium))/\"",
+    "test": "react-scripts test --env=jsdom --coverage --transformIgnorePatterns \"<rootDir>/node_modules/(?!(lit|cesium))/\"",
     "eject": "react-scripts eject",
     "localdev": "scripts/localdev.sh",
     "predeploy": "npm run build",
