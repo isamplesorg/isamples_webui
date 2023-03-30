@@ -1,6 +1,7 @@
 import os
 import asyncio
 import time
+import sys
 from pyppeteer import launch
 
 async def main():
@@ -18,7 +19,7 @@ async def main():
     selector = "ul.solr-search-fields"
     search_fields = await page.querySelector(selector)
     print(f"search fields are {search_fields}")
-    raise SystemExit
+    sys.exit(1)
     if search_fields is None:
         print("Did not find solr search fields, build is bad!")
         raise SystemExit
