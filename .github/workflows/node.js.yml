@@ -51,6 +51,9 @@ jobs:
       working-directory: ./navocab
       run: |
         source $VENV
+        $VENV/bin/vocab load "https://raw.githubusercontent.com/isamplesorg/metadata/develop/src/vocabularies/materialtype.ttl"
+        $VENV/bin/vocab load "https://raw.githubusercontent.com/isamplesorg/metadata/develop/src/vocabularies/sampledfeature.ttl"
+        $VENV/bin/vocab load "https://raw.githubusercontent.com/isamplesorg/metadata/develop/src/vocabularies/specimentype.ttl"
         $VENV/bin/vocab uijson mat:materialsvocabulary -e >& ../src/CVJSON/material_hierarchy.json
         $VENV/bin/vocab uijson sf:sampledfeaturevocabulary -e >& ../src/CVJSON/sampledFeature_hierarchy.json
         $VENV/bin/vocab uijson spec:specimentypevocabulary -e >& ../src/CVJSON/specimenType_hierarchy.json
