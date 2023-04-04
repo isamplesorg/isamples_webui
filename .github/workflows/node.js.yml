@@ -51,12 +51,12 @@ jobs:
       working-directory: ./navocab
       run: |
         source $VENV
-        $VENV/../bin/vocab load "https://raw.githubusercontent.com/isamplesorg/metadata/develop/src/vocabularies/materialtype.ttl"
-        $VENV/../bin/vocab load "https://raw.githubusercontent.com/isamplesorg/metadata/develop/src/vocabularies/sampledfeature.ttl"
-        $VENV/../bin/vocab load "https://raw.githubusercontent.com/isamplesorg/metadata/develop/src/vocabularies/specimentype.ttl"
-        $VENV/../bin/vocab uijson mat:materialsvocabulary -e >& ../src/CVJSON/material_hierarchy.json
-        $VENV/../bin/vocab uijson sf:sampledfeaturevocabulary -e >& ../src/CVJSON/sampledFeature_hierarchy.json
-        $VENV/../bin/vocab uijson spec:specimentypevocabulary -e >& ../src/CVJSON/specimenType_hierarchy.json
+        vocab load "https://raw.githubusercontent.com/isamplesorg/metadata/develop/src/vocabularies/materialtype.ttl"
+        vocab load "https://raw.githubusercontent.com/isamplesorg/metadata/develop/src/vocabularies/sampledfeature.ttl"
+        vocab load "https://raw.githubusercontent.com/isamplesorg/metadata/develop/src/vocabularies/specimentype.ttl"
+        vocab uijson mat:materialsvocabulary -e >& ../src/CVJSON/material_hierarchy.json
+        vocab uijson sf:sampledfeaturevocabulary -e >& ../src/CVJSON/sampledFeature_hierarchy.json
+        vocab uijson spec:specimentypevocabulary -e >& ../src/CVJSON/specimenType_hierarchy.json
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:
