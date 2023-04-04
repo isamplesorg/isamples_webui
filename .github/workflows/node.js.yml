@@ -1,6 +1,9 @@
 # This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
+# This can be run locally using act (https://github.com/nektos/act) like this:
+# act -j build
+
 name: Node.js CI
 
 on:
@@ -18,41 +21,37 @@ jobs:
       matrix:
         node-version: [17.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-        python-version: [3.10]
+        python-version: [3.10.10]
 
     steps:
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Checkout navocab repo to generate JSON files
-      uses: actions/checkout@v3
-      with:
-        repository: https://github.com/isamplesorg/navocab.git
+    # - name: Checkout navocab repo to generate JSON files
+    #   uses: actions/checkout@v3
+    
+    - name: Run git config for navocab to use https
+      run: |
+        git config --global url.https://github.com/.insteadOf git://github.com/
+        git clone https://github.com/isamplesorg/navocab.git
     - name: Install poetry for navocab
-      working-directory: ./navocab
-      uses: snok/install-poetry@v1
+      uses: snok/install-poetry@v1    
       with:
         virtualenvs-create: true
         virtualenvs-in-project: true
-    - name: Cache Poetry virtualenv
-      working-directory: ./navocab
-      id: cache
-      uses: actions/cache@v2
-      with:
-      path: .venv
-      key: venv-${{ runner.os }}-#{{ hashFiles('**/poetry.lock') }}        
-    - name:
-      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-      run: poetry install --no-interaction --no-root
+        version: 1.4.2
+    - name: Install the poetry dependencies in the venv
+      working-directory: ./navocab    
+      run: |
+        poetry -vvv install
     - name: Run the vocab scripts
       working-directory: ./navocab
       run: |
-        source ./.venv/bin/activate
+        source $VENV
         vocab uijson mat:materialsvocabulary -e >& ../src/CVJSON/material_hierarchy.json
         vocab uijson sf:sampledfeaturevocabulary -e >& ../src/CVJSON/sampledFeature_hierarchy.json
         vocab uijson spec:specimentypevocabulary -e >& ../src/CVJSON/specimenType_hierarchy.json
-      
     - uses: actions/checkout@v2
     - uses: snickerbockers/submodules-init@v4
     - name: Use Node.js ${{ matrix.node-version }}
