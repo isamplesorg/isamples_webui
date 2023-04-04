@@ -15,24 +15,28 @@ jobs:
   build-and-deploy:
     concurrency: ci-${{ github.ref }} # Recommended if you intend to make multiple deployments in quick succession.
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+         python-version: [3.9]
     steps:
     - uses: actions/checkout@v3
-    - uses: snickerbockers/submodules-init@v4
     - name: Install and Build 🔧 # This example project is built using npm and outputs the result to the 'build' folder. Replace with the commands required to build your project, or remove this step entirely if your site is pre-built.
       run: |
         npm i
         npm run build
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install pyppeteer
+      run: |
+        pip install pyppeteer
+    - name: Run pyppeteer test
+      run: |
+        python pyppeteer_test.py
     - run: npm run build --if-present
     - name: Deploy 🚀
       uses: JamesIves/github-pages-deploy-action@v4.3.3
       with:
         branch: gh-pages # The branch the action should deploy to.
-        folder: build # The folder the action should deploy.    
-    #- run: npm test
-    # - name: Deploy
-    #   uses: peaceiris/actions-gh-pages@v3
-    #   if: ${{ github.ref == 'refs/heads/main' }}
-    #   with:
-    #     github_token: ${{ secrets.GITHUB_TOKEN }}
-    #     publish_dir: ./dist
-    #     cname: find.isample.xyz
+        folder: build # The folder the action should deploy.
