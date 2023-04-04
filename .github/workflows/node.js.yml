@@ -24,6 +24,8 @@ jobs:
         python-version: [3.10.10]
 
     steps:
+    - uses: actions/checkout@v2
+    - uses: snickerbockers/submodules-init@v4      
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -52,8 +54,6 @@ jobs:
         vocab uijson mat:materialsvocabulary -e >& ../src/CVJSON/material_hierarchy.json
         vocab uijson sf:sampledfeaturevocabulary -e >& ../src/CVJSON/sampledFeature_hierarchy.json
         vocab uijson spec:specimentypevocabulary -e >& ../src/CVJSON/specimenType_hierarchy.json
-    - uses: actions/checkout@v2
-    - uses: snickerbockers/submodules-init@v4
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:
