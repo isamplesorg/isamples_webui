@@ -248,7 +248,7 @@ function DOIs() {
 
   return (
     <div className="dois__container">
-      <form className="form__container" onSubmit={handleSubmit}>
+      <form className="form__container" onSubmit={handleSubmit} data-testid="form">
         <div className="panel panel-default">
           <div className="panel-heading"><h2 className="panel-title">Required Fields</h2></div>
           <div className="panel-body">
