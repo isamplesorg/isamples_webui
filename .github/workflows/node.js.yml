@@ -40,6 +40,8 @@ jobs:
     - name: Install the python dependencies in the env
       working-directory: ./vocabularies/tools
       run: |
+        # remove this before merging…
+        git checkout fix_missing_root_entry
         pip install -r requirements.txt
     - name: Run the vocab scripts
       working-directory: ./vocabularies/tools
