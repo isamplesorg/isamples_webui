@@ -104,6 +104,8 @@ app.add_middleware(
 )
 ```
 
+## src/CVJSON directory
+The JSON files in the `src/CVJSON` directory are script from running tools in the vocabulary repository.  They are checked in as convenience for local development.  When we deploy the webapp to the `gh-pages` branch on every push, they are re-generated before compiling the JavaScript.  For details about how to generate them locally in case they change, look at the entries in the GitHub workflow files that run them as part of the build.
 
 
 ## Available Scripts
