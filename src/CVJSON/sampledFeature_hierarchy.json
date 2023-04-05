@@ -1,140 +1,166 @@
-[
-  {
-    "concept": "https://w3id.org/isample/vocabulary/sampledfeature/0.9/anthropogenicenvironment",
+{
+  "https://w3id.org/isample/vocabulary/sampledfeature/0.9/anysampledfeature": {
     "label": {
-      "en": "Anthropogenic environment"
+      "en": "Any sampled feature"
     },
     "children": [
       {
-        "concept": "https://w3id.org/isample/vocabulary/sampledfeature/0.9/activehumanoccupationsite",
-        "label": {
-          "en": "Active human occupation site"
-        },
-        "children": [
-          {
-            "concept": "https://w3id.org/isample/vocabulary/sampledfeature/0.9/experimentsetting",
-            "label": {
-              "en": "Experiment setting"
-            },
-            "children": []
+        "https://w3id.org/isample/vocabulary/sampledfeature/0.9/anthropogenicenvironment": {
+          "label": {
+            "en": "Anthropogenic environment"
           },
-          {
-            "concept": "https://w3id.org/isample/vocabulary/sampledfeature/0.9/laboratorycuratorialenvironment",
-            "label": {
-              "en": "Laboratory or curatorial environment"
+          "children": [
+            {
+              "https://w3id.org/isample/vocabulary/sampledfeature/0.9/activehumanoccupationsite": {
+                "label": {
+                  "en": "Active human occupation site"
+                },
+                "children": [
+                  {
+                    "https://w3id.org/isample/vocabulary/sampledfeature/0.9/experimentsetting": {
+                      "label": {
+                        "en": "Experiment setting"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/sampledfeature/0.9/laboratorycuratorialenvironment": {
+                      "label": {
+                        "en": "Laboratory or curatorial environment"
+                      },
+                      "children": []
+                    }
+                  }
+                ]
+              }
             },
-            "children": []
-          }
-        ]
+            {
+              "https://w3id.org/isample/vocabulary/sampledfeature/0.9/pasthumanoccupationsite": {
+                "label": {
+                  "en": "Site of past human activities"
+                },
+                "children": []
+              }
+            }
+          ]
+        }
       },
       {
-        "concept": "https://w3id.org/isample/vocabulary/sampledfeature/0.9/pasthumanoccupationsite",
-        "label": {
-          "en": "Site of past human activities"
-        },
-        "children": []
+        "https://w3id.org/isample/vocabulary/sampledfeature/0.9/biologicalentity": {
+          "label": {
+            "en": "Biological entity"
+          },
+          "children": []
+        }
+      },
+      {
+        "https://w3id.org/isample/vocabulary/sampledfeature/0.9/earthenvironment": {
+          "label": {
+            "en": "Earth environment"
+          },
+          "children": [
+            {
+              "https://w3id.org/isample/vocabulary/sampledfeature/0.9/atmosphere": {
+                "label": {
+                  "en": "Atmosphere"
+                },
+                "children": []
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/sampledfeature/0.9/earthinterior": {
+                "label": {
+                  "en": "Earth interior"
+                },
+                "children": []
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/sampledfeature/0.9/earthsurface": {
+                "label": {
+                  "en": "Earth surface"
+                },
+                "children": [
+                  {
+                    "https://w3id.org/isample/vocabulary/sampledfeature/0.9/lakeriverstreambottom": {
+                      "label": {
+                        "en": "Lake river or stream bottom"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/sampledfeature/0.9/marinewaterbodybottom": {
+                      "label": {
+                        "en": "Marine water body bottom"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/sampledfeature/0.9/subaerialsurfaceenvironment": {
+                      "label": {
+                        "en": "Subaerial surface environment"
+                      },
+                      "children": []
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/sampledfeature/0.9/glacierenvironment": {
+                "label": {
+                  "en": "Glacier environment"
+                },
+                "children": []
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/sampledfeature/0.9/subsurfacefluidreservoir": {
+                "label": {
+                  "en": "Subsurface fluid reservoir"
+                },
+                "children": []
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/sampledfeature/0.9/waterbody": {
+                "label": {
+                  "en": "Water body"
+                },
+                "children": [
+                  {
+                    "https://w3id.org/isample/vocabulary/sampledfeature/0.9/marinewaterbody": {
+                      "label": {
+                        "en": "Marine environment"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/sampledfeature/0.9/terrestrialwaterbody": {
+                      "label": {
+                        "en": "Terrestrial water body"
+                      },
+                      "children": []
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "https://w3id.org/isample/vocabulary/sampledfeature/0.9/extraterrestrialenvironment": {
+          "label": {
+            "en": "Extraterrestrial environment"
+          },
+          "children": []
+        }
       }
     ]
-  },
-  {
-    "concept": "https://w3id.org/isample/vocabulary/sampledfeature/0.9/biologicalentity",
-    "label": {
-      "en": "Biological entity"
-    },
-    "children": []
-  },
-  {
-    "concept": "https://w3id.org/isample/vocabulary/sampledfeature/0.9/earthenvironment",
-    "label": {
-      "en": "Earth environment"
-    },
-    "children": [
-      {
-        "concept": "https://w3id.org/isample/vocabulary/sampledfeature/0.9/atmosphere",
-        "label": {
-          "en": "Atmosphere"
-        },
-        "children": []
-      },
-      {
-        "concept": "https://w3id.org/isample/vocabulary/sampledfeature/0.9/earthinterior",
-        "label": {
-          "en": "Earth interior"
-        },
-        "children": []
-      },
-      {
-        "concept": "https://w3id.org/isample/vocabulary/sampledfeature/0.9/earthsurface",
-        "label": {
-          "en": "Earth surface"
-        },
-        "children": [
-          {
-            "concept": "https://w3id.org/isample/vocabulary/sampledfeature/0.9/lakeriverstreambottom",
-            "label": {
-              "en": "Lake river or stream bottom"
-            },
-            "children": []
-          },
-          {
-            "concept": "https://w3id.org/isample/vocabulary/sampledfeature/0.9/marinewaterbodybottom",
-            "label": {
-              "en": "Marine water body bottom"
-            },
-            "children": []
-          },
-          {
-            "concept": "https://w3id.org/isample/vocabulary/sampledfeature/0.9/subaerialsurfaceenvironment",
-            "label": {
-              "en": "Subaerial surface environment"
-            },
-            "children": []
-          }
-        ]
-      },
-      {
-        "concept": "https://w3id.org/isample/vocabulary/sampledfeature/0.9/glacierenvironment",
-        "label": {
-          "en": "Glacier environment"
-        },
-        "children": []
-      },
-      {
-        "concept": "https://w3id.org/isample/vocabulary/sampledfeature/0.9/subsurfacefluidreservoir",
-        "label": {
-          "en": "Subsurface fluid reservoir"
-        },
-        "children": []
-      },
-      {
-        "concept": "https://w3id.org/isample/vocabulary/sampledfeature/0.9/waterbody",
-        "label": {
-          "en": "Water body"
-        },
-        "children": [
-          {
-            "concept": "https://w3id.org/isample/vocabulary/sampledfeature/0.9/marinewaterbody",
-            "label": {
-              "en": "Marine environment"
-            },
-            "children": []
-          },
-          {
-            "concept": "https://w3id.org/isample/vocabulary/sampledfeature/0.9/terrestrialwaterbody",
-            "label": {
-              "en": "Terrestrial water body"
-            },
-            "children": []
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "concept": "https://w3id.org/isample/vocabulary/sampledfeature/0.9/extraterrestrialenvironment",
-    "label": {
-      "en": "Extraterrestrial environment"
-    },
-    "children": []
   }
-]
+}
