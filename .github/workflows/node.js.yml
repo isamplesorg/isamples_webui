@@ -45,8 +45,8 @@ jobs:
       working-directory: ./vocabularies/tools
       run: |
         python vocab.py load ../src/materialtype.ttl
-        python vocab.py load ../src/sampledfeature.ttl"
-        python vocab.py load ../src/specimentype.ttl"
+        python vocab.py load ../src/sampledfeature.ttl
+        python vocab.py load ../src/specimentype.ttl
         python vocab.py uijson mat:materialsvocabulary -e >& ../../src/CVJSON/material_hierarchy.json
         python vocab.py uijson sf:sampledfeaturevocabulary -e >& ../../src/CVJSON/sampledFeature_hierarchy.json
         python vocab.py uijson spec:specimentypevocabulary -e >& ../../src/CVJSON/specimenType_hierarchy.json
