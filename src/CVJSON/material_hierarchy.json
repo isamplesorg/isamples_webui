@@ -15,7 +15,64 @@
                 "label": {
                   "en": "Anthropogenic metal material"
                 },
-                "children": []
+                "children": [
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/brass": {
+                      "label": {
+                        "en": "brass"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/bronze": {
+                      "label": {
+                        "en": "bronze"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/copper": {
+                      "label": {
+                        "en": "Copper"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/gold": {
+                      "label": {
+                        "en": "Gold"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/iron": {
+                      "label": {
+                        "en": "iron"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/lead": {
+                      "label": {
+                        "en": "lead"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/pewter": {
+                      "label": {
+                        "en": "pewter"
+                      },
+                      "children": []
+                    }
+                  }
+                ]
               }
             },
             {
@@ -23,7 +80,130 @@
                 "label": {
                   "en": "Anthropogenic material"
                 },
-                "children": []
+                "children": [
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/anthropogenicorganicmaterial": {
+                      "label": {
+                        "en": "Anthropogenic organic material"
+                      },
+                      "children": [
+                        {
+                          "https://w3id.org/isample/vocabulary/opencontext/material/0.1/plastic": {
+                            "label": {
+                              "en": "Plastic (material)"
+                            },
+                            "children": []
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/ceramicclay": {
+                      "label": {
+                        "en": "Ceramic clay"
+                      },
+                      "children": [
+                        {
+                          "https://w3id.org/isample/vocabulary/opencontext/material/0.1/brickclay": {
+                            "label": {
+                              "en": "Brick clay"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/opencontext/material/0.1/bucchero": {
+                            "label": {
+                              "en": "bucchero"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/opencontext/material/0.1/faience": {
+                            "label": {
+                              "en": "faience"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/opencontext/material/0.1/porcelain": {
+                            "label": {
+                              "en": "Porcelain"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/opencontext/material/0.1/terracotta": {
+                            "label": {
+                              "en": "Terracotta"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/opencontext/material/0.1/terrasigilata": {
+                            "label": {
+                              "en": "Terra sigilata"
+                            },
+                            "children": []
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/fibermaterial": {
+                      "label": {
+                        "en": "Fiber material"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/glass": {
+                      "label": {
+                        "en": "Glass"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/paper": {
+                      "label": {
+                        "en": "Paper"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/plaster": {
+                      "label": {
+                        "en": "plaster"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/plasterormortar": {
+                      "label": {
+                        "en": "Plaster or Mortar"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/rubber": {
+                      "label": {
+                        "en": "Rubber"
+                      },
+                      "children": []
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -51,7 +231,48 @@
           "label": {
             "en": "Biogenic non-organic material"
           },
-          "children": []
+          "children": [
+            {
+              "https://w3id.org/isample/vocabulary/opencontext/material/0.1/amber": {
+                "label": {
+                  "en": "amber"
+                },
+                "children": []
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/opencontext/material/0.1/bone": {
+                "label": {
+                  "en": "bone"
+                },
+                "children": []
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/opencontext/material/0.1/charcoal": {
+                "label": {
+                  "en": "charcoal"
+                },
+                "children": []
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/opencontext/material/0.1/coal": {
+                "label": {
+                  "en": "coal"
+                },
+                "children": []
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/opencontext/material/0.1/shell": {
+                "label": {
+                  "en": "Shell"
+                },
+                "children": []
+              }
+            }
+          ]
         }
       },
       {
@@ -73,13 +294,126 @@
                 "label": {
                   "en": "Mineral"
                 },
-                "children": []
+                "children": [
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/hematite": {
+                      "label": {
+                        "en": "Hematite"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/kaolin": {
+                      "label": {
+                        "en": "kaolin"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/mica": {
+                      "label": {
+                        "en": "mica"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/quartz": {
+                      "label": {
+                        "en": "quartz"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/mingroup/0.9/boratemineral": {
+                      "label": {
+                        "en": "Mineral-Borate"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/mingroup/0.9/carbonatenitratemineral": {
+                      "label": {
+                        "en": "Mineral-Carbonate or Nitrate"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/mingroup/0.9/halidemineral": {
+                      "label": {
+                        "en": "Mineral-Halide"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/mingroup/0.9/nativeelementmineral": {
+                      "label": {
+                        "en": "Mineral-Native Element"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/mingroup/0.9/organicmineral": {
+                      "label": {
+                        "en": "Mineral-Organic Compound"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/mingroup/0.9/oxidemineral": {
+                      "label": {
+                        "en": "Mineral-Oxide"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/mingroup/0.9/phosphatearsenatevanadatemineral": {
+                      "label": {
+                        "en": "Mineral-Phosphate, Arsenate, or Vanadate"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/mingroup/0.9/silicategermanatemineral": {
+                      "label": {
+                        "en": "Mineral-Silicate or Germanate"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/mingroup/0.9/sulfateselenatetelluratemineral": {
+                      "label": {
+                        "en": "Mineral-Sulfate, Selenate, or Tellurate"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/mingroup/0.9/sulfidesulfosaltmineral": {
+                      "label": {
+                        "en": "Mineral-Sulfide or Sulfosalt"
+                      },
+                      "children": []
+                    }
+                  }
+                ]
               }
             },
             {
               "https://w3id.org/isample/vocabulary/material/0.9/mixedsoilsedimentrock": {
                 "label": {
-                  "en": "Mixed soil, sediment or rock"
+                  "en": "Mixed soil sediment or rock"
                 },
                 "children": []
               }
@@ -89,23 +423,981 @@
                 "label": {
                   "en": "Particulate"
                 },
-                "children": []
+                "children": [
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/cinder": {
+                      "label": {
+                        "en": "Cinder"
+                      },
+                      "children": []
+                    }
+                  }
+                ]
               }
             },
             {
-              "https://w3id.org/isample/vocabulary/material/0.9/rock": {
+              "https://w3id.org/isample/vocabulary/material/0.9/rockorsediment": {
                 "label": {
-                  "en": "Rock"
+                  "en": "Rock or sediment"
                 },
-                "children": []
-              }
-            },
-            {
-              "https://w3id.org/isample/vocabulary/material/0.9/sediment": {
-                "label": {
-                  "en": "Sediment"
-                },
-                "children": []
+                "children": [
+                  {
+                    "https://w3id.org/isample/vocabulary/material/0.9/rock": {
+                      "label": {
+                        "en": "Rock"
+                      },
+                      "children": [
+                        {
+                          "https://w3id.org/isample/vocabulary/opencontext/material/0.1/basalt": {
+                            "label": {
+                              "en": "Basalt"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/opencontext/material/0.1/chert": {
+                            "label": {
+                              "en": "Chert"
+                            },
+                            "children": [
+                              {
+                                "https://w3id.org/isample/vocabulary/opencontext/material/0.1/flint": {
+                                  "label": {
+                                    "en": "flint"
+                                  },
+                                  "children": []
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/opencontext/material/0.1/cinder": {
+                            "label": {
+                              "en": "Cinder"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/opencontext/material/0.1/coal": {
+                            "label": {
+                              "en": "coal"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/opencontext/material/0.1/dolomite": {
+                            "label": {
+                              "en": "dolomite"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/opencontext/material/0.1/gabbro": {
+                            "label": {
+                              "en": "gabbro"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/opencontext/material/0.1/greywacke": {
+                            "label": {
+                              "en": "greywacke"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/opencontext/material/0.1/limestone": {
+                            "label": {
+                              "en": "limestone"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/opencontext/material/0.1/marble": {
+                            "label": {
+                              "en": "marble"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/opencontext/material/0.1/obsidian": {
+                            "label": {
+                              "en": "obsidian"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/opencontext/material/0.1/pumice": {
+                            "label": {
+                              "en": "pumice"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/opencontext/material/0.1/slate": {
+                            "label": {
+                              "en": "Slate"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/opencontext/material/0.1/travertine": {
+                            "label": {
+                              "en": "Travertine"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Aphanite": {
+                            "label": {
+                              "en": "rksd:Aphanite"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Breccia": {
+                            "label": {
+                              "en": "rksd:Breccia"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Fault_Related_Material": {
+                            "label": {
+                              "en": "rksd:Fault_Related_Material"
+                            },
+                            "children": [
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Cataclasite_Series": {
+                                  "label": {
+                                    "en": "rksd:Cataclasite_Series"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Mylonitic_Rock": {
+                                  "label": {
+                                    "en": "rksd:Mylonitic_Rock"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/breccia_gouge_series": {
+                                  "label": {
+                                    "en": "rksd:breccia_gouge_series"
+                                  },
+                                  "children": []
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Fragmental_Igneous_Rock": {
+                            "label": {
+                              "en": "rksd:Fragmental_Igneous_Rock"
+                            },
+                            "children": [
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Pyroclastic_Rock": {
+                                  "label": {
+                                    "en": "rksd:Pyroclastic_Rock"
+                                  },
+                                  "children": []
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Igneous_Rock": {
+                            "label": {
+                              "en": "rksd:Igneous_Rock"
+                            },
+                            "children": [
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Acidic_Igneous_Rock": {
+                                  "label": {
+                                    "en": "rksd:Acidic_Igneous_Rock"
+                                  },
+                                  "children": [
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Dacite": {
+                                        "label": {
+                                          "en": "rksd:Dacite"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Granitoid": {
+                                        "label": {
+                                          "en": "rksd:Granitoid"
+                                        },
+                                        "children": [
+                                          {
+                                            "https://w3id.org/isample/vocabulary/rocksediment/0.9/Alkali_Feldspar_Granite": {
+                                              "label": {
+                                                "en": "rksd:Alkali_Feldspar_Granite"
+                                              },
+                                              "children": []
+                                            }
+                                          },
+                                          {
+                                            "https://w3id.org/isample/vocabulary/rocksediment/0.9/Granite": {
+                                              "label": {
+                                                "en": "rksd:Granite"
+                                              },
+                                              "children": []
+                                            }
+                                          },
+                                          {
+                                            "https://w3id.org/isample/vocabulary/rocksediment/0.9/Granodiorite": {
+                                              "label": {
+                                                "en": "rksd:Granodiorite"
+                                              },
+                                              "children": []
+                                            }
+                                          },
+                                          {
+                                            "https://w3id.org/isample/vocabulary/rocksediment/0.9/Tonalite": {
+                                              "label": {
+                                                "en": "rksd:Tonalite"
+                                              },
+                                              "children": []
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Quartz_Rich_Igneous_Rock": {
+                                        "label": {
+                                          "en": "rksd:Quartz_Rich_Igneous_Rock"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Rhyolitoid": {
+                                        "label": {
+                                          "en": "rksd:Rhyolitoid"
+                                        },
+                                        "children": []
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Basic_Igneous_Rock": {
+                                  "label": {
+                                    "en": "rksd:Basic_Igneous_Rock"
+                                  },
+                                  "children": [
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Basalt": {
+                                        "label": {
+                                          "en": "rksd:Basalt"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Gabbroic_Rock": {
+                                        "label": {
+                                          "en": "rksd:Gabbroic_Rock"
+                                        },
+                                        "children": []
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Doleritic_Rock": {
+                                  "label": {
+                                    "en": "rksd:Doleritic_Rock"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Exotic_Composition_Igneous_Rock": {
+                                  "label": {
+                                    "en": "rksd:Exotic_Composition_Igneous_Rock"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Fine_Grained_Igneous_Rock": {
+                                  "label": {
+                                    "en": "rksd:Fine_Grained_Igneous_Rock"
+                                  },
+                                  "children": [
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Andesite": {
+                                        "label": {
+                                          "en": "rksd:Andesite"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Basalt": {
+                                        "label": {
+                                          "en": "rksd:Basalt"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Dacite": {
+                                        "label": {
+                                          "en": "rksd:Dacite"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Foiditoid": {
+                                        "label": {
+                                          "en": "rksd:Foiditoid"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/High_Magnesium_Fine_Grained_Igneous_Rock": {
+                                        "label": {
+                                          "en": "rksd:High_Magnesium_Fine_Grained_Igneous_Rock"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Phonolitoid": {
+                                        "label": {
+                                          "en": "rksd:Phonolitoid"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Rhyolitoid": {
+                                        "label": {
+                                          "en": "rksd:Rhyolitoid"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Tephritoid": {
+                                        "label": {
+                                          "en": "rksd:Tephritoid"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Trachytoid": {
+                                        "label": {
+                                          "en": "rksd:Trachytoid"
+                                        },
+                                        "children": []
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Fragmental_Igneous_Rock": {
+                                  "label": {
+                                    "en": "rksd:Fragmental_Igneous_Rock"
+                                  },
+                                  "children": [
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Pyroclastic_Rock": {
+                                        "label": {
+                                          "en": "rksd:Pyroclastic_Rock"
+                                        },
+                                        "children": []
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Glass_Rich_Igneous_Rock": {
+                                  "label": {
+                                    "en": "rksd:Glass_Rich_Igneous_Rock"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Hypabyssal_Intrusive_Rock": {
+                                  "label": {
+                                    "en": "rksd:Hypabyssal_Intrusive_Rock"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Intermediate_Composition_Igneous_Rock": {
+                                  "label": {
+                                    "en": "rksd:Intermediate_Composition_Igneous_Rock"
+                                  },
+                                  "children": [
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Andesite": {
+                                        "label": {
+                                          "en": "rksd:Andesite"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Dioritoid": {
+                                        "label": {
+                                          "en": "rksd:Dioritoid"
+                                        },
+                                        "children": []
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Phaneritic_Igneous_Rock": {
+                                  "label": {
+                                    "en": "rksd:Phaneritic_Igneous_Rock"
+                                  },
+                                  "children": [
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Anorthositic_Rock": {
+                                        "label": {
+                                          "en": "rksd:Anorthositic_Rock"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Aplite": {
+                                        "label": {
+                                          "en": "rksd:Aplite"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Dioritoid": {
+                                        "label": {
+                                          "en": "rksd:Dioritoid"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Foid_Dioritoid": {
+                                        "label": {
+                                          "en": "rksd:Foid_Dioritoid"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Foid_Gabbroid": {
+                                        "label": {
+                                          "en": "rksd:Foid_Gabbroid"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Foid_Syenitoid": {
+                                        "label": {
+                                          "en": "rksd:Foid_Syenitoid"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Foidolite": {
+                                        "label": {
+                                          "en": "rksd:Foidolite"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Gabbroid": {
+                                        "label": {
+                                          "en": "rksd:Gabbroid"
+                                        },
+                                        "children": [
+                                          {
+                                            "https://w3id.org/isample/vocabulary/rocksediment/0.9/Gabbroic_Rock": {
+                                              "label": {
+                                                "en": "rksd:Gabbroic_Rock"
+                                              },
+                                              "children": []
+                                            }
+                                          },
+                                          {
+                                            "https://w3id.org/isample/vocabulary/rocksediment/0.9/Monzogabbroic_Rock": {
+                                              "label": {
+                                                "en": "rksd:Monzogabbroic_Rock"
+                                              },
+                                              "children": []
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Granitoid": {
+                                        "label": {
+                                          "en": "rksd:Granitoid"
+                                        },
+                                        "children": [
+                                          {
+                                            "https://w3id.org/isample/vocabulary/rocksediment/0.9/Alkali_Feldspar_Granite": {
+                                              "label": {
+                                                "en": "rksd:Alkali_Feldspar_Granite"
+                                              },
+                                              "children": []
+                                            }
+                                          },
+                                          {
+                                            "https://w3id.org/isample/vocabulary/rocksediment/0.9/Granite": {
+                                              "label": {
+                                                "en": "rksd:Granite"
+                                              },
+                                              "children": []
+                                            }
+                                          },
+                                          {
+                                            "https://w3id.org/isample/vocabulary/rocksediment/0.9/Granodiorite": {
+                                              "label": {
+                                                "en": "rksd:Granodiorite"
+                                              },
+                                              "children": []
+                                            }
+                                          },
+                                          {
+                                            "https://w3id.org/isample/vocabulary/rocksediment/0.9/Tonalite": {
+                                              "label": {
+                                                "en": "rksd:Tonalite"
+                                              },
+                                              "children": []
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Hornblendite": {
+                                        "label": {
+                                          "en": "rksd:Hornblendite"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Pegmatite": {
+                                        "label": {
+                                          "en": "rksd:Pegmatite"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Peridotite": {
+                                        "label": {
+                                          "en": "rksd:Peridotite"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Pyroxenite": {
+                                        "label": {
+                                          "en": "rksd:Pyroxenite"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Quartz_Rich_Igneous_Rock": {
+                                        "label": {
+                                          "en": "rksd:Quartz_Rich_Igneous_Rock"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Syenitoid": {
+                                        "label": {
+                                          "en": "rksd:Syenitoid"
+                                        },
+                                        "children": []
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Plutonic_Igneous_Rock": {
+                                  "label": {
+                                    "en": "rksd:Plutonic_Igneous_Rock"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Porphyry": {
+                                  "label": {
+                                    "en": "rksd:Porphyry"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Ultrabasic_Igneous_Rock": {
+                                  "label": {
+                                    "en": "rksd:Ultrabasic_Igneous_Rock"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Ultramafic_Igneous_Rock": {
+                                  "label": {
+                                    "en": "rksd:Ultramafic_Igneous_Rock"
+                                  },
+                                  "children": [
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Hornblendite": {
+                                        "label": {
+                                          "en": "rksd:Hornblendite"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Peridotite": {
+                                        "label": {
+                                          "en": "rksd:Peridotite"
+                                        },
+                                        "children": []
+                                      }
+                                    },
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Pyroxenite": {
+                                        "label": {
+                                          "en": "rksd:Pyroxenite"
+                                        },
+                                        "children": []
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Impact_Generated_Material": {
+                            "label": {
+                              "en": "rksd:Impact_Generated_Material"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Massive_Sulphide": {
+                            "label": {
+                              "en": "rksd:Massive_Sulphide"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Metamorphic_Rock": {
+                            "label": {
+                              "en": "rksd:Metamorphic_Rock"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Metasomatic_Rock": {
+                            "label": {
+                              "en": "rksd:Metasomatic_Rock"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Sedimentary_Rock": {
+                            "label": {
+                              "en": "rksd:Sedimentary_Rock"
+                            },
+                            "children": [
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Carbonate_Sedimentary_Rock": {
+                                  "label": {
+                                    "en": "rksd:Carbonate_Sedimentary_Rock"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Clastic_Sedimentary_Rock": {
+                                  "label": {
+                                    "en": "rksd:Clastic_Sedimentary_Rock"
+                                  },
+                                  "children": [
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Diamictite": {
+                                        "label": {
+                                          "en": "rksd:Diamictite"
+                                        },
+                                        "children": []
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Generic_Conglomerate": {
+                                  "label": {
+                                    "en": "rksd:Generic_Conglomerate"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Generic_Mudstone": {
+                                  "label": {
+                                    "en": "rksd:Generic_Mudstone"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Generic_Sandstone": {
+                                  "label": {
+                                    "en": "rksd:Generic_Sandstone"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Hybrid_Sedimentary_Rock": {
+                                  "label": {
+                                    "en": "rksd:Hybrid_Sedimentary_Rock"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Iron_Rich_Sedimentary_Rock": {
+                                  "label": {
+                                    "en": "rksd:Iron_Rich_Sedimentary_Rock"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Non_Clastic_Siliceous_Sedimentary_Rock": {
+                                  "label": {
+                                    "en": "rksd:Non_Clastic_Siliceous_Sedimentary_Rock"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Organic_Rich_Sedimentary_Rock": {
+                                  "label": {
+                                    "en": "rksd:Organic_Rich_Sedimentary_Rock"
+                                  },
+                                  "children": [
+                                    {
+                                      "https://w3id.org/isample/vocabulary/rocksediment/0.9/Coal": {
+                                        "label": {
+                                          "en": "rksd:Coal"
+                                        },
+                                        "children": []
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Phosphorite": {
+                                  "label": {
+                                    "en": "rksd:Phosphorite"
+                                  },
+                                  "children": []
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Tuffite": {
+                            "label": {
+                              "en": "rksd:Tuffite"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/residual_material": {
+                            "label": {
+                              "en": "rksd:residual_material"
+                            },
+                            "children": []
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/material/0.9/sediment": {
+                      "label": {
+                        "en": "Sediment"
+                      },
+                      "children": [
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Biogenic_Sediment": {
+                            "label": {
+                              "en": "rksd:Biogenic_Sediment"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Carbonate_Sediment": {
+                            "label": {
+                              "en": "rksd:Carbonate_Sediment"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Chemical_Sedimentary_Material": {
+                            "label": {
+                              "en": "rksd:Chemical_Sedimentary_Material"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Clastic_Sediment": {
+                            "label": {
+                              "en": "rksd:Clastic_Sediment"
+                            },
+                            "children": [
+                              {
+                                "https://w3id.org/isample/vocabulary/rocksediment/0.9/Diamicton": {
+                                  "label": {
+                                    "en": "rksd:Diamicton"
+                                  },
+                                  "children": []
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Gravel_Size_Sediment": {
+                            "label": {
+                              "en": "rksd:Gravel_Size_Sediment"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Hybrid_Sediment": {
+                            "label": {
+                              "en": "rksd:Hybrid_Sediment"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Iron_Rich_Sediment": {
+                            "label": {
+                              "en": "rksd:Iron_Rich_Sediment"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Mud_Size_Sediment": {
+                            "label": {
+                              "en": "rksd:Mud_Size_Sediment"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Non_Clastic_Siliceous_Sediment": {
+                            "label": {
+                              "en": "rksd:Non_Clastic_Siliceous_Sediment"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Phosphate_Rich_Sediment": {
+                            "label": {
+                              "en": "rksd:Phosphate_Rich_Sediment"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Sand_Size_Sediment": {
+                            "label": {
+                              "en": "rksd:Sand_Size_Sediment"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/rocksediment/0.9/Tephra": {
+                            "label": {
+                              "en": "rksd:Tephra"
+                            },
+                            "children": []
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
               }
             },
             {
@@ -157,7 +1449,100 @@
           "label": {
             "en": "Organic material"
           },
-          "children": []
+          "children": [
+            {
+              "https://w3id.org/isample/vocabulary/opencontext/material/0.1/anthropogenicorganicmaterial": {
+                "label": {
+                  "en": "Anthropogenic organic material"
+                },
+                "children": [
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/plastic": {
+                      "label": {
+                        "en": "Plastic (material)"
+                      },
+                      "children": []
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/opencontext/material/0.1/organicanimalmaterial": {
+                "label": {
+                  "en": "Organic animal material"
+                },
+                "children": []
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/opencontext/material/0.1/organicanimalproduct": {
+                "label": {
+                  "en": "Organic animal product"
+                },
+                "children": [
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/hair": {
+                      "label": {
+                        "en": "Hair"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/leather": {
+                      "label": {
+                        "en": "Leather"
+                      },
+                      "children": []
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/opencontext/material/0.1/organicplantmaterial": {
+                "label": {
+                  "en": "Organic plant material"
+                },
+                "children": [
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/wood": {
+                      "label": {
+                        "en": "Wood"
+                      },
+                      "children": []
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/opencontext/material/0.1/plantmaterial": {
+                "label": {
+                  "en": "Plant Material"
+                },
+                "children": [
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/plantfiber": {
+                      "label": {
+                        "en": "Plant fiber"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/material/0.1/wood": {
+                      "label": {
+                        "en": "Wood"
+                      },
+                      "children": []
+                    }
+                  }
+                ]
+              }
+            }
+          ]
         }
       }
     ]
