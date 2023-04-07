@@ -44,14 +44,12 @@ jobs:
         git checkout fix_missing_root_entry
         pip install -r requirements.txt
     - name: Run the vocab scripts
-      working-directory: ./vocabularies/tools
+      working-directory: ./vocabularies/
       run: |
-        python vocab.py load ../src/materialtype.ttl
-        python vocab.py load ../src/sampledfeature.ttl
-        python vocab.py load ../src/specimentype.ttl
-        python vocab.py uijson mat:materialsvocabulary -e >& ../../src/CVJSON/material_hierarchy.json
-        python vocab.py uijson sf:sampledfeaturevocabulary -e >& ../../src/CVJSON/sampledFeature_hierarchy.json
-        python vocab.py uijson spec:specimentypevocabulary -e >& ../../src/CVJSON/specimenType_hierarchy.json
+        make cache
+        python tools/vocab.py -s cache/vocabularies.db uijson mat:materialsvocabulary -e >& ../src/CVJSON/material_hierarchy.json
+        python tools/vocab.py -s cache/vocabularies.db uijson sf:sampledfeaturevocabulary -e >& ../src/CVJSON/sampledFeature_hierarchy.json
+        python tools/vocab.py -s cache/vocabularies.db uijson spec:specimentypevocabulary -e >& ../src/CVJSON/specimenType_hierarchy.json
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:

@@ -59,7 +59,96 @@
           "label": {
             "en": "Artifact"
           },
-          "children": []
+          "children": [
+            {
+              "https://w3id.org/isample/vocabulary/opencontext/specimentype/0.1/architecturalelement": {
+                "label": {
+                  "en": "Architectural element"
+                },
+                "children": []
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/opencontext/specimentype/0.1/clothing": {
+                "label": {
+                  "en": "Clothing"
+                },
+                "children": []
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/opencontext/specimentype/0.1/coin": {
+                "label": {
+                  "en": "Coin"
+                },
+                "children": []
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/opencontext/specimentype/0.1/containerobject": {
+                "label": {
+                  "en": "Container object"
+                },
+                "children": []
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/opencontext/specimentype/0.1/domesticitem": {
+                "label": {
+                  "en": "Domestic item"
+                },
+                "children": []
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/opencontext/specimentype/0.1/ornament": {
+                "label": {
+                  "en": "Ornament"
+                },
+                "children": []
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/opencontext/specimentype/0.1/photograph": {
+                "label": {
+                  "en": "Photograph"
+                },
+                "children": []
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/opencontext/specimentype/0.1/sherd": {
+                "label": {
+                  "en": "Pot sherd"
+                },
+                "children": []
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/opencontext/specimentype/0.1/tile": {
+                "label": {
+                  "en": "Tile"
+                },
+                "children": []
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/opencontext/specimentype/0.1/utilityitem": {
+                "label": {
+                  "en": "Utility item"
+                },
+                "children": []
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/opencontext/specimentype/0.1/weapon": {
+                "label": {
+                  "en": "Weapon"
+                },
+                "children": []
+              }
+            }
+          ]
         }
       },
       {
@@ -98,7 +187,16 @@
                 "label": {
                   "en": "Organism part"
                 },
-                "children": []
+                "children": [
+                  {
+                    "https://w3id.org/isample/vocabulary/opencontext/specimentype/0.1/peiceofbone": {
+                      "label": {
+                        "en": "Bone object"
+                      },
+                      "children": []
+                    }
+                  }
+                ]
               }
             },
             {

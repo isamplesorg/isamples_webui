@@ -51,7 +51,330 @@
           "label": {
             "en": "Biological entity"
           },
-          "children": []
+          "children": [
+            {
+              "https://w3id.org/isample/vocabulary/biologicentity/0.9/eukaryote": {
+                "label": {
+                  "en": "Eukaryote"
+                },
+                "children": [
+                  {
+                    "https://w3id.org/isample/vocabulary/biologicentity/0.9/Animalia": {
+                      "label": {
+                        "en": "Animalia"
+                      },
+                      "children": [
+                        {
+                          "https://w3id.org/isample/vocabulary/biologicentity/0.9/Vertebrate": {
+                            "label": {
+                              "en": "Vertebrate"
+                            },
+                            "children": [
+                              {
+                                "https://w3id.org/isample/vocabulary/biologicentity/0.9/amphibian": {
+                                  "label": {
+                                    "en": "Amphibian"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/biologicentity/0.9/bird": {
+                                  "label": {
+                                    "en": "Bird"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/biologicentity/0.9/fish": {
+                                  "label": {
+                                    "en": "Fish"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/biologicentity/0.9/mammal": {
+                                  "label": {
+                                    "en": "Mammal"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/biologicentity/0.9/reptile": {
+                                  "label": {
+                                    "en": "Reptile"
+                                  },
+                                  "children": []
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/biologicentity/0.9/arthropod": {
+                            "label": {
+                              "en": "Arthropod"
+                            },
+                            "children": [
+                              {
+                                "https://w3id.org/isample/vocabulary/biologicentity/0.9/arachnid": {
+                                  "label": {
+                                    "en": "Arachnid"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/biologicentity/0.9/crustacea": {
+                                  "label": {
+                                    "en": "Crustaceans"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/biologicentity/0.9/hexapoda": {
+                                  "label": {
+                                    "en": "Insect"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/biologicentity/0.9/myriapod": {
+                                  "label": {
+                                    "en": "Myriapod"
+                                  },
+                                  "children": []
+                                }
+                              },
+                              {
+                                "https://w3id.org/isample/vocabulary/biologicentity/0.9/otherarthropod": {
+                                  "label": {
+                                    "en": "Other arthropod"
+                                  },
+                                  "children": []
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/biologicentity/0.9/mollusca": {
+                            "label": {
+                              "en": "Mollusca"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/biologicentity/0.9/otherinvertebrate": {
+                            "label": {
+                              "en": "Other invertebrate"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/biologicentity/0.9/porifera": {
+                            "label": {
+                              "en": "Porifera"
+                            },
+                            "children": []
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/biologicentity/0.9/Fungi": {
+                      "label": {
+                        "en": "Fungi"
+                      },
+                      "children": [
+                        {
+                          "https://w3id.org/isample/vocabulary/biologicentity/0.9/macrofungi": {
+                            "label": {
+                              "en": "Macrofungi"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/biologicentity/0.9/microfungi": {
+                            "label": {
+                              "en": "Microfungi"
+                            },
+                            "children": []
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/biologicentity/0.9/Plantae": {
+                      "label": {
+                        "en": "Plantae"
+                      },
+                      "children": [
+                        {
+                          "https://w3id.org/isample/vocabulary/biologicentity/0.9/bryophyte": {
+                            "label": {
+                              "en": "Bryophyte"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/biologicentity/0.9/otherplant": {
+                            "label": {
+                              "en": "Other plant"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/biologicentity/0.9/pteridophyte": {
+                            "label": {
+                              "en": "Pteridophyte"
+                            },
+                            "children": []
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/biologicentity/0.9/spermatophyte": {
+                            "label": {
+                              "en": "Seed plant"
+                            },
+                            "children": []
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/biologicentity/0.9/Protista": {
+                      "label": {
+                        "en": "Protista"
+                      },
+                      "children": [
+                        {
+                          "https://w3id.org/isample/vocabulary/biologicentity/0.9/amoebozoa": {
+                            "label": {
+                              "en": "Amoebozoa"
+                            },
+                            "children": [
+                              {
+                                "https://w3id.org/isample/vocabulary/biologicentity/0.9/myxomycete": {
+                                  "label": {
+                                    "en": "Myxomycetes"
+                                  },
+                                  "children": []
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "https://w3id.org/isample/vocabulary/biologicentity/0.9/protozoa": {
+                            "label": {
+                              "en": "Protozoa"
+                            },
+                            "children": []
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/biologicentity/0.9/algae": {
+                      "label": {
+                        "en": "Algae"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/biologicentity/0.9/eukaryoticmicroorganisms": {
+                      "label": {
+                        "en": "Eukaryotic microorganisms"
+                      },
+                      "children": []
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/biologicentity/0.9/lichen": {
+                "label": {
+                  "en": "Lichen"
+                },
+                "children": []
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/biologicentity/0.9/plasmid": {
+                "label": {
+                  "en": "Plasmid"
+                },
+                "children": []
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/biologicentity/0.9/prokaryote": {
+                "label": {
+                  "en": "Prokaryote"
+                },
+                "children": [
+                  {
+                    "https://w3id.org/isample/vocabulary/biologicentity/0.9/archaea": {
+                      "label": {
+                        "en": "Archaea"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/biologicentity/0.9/bacteria": {
+                      "label": {
+                        "en": "Bacteria"
+                      },
+                      "children": []
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "https://w3id.org/isample/vocabulary/biologicentity/0.9/virus": {
+                "label": {
+                  "en": "Virus"
+                },
+                "children": [
+                  {
+                    "https://w3id.org/isample/vocabulary/biologicentity/0.9/othervirus": {
+                      "label": {
+                        "en": "Other Virus"
+                      },
+                      "children": []
+                    }
+                  },
+                  {
+                    "https://w3id.org/isample/vocabulary/biologicentity/0.9/phage": {
+                      "label": {
+                        "en": "Phage"
+                      },
+                      "children": []
+                    }
+                  }
+                ]
+              }
+            }
+          ]
         }
       },
       {
