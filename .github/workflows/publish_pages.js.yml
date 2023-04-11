@@ -31,6 +31,7 @@ jobs:
     - name: Install the python dependencies in the env
       working-directory: ./vocabularies/tools
       run: |
+        git checkout main
         pip install -r requirements.txt
     - name: Run the vocab scripts
       working-directory: ./vocabularies/tools
