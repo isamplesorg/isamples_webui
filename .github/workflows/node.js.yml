@@ -33,7 +33,7 @@ jobs:
     # - name: Checkout navocab repo to generate JSON files
     #   uses: actions/checkout@v3
     
-    - uses: isamplesorg/vocabularies@master
+    - uses: isamplesorg/vocabularies@main
     
     - name: Run git config for navocab to use https
       run: |
