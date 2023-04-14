@@ -31,18 +31,23 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Vocabulary action
       uses: isamplesorg/vocabularies@main
+      working-directory: ${{ github.workspace }}
       with:
         action: uijson
         path: ${{ github.workspace }}/src/CVJSON
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
+      working-directory: ${{ github.workspace }}
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm i
+      working-directory: ${{ github.workspace }}
     - run: npm run build --if-present
+      working-directory: ${{ github.workspace }}
     - run: npm test
+      working-directory: ${{ github.workspace }}
     # - name: Deploy
     #   uses: peaceiris/actions-gh-pages@v3
     #   if: ${{ github.ref == 'refs/heads/main' }}
