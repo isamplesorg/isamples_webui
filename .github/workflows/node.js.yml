@@ -31,15 +31,15 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Vocabulary action
       uses: isamplesorg/vocabularies@main
-      working-directory: ${{ github.workspace }}
       with:
+        working-directory: ${{ github.workspace }}        
         action: uijson
         path: ${{ github.workspace }}/src/CVJSON
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
-      working-directory: ${{ github.workspace }}
       with:
+        working-directory: ${{ github.workspace }}        
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm i
