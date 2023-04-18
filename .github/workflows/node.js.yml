@@ -29,35 +29,16 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: snickerbockers/submodules-init@v4
-    - run: ls -l ${{ github.workspace }}/src/CVJSON
     - name: Vocabulary action
       uses: isamplesorg/vocabularies@main
       with:
         action: uijson
         path: ${{ github.workspace }}/src/CVJSON
-    # - name: Upload artifact
-    #   uses: actions/upload-artifact@v3
-    #   with:
-    #     name: CVJSON
-    #     path: CVJSON
-    - run: ls -l ${{ github.workspace }}/src/CVJSON
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:        
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    # - name: Download uijson artifacts
-    #   uses: actions/download-artifact@v3
-    #   with:
-    #     name: CVJSON
-    #     path: src
     - run: npm i
     - run: npm run build --if-present
     - run: npm test
-    # - name: Deploy
-    #   uses: peaceiris/actions-gh-pages@v3
-    #   if: ${{ github.ref == 'refs/heads/main' }}
-    #   with:
-    #     github_token: ${{ secrets.GITHUB_TOKEN }}
-    #     publish_dir: ./dist
-    #     cname: find.isample.xyz
