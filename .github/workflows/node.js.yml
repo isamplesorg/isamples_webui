@@ -37,12 +37,12 @@ jobs:
       uses: isamplesorg/vocabularies@main
       with:
         action: uijson
-        path: CVJSON
-    - name: Upload artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: CVJSON
-        path: CVJSON
+        path: ${{ github.workspace }}/src/CVJSON
+    # - name: Upload artifact
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: CVJSON
+    #     path: CVJSON
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
