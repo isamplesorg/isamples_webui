@@ -15,30 +15,13 @@ jobs:
   build-and-deploy:
     concurrency: ci-${{ github.ref }} # Recommended if you intend to make multiple deployments in quick succession.
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-         python-version: [3.10.10]
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+    - name: Vocabulary action
+      uses: isamplesorg/vocabularies@main
       with:
-        python-version: ${{ matrix.python-version }}    
-    - name: Run git config for navocab to use https
-      run: |
-        git config --global url.https://github.com/.insteadOf git://github.com/
-        git clone https://github.com/isamplesorg/vocabularies.git
-    - name: Install the python dependencies in the env
-      working-directory: ./vocabularies/tools
-      run: |
-        pip install -r requirements.txt
-    - name: Run the vocab scripts
-      working-directory: ./vocabularies/
-      run: |
-        make cache
-        python tools/vocab.py -s cache/vocabularies.db uijson mat:materialsvocabulary -e >& ../src/CVJSON/material_hierarchy.json
-        python tools/vocab.py -s cache/vocabularies.db uijson sf:sampledfeaturevocabulary -e >& ../src/CVJSON/sampledFeature_hierarchy.json
-        python tools/vocab.py -s cache/vocabularies.db uijson spec:specimentypevocabulary -e >& ../src/CVJSON/specimenType_hierarchy.json
+        action: uijson
+        path: ${{ github.workspace }}/src/CVJSON
     - name: Install and Build 🔧 # This example project is built using npm and outputs the result to the 'build' folder. Replace with the commands required to build your project, or remove this step entirely if your site is pre-built.
       run: |
         npm i

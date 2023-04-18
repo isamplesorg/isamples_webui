@@ -18,9 +18,6 @@ jobs:
 
     runs-on: ubuntu-latest
     
-    env:
-      ACTIONS_STEP_DEBUG: true
-    
     strategy:
       matrix:
         node-version: [17.x]
