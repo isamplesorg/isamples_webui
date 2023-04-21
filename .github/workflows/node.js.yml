@@ -17,49 +17,25 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    
     strategy:
       matrix:
         node-version: [17.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-        python-version: [3.10.10]
 
     steps:
     - uses: actions/checkout@v2
-    - uses: snickerbockers/submodules-init@v4      
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+    - uses: snickerbockers/submodules-init@v4
+    - name: Vocabulary action
+      uses: isamplesorg/vocabularies@main
       with:
-        python-version: ${{ matrix.python-version }}
-    # - name: Checkout navocab repo to generate JSON files
-    #   uses: actions/checkout@v3
-    
-    - name: Run git config for navocab to use https
-      run: |
-        git config --global url.https://github.com/.insteadOf git://github.com/
-        git clone https://github.com/isamplesorg/vocabularies.git
-    - name: Install the python dependencies in the env
-      working-directory: ./vocabularies/tools
-      run: |
-        pip install -r requirements.txt
-    - name: Run the vocab scripts
-      working-directory: ./vocabularies/
-      run: |
-        make cache
-        python tools/vocab.py -s cache/vocabularies.db uijson mat:materialsvocabulary -e >& ../src/CVJSON/material_hierarchy.json
-        python tools/vocab.py -s cache/vocabularies.db uijson sf:sampledfeaturevocabulary -e >& ../src/CVJSON/sampledFeature_hierarchy.json
-        python tools/vocab.py -s cache/vocabularies.db uijson spec:specimentypevocabulary -e >& ../src/CVJSON/specimenType_hierarchy.json
+        action: uijson
+        path: ${{ github.workspace }}/src/CVJSON
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
-      with:
+      with:        
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm i
     - run: npm run build --if-present
     - run: npm test
-    # - name: Deploy
-    #   uses: peaceiris/actions-gh-pages@v3
-    #   if: ${{ github.ref == 'refs/heads/main' }}
-    #   with:
-    #     github_token: ${{ secrets.GITHUB_TOKEN }}
-    #     publish_dir: ./dist
-    #     cname: find.isample.xyz
