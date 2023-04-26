@@ -151,5 +151,38 @@ export class Annotation {
         return response.json();
     }
 
+    /**
+     * Hide the group's annotation with the given ID
+     * This requires the user to have moderator permission to hide the annotation
+     * @param {*} ID 
+     */
+    async hideGroupAnnotation (ID) {
+        const url = new URL(`api/annotations/${ID}/hide`, this.annot_tool.baseURL);
+        await fetch(url, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${this.auth_token}`
+            }
+        });
+    }
+
+     /**
+     * Delete the group's annotation with the given ID
+     * This requires the user to have moderator permission to delete the annotation
+     * @param {*} ID 
+     */
+     async deleteGroupAnnotation (ID) {
+        const url = new URL(`api/annotations/${ID}/hide`, this.annot_tool.baseURL);
+        await fetch(url, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${this.auth_token}`
+            }
+        });
+    }
+
+
 }
 
