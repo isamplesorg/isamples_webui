@@ -3,6 +3,13 @@ import { useNavigate } from "react-router-dom";
 import Cookies from 'universal-cookie';
 import ScrollToTop from "components/scrollTop";
 
+import {applyPolyfills, defineCustomElements} from 'throughput-widget/loader';
+applyPolyfills().then((
+  defineCustomElements()
+));
+
+const dsid = "1114"
+
 /**
  * a function to return navigation bar
  * @param {Object} props
@@ -46,6 +53,7 @@ const NavBar = function (props) {
   // Create button group based on different pages
   const buttonGroup =
     <div className='navbar-right'>
+      <throughput-widget identifier="r3d100011761" link={dsid} additional-type="site" orcid-client-id="APP-RO1IP7PGLXBXB9ND" read-only-mode="false"/>
       {
         (() => {
           switch (props.page) {
