@@ -31,7 +31,7 @@
     "react-table": "^7.7.0",
     "redux": "^4.1.2",
     "solr-faceted-search-react": "github:isamplesorg/solr-faceted-search-react",
-    "throughput-widget": "github:isamplesorg/throughput-widget#isamples-oauth-redirect",
+    "throughput-widget": "github:isamplesorg/throughput-widget",
     "universal-cookie": "^4.0.4",
     "web-vitals": "^2.1.4"
   },
