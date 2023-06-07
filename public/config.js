@@ -22,3 +22,22 @@ const config = {
 };
 
 window.config = config;
+
+async function fetchGrantToken() {
+  const response = await fetch("http://localhost:8000/hypothesis_jwt");
+  var grantToken = await response.text();
+  // Need to strip the quotes from the returned response
+  grantToken = grantToken.replace('"', '');
+  console.log("grant token is ", grantToken);
+  window.hypothesisConfig = function () {
+    return {
+        "services": [{
+          "apiUrl": "http://localhost:5000/api/",
+          "authority": "isample.xyz",
+          "grantToken": grantToken
+        }]
+    };
+  };
+}
+
+fetchGrantToken();
