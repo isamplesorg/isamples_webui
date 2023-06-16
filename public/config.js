@@ -24,19 +24,35 @@ const config = {
 window.config = config;
 
 async function fetchGrantToken() {
-  const response = await fetch("http://localhost:8000/hypothesis_jwt");
-  var grantToken = await response.text();
-  // Need to strip the quotes from the returned response
-  grantToken = grantToken.replace(/"/g, '');
+  var grantToken = "";
+  try {
+    const response = await fetch("http://localhost:8000/manage/hypothesis_jwt");
+    if (response.status != 401) {
+      grantToken = await response.text();
+      // Need to strip the quotes from the returned response
+      grantToken = grantToken.replace(/"/g, '');
+    }
+  } catch (e) {
+    console.warn(e)
+  }
   console.log("grant token is ", grantToken);
   window.hypothesisConfig = function () {
-    return {
+    var hypothesisConfig = {
         "services": [{
           "apiUrl": "http://localhost:5000/api/",
           "authority": "isample.xyz",
-          "grantToken": grantToken
+          "onLoginRequest": function () {
+            window.location.assign(window.config.login);
+          },
+          "onLogoutRequest": function () {
+            window.location.assign(window.config.logout);
+          }
         }]
     };
+    if (grantToken != "") {
+      hypothesisConfig["grantToken"] = grantToken;
+    }
+    return hypothesisConfig;
   };
 }
 
