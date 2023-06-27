@@ -192,9 +192,6 @@ function extractJsonldFromDOM() {
 
 window.addEventListener('load', extractJsonldFromDOM());
 
-
-import Cookies from 'universal-cookie';
-
 async function fetchGrantToken() {
   var grantToken = "";
   // The story as of right now is that we only appear to have the "previousParams" session cookie showing up in
