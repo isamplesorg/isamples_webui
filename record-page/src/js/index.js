@@ -114,6 +114,9 @@ function createTable(data) {
  */
 function findGeoInfo(data, field) {
     const fieldStart = JSON.stringify(data).indexOf(field);
+    if (typeof(fieldStart) === "undefined") {
+      return NaN;
+    }
     const fieldLength = JSON.stringify(data).substring(fieldStart).indexOf(',');
     const fieldValue = JSON.stringify(data).substring(fieldStart, fieldStart + fieldLength);
     return parseFloat(fieldValue.split(':')[1].replaceAll('"', ""));
@@ -185,7 +188,7 @@ function extractJsonldFromDOM() {
     const newFieldsDict = cleanJSON("", _jsonld);
     document.getElementById('TableView').appendChild(createTable(newFieldsDict));
     document.getElementById('citation').innerHTML = createCitation(newFieldsDict);
-    // createMap([findGeoInfo(_jsonld, 'latitude'), findGeoInfo(_jsonld, 'longitude')]);
+    createMap([findGeoInfo(_jsonld, 'latitude'), findGeoInfo(_jsonld, 'longitude')]);
 };
 
 window.addEventListener('load', extractJsonldFromDOM());
