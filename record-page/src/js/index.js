@@ -1,5 +1,3 @@
-import Cookies from 'universal-cookie';
-
 const ZOOM_LEVEL = 6;
 const NO_ZOOM_LEVEL = 0;
 const DEFAULT_LOCATION = [0, 0];
@@ -198,17 +196,22 @@ async function fetchGrantToken() {
   // this data structure.  If I go into Chrome, I can definitely see the session cookie, so something about how
   // this is reading the cookies isn't getting that for some reason.
   const cookies = new Cookies();
-  cookies.set('logged', true, { path: "/" });
+  // cookies.set('logged', true, { path: "/" });
   console.log("cookies are ", cookies);
   console.log("document cookies are ", document.cookie)
-  const sessionCookie = cookies.get("session");
+
+  const sessionCookieValue = document.cookie
+  .split("; ")
+  .find((row) => row.startsWith("session="))
+  ?.split("=")[1];
+
   console.log("session cookie is ", sessionCookie);
   fetch("http://localhost:8000/manage/hypothesis_jwt", {
     'method': 'POST',
     credentials: "include",
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': cookies.get('session'),
+      'Authorization': sessionCookieValue,
     }
   })
     .then((res) => {
