@@ -52,8 +52,6 @@ import DOIs from 'pages/DOIs';
 import UserInfo from 'pages/userInfo';
 import HierarchyFacet from 'extension/iSamples_hierarchyFacet';
 
-import "annotation-lib/hypothesis_integration.js";
-
 // initializa a cookie instance
 const cookies = new Cookies();
 
