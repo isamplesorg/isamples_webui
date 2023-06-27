@@ -185,7 +185,7 @@ function extractJsonldFromDOM() {
     const newFieldsDict = cleanJSON("", _jsonld);
     document.getElementById('TableView').appendChild(createTable(newFieldsDict));
     document.getElementById('citation').innerHTML = createCitation(newFieldsDict);
-    createMap([findGeoInfo(_jsonld, 'latitude'), findGeoInfo(_jsonld, 'longitude')]);
+    // createMap([findGeoInfo(_jsonld, 'latitude'), findGeoInfo(_jsonld, 'longitude')]);
 };
 
 window.addEventListener('load', extractJsonldFromDOM());
