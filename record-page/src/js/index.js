@@ -193,7 +193,7 @@ function extractJsonldFromDOM() {
 
 window.addEventListener('load', extractJsonldFromDOM());
 
-async function fetchGrantToken(authority, isamples_jwt_url, hypothesis_api_url, login_url, logout_url) {
+export default async function fetchGrantToken(authority, isamples_jwt_url, hypothesis_api_url, login_url, logout_url) {
   var grantToken = "";
   fetch(isamples_jwt_url, {
     'method': 'POST',
