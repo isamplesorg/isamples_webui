@@ -193,34 +193,19 @@ function extractJsonldFromDOM() {
 
 window.addEventListener('load', extractJsonldFromDOM());
 
-async function fetchGrantToken() {
+async function fetchGrantToken(authority, isamples_jwt_url, hypothesis_api_url, login_url, logout_url) {
   var grantToken = "";
-  // The story as of right now is that we only appear to have the "previousParams" session cookie showing up in
-  // this data structure.  If I go into Chrome, I can definitely see the session cookie, so something about how
-  // this is reading the cookies isn't getting that for some reason.
-  const cookies = new Cookies();
-  // cookies.set('logged', true, { path: "/" });
-  console.log("cookies are ", cookies);
-  console.log("document cookies are ", document.cookie)
-
-  const sessionCookieValue = document.cookie
-  .split("; ")
-  .find((row) => row.startsWith("session="))
-  ?.split("=")[1];
-
-  console.log("session cookie is ", sessionCookie);
-  fetch("http://localhost:8000/manage/hypothesis_jwt", {
+  fetch(isamples_jwt_url, {
     'method': 'POST',
     credentials: "include",
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': sessionCookieValue,
+      'Content-Type': 'application/json'
     }
   })
     .then((res) => {
       // check the POST return status
       const { status } = res;
-      console.log("token response status is ", status);
+      // console.log("token response status is ", status);
       if (status === 200) {
         return res.text();
       } else {
@@ -228,33 +213,33 @@ async function fetchGrantToken() {
       }
     })
     .then((grantToken) => {
-      console.log("grant token is ", grantToken)
-      grantToken = grantToken.replace(/"/g, '');
+      // console.log("grant token is ", grantToken)
+      window.grantToken = grantToken.replace(/"/g, '');
     },
       (error) => {
-        console.warn(error);
+        // console.warn(error);
+        window.grantToken = "";
       }
     )
-  console.log("grant token is ", grantToken);
+  // console.log("grant token is ", grantToken);
   window.hypothesisConfig = function () {
-    var hypothesisConfig = {
-        "services": [{
-          "apiUrl": "http://localhost:5000/api/",
-          "authority": "isample.xyz",
-          "onLoginRequest": function () {
-            window.location.assign(window.config.login);
-          },
-          "onLogoutRequest": function () {
-            window.location.assign(window.config.logout);
-          }
-        }]
+    var serviceConfig = {
+      "apiUrl": hypothesis_api_url,
+      "authority": authority,
+      "onLoginRequest": function () {
+         window.location.assign(login_url);
+      },
+      "onLogoutRequest": function () {
+         window.location.assign(logout_url);
+      }
     };
-    if (grantToken !== "") {
-      hypothesisConfig["grantToken"] = grantToken;
+    if (window.grantToken !== undefined && window.grantToken.length > 0) {
+      serviceConfig["grantToken"] = window.grantToken;
     }
+    var hypothesisConfig = {
+        "services": [serviceConfig]
+    };
+    // console.log("here is the hypothesis config");
     return hypothesisConfig;
   };
 }
-
-
-window.addEventListener('load', fetchGrantToken());
