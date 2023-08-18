@@ -261,7 +261,14 @@ export class PointStreamDatasource extends Cesium.CustomDataSource {
     }
 
 }
-
+export async function ISamplesSpatialFactory(element){
+    const terrain = await Cesium.createWorldTerrainAsync({
+        //requestWaterMask: true,
+        //requestVertexNormals: true,
+    });
+    const tileset = await Cesium.createOsmBuildingsAsync();
+    return new ISamplesSpatial(element, terrain, tileset);
+  }
 
 /**
  * Wraps a Cesium view
@@ -272,7 +279,7 @@ export class ISamplesSpatial {
      * Create a new viewer
      * @param element Element or elementId
      */
-    constructor(element) {
+    constructor(element, terrain, tileset) {
         this.tracking_info = {
             color: Cesium.Color.BLUE,
             width: 10,
@@ -280,11 +287,7 @@ export class ISamplesSpatial {
             polyline: null,
             positions: [],
         };
-        let worldTerrain = Cesium.createWorldTerrain({
-            //requestWaterMask: true,
-            //requestVertexNormals: true,
-        });
-
+        let worldTerrain = terrain;
         this.viewer = new Cesium.Viewer(element, {
             infoBox: false,
             timeline: false,
@@ -292,7 +295,7 @@ export class ISamplesSpatial {
             sceneModePicker: false,
             terrainProvider: worldTerrain,
         });
-        this.buildingTileset = this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
+        this.buildingTileset = tileset;
         this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
         this.viewer.clock.onTick.addEventListener(() => {
             let rect = this.currentBounds;
@@ -303,7 +306,6 @@ export class ISamplesSpatial {
         this.selectBoxCallback = null;
         this.selectedBox = null;
     }
-
     get canvas() {
         return this.viewer.canvas;
     }

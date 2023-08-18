@@ -177,6 +177,9 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
           } else {
             locations[location] = 1;
           }
+          if (typeof doc.x !== 'number' || typeof doc.y !== 'number' || doc.z && typeof doc.z !== 'number' || typeof locations[location] !== 'number'){
+            return; // invalid fetch case 
+          }
           const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, (doc.z || DEFAULT_ELEVATION) + locations[location]);
           this.add({
             id: doc.id,
@@ -203,6 +206,15 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
   }
 }
 
+export async function ISamplesSpatialFactory(element, initialLocation){
+  const terrain = await Cesium.createWorldTerrainAsync({
+      //requestWaterMask: true,
+      //requestVertexNormals: true,
+  });
+  const tileset = await Cesium.createOsmBuildingsAsync();
+  return new ISamplesSpatial(element, initialLocation, terrain, tileset);
+}
+
 /**
  * Wraps a Cesium view
  */
@@ -212,7 +224,7 @@ export class ISamplesSpatial {
    * Create a new viewer
    * @param element Element or elementId
    */
-  constructor(element, initialLocation) {
+  constructor(element, initialLocation, worldTerrain, tileset){
     this.tracking_info = {
       color: Cesium.Color.BLUE,
       width: 10,
@@ -220,7 +232,7 @@ export class ISamplesSpatial {
       polyline: null,
       positions: [],
     };
-    this.worldTerrain = Cesium.createWorldTerrain({});
+    this.worldTerrain = worldTerrain; 
 
     this.viewer = new Cesium.Viewer(element, {
       timeline: false,
@@ -239,7 +251,7 @@ export class ISamplesSpatial {
     if (initialLocation) {
       this.viewer.camera.setView(initialLocation.getView);
     }
-    this.buildingTileset = this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
+    this.buildingTileset = this.viewer.scene.primitives.add(tileset); 
     this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
     this.viewer.scene.globe.depthTestAgainstTerrain = true;
     this.mouseCoordinateCallback = null;
@@ -626,9 +638,10 @@ export class ISamplesSpatial {
     gridder.update(viewer, rect);
   }
 
-  addGrid() {
+  async addGrid() {
       // Add Cesium OSM Buildings, a global 3D buildings layer.
-      this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
+      const tileset = await Cesium.createOsmBuildingsAsync();
+      this.viewer.scene.primitives.add(tileset);
       this.gridder = new H3GridManager();
       const viewer = this.viewer;
       this.gridTracker(viewer, this.gridder);

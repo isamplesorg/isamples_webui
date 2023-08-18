@@ -12,7 +12,7 @@ import 'css/cesiumMap.css';
 
 import {
   SpatialView,
-  ISamplesSpatial,
+  ISamplesSpatialFactory,
   PointStreamPrimitiveCollection
 } from "./api/spatial";
 import { ISamplesAPI } from "./api/server";
@@ -392,7 +392,7 @@ class CesiumMap extends React.Component {
 
   // This is a initial function in react liftcycle.
   // Only call once when this component first render
-  componentDidMount() {
+  async componentDidMount() {
     const { mapInfo, setCamera, newSearchFields, newBbox, onSetFields } = this.props;
     // set the initial position based on the parameters from parent components
     const initialPosition = new SpatialView(
@@ -401,8 +401,7 @@ class CesiumMap extends React.Component {
       mapInfo.height,
       mapInfo.heading,
       mapInfo.pitch);
-    viewer = new ISamplesSpatial("cesiumContainer", initialPosition || moorea);
-  
+    viewer = await ISamplesSpatialFactory("cesiumContainer", initialPosition || moorea);
     // remove the Ceisum information with custom button group
     render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
     viewer.addHud("cesiumContainer");
