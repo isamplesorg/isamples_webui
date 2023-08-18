@@ -177,7 +177,7 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
           } else {
             locations[location] = 1;
           }
-          if (typeof doc.x !== 'number' || typeof doc.y !== 'number' || doc.z && typeof doc.z !== 'number' || typeof locations[location] !== 'number'){
+          if (typeof doc.x !== 'number' || typeof doc.y !== 'number' || (doc.z && typeof doc.z !== 'number') || typeof locations[location] !== 'number'){
             return; // invalid fetch case 
           }
           const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, (doc.z || DEFAULT_ELEVATION) + locations[location]);
