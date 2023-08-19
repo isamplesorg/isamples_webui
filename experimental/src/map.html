@@ -143,7 +143,7 @@
 
     Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwNzk3NjkyMy1iNGI1LTRkN2UtODRiMy04OTYwYWE0N2M3ZTkiLCJpZCI6Njk1MTcsImlhdCI6MTYzMzU0MTQ3N30.e70dpNzOCDRLDGxRguQCC-tRzGzA-23Xgno5lNgCeB4";
 
-    let worldTerrain = Cesium.createWorldTerrain({
+    let worldTerrain = Cesium.createWorldTerrainAsync({
         //requestWaterMask: true,
         //requestVertexNormals: true,
 
@@ -158,7 +158,8 @@
     });
 
     // Add Cesium OSM Buildings, a global 3D buildings layer.
-    const buildingTileset = viewer.scene.primitives.add(Cesium.createOsmBuildings());
+    let osmBuildingsTileset = Cesium.createOsmBuildingsAsync();
+    const buildingTileset = viewer.scene.primitives.add(osmBuildingsTileset);
 
     var tileset = viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
         url: Cesium.IonResource.fromAssetId(642092),

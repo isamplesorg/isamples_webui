@@ -272,7 +272,7 @@ export class ISamplesSpatial {
      * Create a new viewer
      * @param element Element or elementId
      */
-    constructor(element) {
+    constructor (element) {
         this.tracking_info = {
             color: Cesium.Color.BLUE,
             width: 10,
@@ -280,7 +280,10 @@ export class ISamplesSpatial {
             polyline: null,
             positions: [],
         };
-        let worldTerrain = Cesium.createWorldTerrain({
+    }
+
+    async initialize (element) {
+        let worldTerrain = await Cesium.createWorldTerrainAsync({
             //requestWaterMask: true,
             //requestVertexNormals: true,
         });
@@ -292,7 +295,8 @@ export class ISamplesSpatial {
             sceneModePicker: false,
             terrainProvider: worldTerrain,
         });
-        this.buildingTileset = this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
+        let osmBuildingsTileset = Cesium.createOsmBuildingsAsync();
+        this.buildingTileset = this.viewer.scene.primitives.add(osmBuildingsTileset);
         this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
         this.viewer.clock.onTick.addEventListener(() => {
             let rect = this.currentBounds;

@@ -161,7 +161,6 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
 
     const field = facet ? Object.keys(facet)[0] : 'source';
     const CV = facet ? facet[field] : source;
-
     return await pointStream(
       params,
       (doc) => {
@@ -212,7 +211,7 @@ export class ISamplesSpatial {
    * Create a new viewer
    * @param element Element or elementId
    */
-  constructor(element, initialLocation) {
+  constructor(element) {
     this.tracking_info = {
       color: Cesium.Color.BLUE,
       width: 10,
@@ -220,16 +219,28 @@ export class ISamplesSpatial {
       polyline: null,
       positions: [],
     };
-    this.worldTerrain = Cesium.createWorldTerrain({});
-
     this.viewer = new Cesium.Viewer(element, {
       timeline: false,
       animation: false,
       sceneModePicker: false,
-      terrainProvider: this.worldTerrain,
       fullscreenElement: element
     });
+    this.osmBuildingsTileset = null;
+  }
 
+  async initialize() {
+    try {
+      this.worldTerrain = await Cesium.createWorldTerrainAsync();
+      this.osmBuildingsTileset = await Cesium.createOsmBuildingsAsync();
+      this.viewer.scene.primitives.add(this.osmBuildingsTileset);
+    } catch(error) {
+      console.log(error);
+    }
+  }
+  
+  async create(initialLocation) {
+    await this.initialize(); // do all the async calls 
+    this.viewer.scene.terrainProvider = this.worldTerrain;
     // limit the map max height
     // 20000000 is the maxium zoom distance so the users wouldn't zoom too far way from earth
     // 10 the minimum height for the points so the users wouldn't zoom to the ground.
@@ -239,7 +250,6 @@ export class ISamplesSpatial {
     if (initialLocation) {
       this.viewer.camera.setView(initialLocation.getView);
     }
-    this.buildingTileset = this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
     this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
     this.viewer.scene.globe.depthTestAgainstTerrain = true;
     this.mouseCoordinateCallback = null;
@@ -284,6 +294,7 @@ export class ISamplesSpatial {
 
     this.gridder = false; // save the grid manager
     this.gridTrackerListener = null;
+    return true; // initialization success
   }
 
   get canvas() {
