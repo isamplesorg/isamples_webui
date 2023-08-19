@@ -228,6 +228,10 @@ export class ISamplesSpatial {
     this.osmBuildingsTileset = null;
   }
 
+  /**
+   * Call the async methods that are required for building the viewer.
+   * CesiumJS API readyPromise pattern originally allowed to work with the Viewer once it is finished initialized and fully loaded. Now this is changed to using an async/await pattern.
+   */
   async initialize() {
     try {
       this.worldTerrain = await Cesium.createWorldTerrainAsync();
@@ -238,6 +242,11 @@ export class ISamplesSpatial {
     }
   }
   
+  /**
+   * Create the viewer 
+   * @param {*} initialLocation passed by {@link CesiumMap} which would be the initial location of the camera
+   * @returns true when initialization of the viewer succeeds 
+   */
   async create(initialLocation) {
     await this.initialize(); // do all the async calls 
     this.viewer.scene.terrainProvider = this.worldTerrain;

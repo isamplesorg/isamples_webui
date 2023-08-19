@@ -452,7 +452,7 @@ class CesiumMap extends React.Component {
             setPrimitive.farthest.x,
             cameraLat,
             cameraLong);
-          // update the points every 10 seconds
+          // update the points every 30 seconds
           // Update:
           //      A new parameter loading to indicate if the users cick somewhere and avoid intervel to check positions.
           // New method:
@@ -485,7 +485,7 @@ class CesiumMap extends React.Component {
     // clear all element in cesium
     searchFields = nextProps.newSearchFields;
     clearBoundingBox(true);
-    // // update the point layer only when number of points differ
+    // update the point layer only when number of points differ
     if (viewer && nextProps.numFound !== prevNumFound) {
       prevNumFound = nextProps.numFound; 
       this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
