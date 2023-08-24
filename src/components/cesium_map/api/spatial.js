@@ -163,29 +163,31 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
     const CV = facet ? facet[field] : source;
     return await pointStream(
       params,
-      (doc) => {
-        // Handle the data records, e.g. response.docs[0].doc
-        if (doc.hasOwnProperty('x')) {
-          if (!this.loading.style.display) {
-            // remove loading spinner
-            this.loading.style.display = "none";
+      (docs) => {
+        for (let doc of docs){
+          // Handle the data records, e.g. response.docs[0].doc
+          if (doc.hasOwnProperty('x')) {
+            if (!this.loading.style.display) {
+              // remove loading spinner
+              this.loading.style.display = "none";
+            }
+            let location = doc.x.toString() + ":" + doc.y.toString();
+            if (location in locations) {
+              locations[location] = locations[location] + 1;
+            } else {
+              locations[location] = 1;
+            }
+            const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, (doc.z || DEFAULT_ELEVATION) + locations[location]);
+            this.add({
+              id: doc.id,
+              position: p0,
+              color: Cesium.Color.fromCssColorString(colorbind[CV.indexOf(doc[field]) % colorbind.length]),
+              pixelSize: 8,
+              disableDepthTestDistance: 1
+            })
+            this.collection.push(Cesium.Cartographic.fromDegrees(doc.x, doc.y))
+            this.lastPos = { x: doc.x, y: doc.y };
           }
-          let location = doc.x.toString() + ":" + doc.y.toString();
-          if (location in locations) {
-            locations[location] = locations[location] + 1;
-          } else {
-            locations[location] = 1;
-          }
-          const p0 = Cesium.Cartesian3.fromDegrees(doc.x, doc.y, (doc.z || DEFAULT_ELEVATION) + locations[location]);
-          this.add({
-            id: doc.id,
-            position: p0,
-            color: Cesium.Color.fromCssColorString(colorbind[CV.indexOf(doc[field]) % colorbind.length]),
-            pixelSize: 8,
-            disableDepthTestDistance: 1
-          })
-          this.collection.push(Cesium.Cartographic.fromDegrees(doc.x, doc.y))
-          this.lastPos = { x: doc.x, y: doc.y };
         }
       },
       (final) => {

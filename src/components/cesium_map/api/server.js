@@ -1,9 +1,10 @@
-import oboe from "oboe";
 import {
   setSolrQuery,
   recordInfoQuery,
   facetedQuery
 } from "components/cesium_map/api/query";
+
+const BATCH_NUM_POINTS = 10; // number of points to display in batch
 
 export class ISamplesAPI {
 
@@ -97,38 +98,102 @@ export class ISamplesAPI {
 }
 
 /**
- * This is fetch function of Oboe
- *
- * See oboe link for more information
- * https://github.com/jimhigson/oboe.js-website/blob/master/content/examples.md
- * @param {*} params the url parameters
- *
- * @todo abort the fetch process
+ * Fetch data from server and display it as an individual point to map.
+ * 
+ * As the response may be very large, read the response stream by chunk. 
+ * We do this by storing the specified {@link BATCH_NUM_POINTS} of points in the array and adding it to the map
+ * by calling the {@param perdoc_cb} function. This is to prevent the out of memory crash that can occur. 
+ * 
  */
 async function pointStream(query, perdoc_cb = null, finaldoc_cb = null, error_cb = null) {
-  // There is no documantation about it.
-  // See the source code:
-  //    https://github.com/jimhigson/oboe.js/blob/52d150dd78b20205bd26d63c807ac170c03f0f64/dist/oboe-browser.js#L2040
-  // reture oboe instance so we could abort fetch
-  return await oboe(window.config.solr_stream + "?" + setSolrQuery(query))
-    .node('docs.*', (doc) => {
-      if (perdoc_cb !== null) {
-        perdoc_cb(doc);
+  let url = window.config.solr_stream + "?" + setSolrQuery(query)
+  const response = await fetch(url);
+  if (!response.ok) {
+    console.log('Network Error');
+    if (error_cb != null) {
+      error_cb();
+      return;
+    }
+  }
+
+  const textDecoder = new TextDecoder('utf-8');
+  let buffer = '';
+  const reader = response.body.getReader();
+
+  let pointsArr = [];
+  try {
+    let responseArrStarted = false;
+    while (true) {
+      let { done, value } = await reader.read();
+      if (done) {
+        if (buffer) {
+          try {
+            let jsonObj = JSON.parse(buffer);
+            perdoc_cb(jsonObj);
+          }
+          catch(error) {
+            console.log("Last json object parsing error", buffer);
+          }
+        }
+        break;
       }
-      return oboe.drop;
-    })
-    .done((finalJson) => {
-      if (finaldoc_cb !== null) {
-        finaldoc_cb(finalJson);
+      let openBraces = 0;
+      let closeBraces = 0;
+      let decoded = textDecoder.decode(value);
+      buffer += decoded;
+      for (let i = 0; i < buffer.length; i++) {
+        if (buffer[i] === '{') {
+          openBraces++;
+        } else if (buffer[i] === '}') {
+          closeBraces++;
+        } 
+        else if (buffer[i] === '[') {
+          // start of docs array : discard previous part 
+          buffer = buffer.substring(i+1);
+          openBraces = 0 ; // initialize back to 0 
+          responseArrStarted = true;
+        }
+        else if (buffer[i] === ']') {
+          buffer = ''; 
+          done = true; // end of array 
+        }
+        // parsing json string into an object 
+        if (responseArrStarted && openBraces > 0 && openBraces === closeBraces) {
+          const jsonString = buffer.substring(0, i + 1);
+          try {
+            let jsonObj = JSON.parse(jsonString);
+            pointsArr.push(jsonObj);
+            // done reading one json obj, discard current object from buffer 
+            if (buffer[i+1] === ",") {
+              buffer = buffer.substring(i+2); // discard comma 
+            }
+            else {
+              buffer = buffer.substring(i + 1);
+            }
+            openBraces = 0;
+            closeBraces = 0;
+            i = -1;
+          } catch(error) {
+            console.log("json parsing error");
+            buffer = []; // discard invalid json string 
+          }
+        }
+        if (pointsArr.length === BATCH_NUM_POINTS) {
+          perdoc_cb(pointsArr);
+          pointsArr = [];
+        }
       }
-    })
-    .fail((err) => {
-      if (error_cb !== null) {
-        error_cb(err)
-      } else {
-        console.error(err);
-      }
-    })
+    }
+  } catch (error) {
+    console.error('Stream processing error:', error);
+    console.log(buffer);
+    if (error_cb!= null) {
+      error_cb();
+    };
+  }
+  if (finaldoc_cb != null) {
+    finaldoc_cb();  // done
+  }
 }
 
 export {
