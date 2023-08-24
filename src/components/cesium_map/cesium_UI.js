@@ -298,12 +298,12 @@ class CesiumMap extends React.Component {
     this.updatePrimitive(cameraLat, cameraLong);
   }
 
-  handleGrid = (e) => {
+  handleGrid = async(e) => {
     // turn on showing the grid option
     showGrid = e.target.checked;
     // update the state so the map can re-render
     if (showGrid && setPrimitive){
-      viewer.addGrid();
+      await viewer.addGrid();
     }
     else {
       viewer.removeGrid();
@@ -347,6 +347,9 @@ class CesiumMap extends React.Component {
    */
   handleChange = (e) => {
     display = e.target.checked;
+    if (!setPrimitive.enableDisplayBtn){
+      return;
+    }
     if (!e.target.checked){
       setPrimitive.clear();  // clear all points
       setPrimitive.disableDisplay(); // disable display

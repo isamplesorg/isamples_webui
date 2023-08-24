@@ -174,8 +174,11 @@ async function pointStream(query, perdoc_cb = null, finaldoc_cb = null, error_cb
             closeBraces = 0;
             i = -1;
           } catch(error) {
-            console.log("json parsing error");
             buffer = []; // discard invalid json string 
+            done = true; // stop rendering 
+            if (error_cb != null){
+              error_cb();
+            }
           }
         }
         if (pointsArr.length === BATCH_NUM_POINTS) {

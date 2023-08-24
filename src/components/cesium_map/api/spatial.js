@@ -131,6 +131,7 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
     super(terrain)
     this.terrain = terrain;
     this.display = display; // flag that indicates whether we want to fetch points 
+    this.enableDisplayBtn = true; 
   }
 
   clear() {
@@ -142,11 +143,15 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
   }
 
   enableDisplay(){
-    this.display = true; 
+    if (this.enableDisplayBtn){
+      this.display = true; 
+    }
   }
 
   disableDisplay(){
-    this.display = false; 
+    if (this.enableDisplayBtn){
+      this.display = false; 
+    }
   }
 
   // function to query results and add point into cesium
@@ -161,6 +166,7 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
 
     const field = facet ? Object.keys(facet)[0] : 'source';
     const CV = facet ? facet[field] : source;
+    this.enableDisplayBtn = false;
     return await pointStream(
       params,
       (docs) => {
@@ -192,6 +198,7 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
       },
       (final) => {
         console.log("Point primitive stream complete");
+        this.enableDisplayBtn = true; 
       },
       (err) => {
         // remove loading spinner
@@ -648,9 +655,10 @@ export class ISamplesSpatial {
     gridder.update(viewer, rect);
   }
 
-  addGrid() {
+  async addGrid() {
       // Add Cesium OSM Buildings, a global 3D buildings layer.
-      this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
+      let osmBuildingsTileset = await Cesium.createOsmBuildingsAsync();
+      this.viewer.scene.primitives.add(osmBuildingsTileset);
       this.gridder = new H3GridManager();
       const viewer = this.viewer;
       this.gridTracker(viewer, this.gridder);
