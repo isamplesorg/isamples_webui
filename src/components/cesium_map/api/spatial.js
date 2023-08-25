@@ -169,8 +169,7 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
     this.enableDisplayBtn = false;
     return await pointStream(
       params,
-      (docs) => {
-        for (let doc of docs){
+      (doc) => {
           // Handle the data records, e.g. response.docs[0].doc
           if (doc.hasOwnProperty('x')) {
             if (!this.loading.style.display) {
@@ -194,7 +193,6 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
             this.collection.push(Cesium.Cartographic.fromDegrees(doc.x, doc.y))
             this.lastPos = { x: doc.x, y: doc.y };
           }
-        }
       },
       (final) => {
         console.log("Point primitive stream complete");

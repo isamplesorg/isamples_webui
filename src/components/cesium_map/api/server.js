@@ -3,6 +3,7 @@ import {
   recordInfoQuery,
   facetedQuery
 } from "components/cesium_map/api/query";
+import {JsonStrum} from '@xtao-org/jsonstrum';
 
 const BATCH_NUM_POINTS = 10; // number of points to display in batch
 
@@ -116,10 +117,15 @@ async function pointStream(query, perdoc_cb = null, finaldoc_cb = null, error_cb
     }
   }
 
+  const strum = JsonStrum({
+    object: (object) => perdoc_cb(object),
+    array: (array) => console.log('array', array),
+    level: 1,
+  })
+
   const textDecoder = new TextDecoder('utf-8');
   let buffer = '';
   const reader = response.body.getReader();
-
   let pointsArr = [];
   try {
     let responseArrStarted = false;
@@ -159,29 +165,22 @@ async function pointStream(query, perdoc_cb = null, finaldoc_cb = null, error_cb
         }
         // parsing json string into an object 
         if (responseArrStarted && openBraces > 0 && openBraces === closeBraces) {
-          const jsonString = buffer.substring(0, i + 1);
-          try {
-            let jsonObj = JSON.parse(jsonString);
-            pointsArr.push(jsonObj);
-            // done reading one json obj, discard current object from buffer 
-            if (buffer[i+1] === ",") {
-              buffer = buffer.substring(i+2); // discard comma 
-            }
-            else {
-              buffer = buffer.substring(i + 1);
-            }
-            openBraces = 0;
-            closeBraces = 0;
-            i = -1;
-          } catch(error) {
-            buffer = []; // discard invalid json string 
-            done = true; // stop rendering 
-            if (error_cb != null){
-              error_cb();
-            }
+          let jsonString = buffer.substring(0,i+1);
+          pointsArr.push(jsonString);
+          //done reading one json obj, discard current object from buffer 
+          if (buffer[i+1] === ",") {
+            buffer = buffer.substring(i+2); // discard comma 
           }
+          else {
+            buffer = buffer.substring(i + 1);
+          }
+          openBraces = 0;
+          closeBraces = 0;
+          i = -1;
         }
+        // display points in batch 
         if (pointsArr.length === BATCH_NUM_POINTS) {
+          strum.chunk("[" + pointsArr.join(",") + "]");
           perdoc_cb(pointsArr);
           pointsArr = [];
         }
