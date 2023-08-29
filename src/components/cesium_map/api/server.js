@@ -151,14 +151,13 @@ async function pointStream(query, perdoc_cb = null, finaldoc_cb = null, error_cb
           openBraces++;
         } else if (buffer[i] === '}') {
           closeBraces++;
-        } 
-        else if (buffer[i] === '[') {
+        } else if (buffer[i] === '[') {
           // start of docs array : discard previous part 
           buffer = buffer.substring(i+1);
           openBraces = 0 ; // initialize back to 0 
           responseArrStarted = true;
-        }
-        else if (buffer[i] === ']') {
+          i = -1;
+        } else if (buffer[i] === ']') {
           buffer = ''; 
           done = true; // end of array 
         }
@@ -167,11 +166,10 @@ async function pointStream(query, perdoc_cb = null, finaldoc_cb = null, error_cb
           let jsonString = buffer.substring(0,i+1);
           pointsArr.push(jsonString);
           //done reading one json obj, discard current object from buffer 
-          if (buffer[i+1] === ",") {
-            buffer = buffer.substring(i+2); // discard comma 
-          }
-          else {
-            buffer = buffer.substring(i + 1);
+          buffer = buffer.substring(i); // continue on next part of string
+          let commaIdx = buffer.indexOf(",");
+          if (commaIdx !== -1 ){
+            buffer = buffer.substring(commaIdx+1); // discard the comma
           }
           openBraces = 0;
           closeBraces = 0;
