@@ -203,7 +203,6 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
         if (this.loading) {
           this.loading.style.display = "none";
         }
-
         console.error(err);
       })
   }

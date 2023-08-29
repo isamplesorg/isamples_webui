@@ -110,16 +110,15 @@ async function pointStream(query, perdoc_cb = null, finaldoc_cb = null, error_cb
   let url = window.config.solr_stream + "?" + setSolrQuery(query)
   const response = await fetch(url);
   if (!response.ok) {
-    console.log('Network Error');
     if (error_cb != null) {
-      error_cb();
+      error_cb("Network error");
       return;
     }
   }
 
   const strum = JsonStrum({
     object: (object) => perdoc_cb(object),
-    array: (array) => console.log('array', array),
+    array: (array) => console.log('invalid data type', array),
     level: 1,
   })
 
@@ -181,16 +180,13 @@ async function pointStream(query, perdoc_cb = null, finaldoc_cb = null, error_cb
         // display points in batch 
         if (pointsArr.length === BATCH_NUM_POINTS) {
           strum.chunk("[" + pointsArr.join(",") + "]");
-          perdoc_cb(pointsArr);
           pointsArr = [];
         }
       }
     }
   } catch (error) {
-    console.error('Stream processing error:', error);
-    console.log(buffer);
     if (error_cb!= null) {
-      error_cb();
+      error_cb(error);
     };
   }
   if (finaldoc_cb != null) {
