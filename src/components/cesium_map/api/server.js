@@ -99,12 +99,27 @@ export class ISamplesAPI {
 }
 
 /**
- * Fetch data from server and display it as an individual point to map.
+ * Fetch point data stream from server and display individual points to map.
  * 
- * As the response may be very large, read the response stream by chunk. 
- * We do this by storing the specified {@link BATCH_NUM_POINTS} of points in the array and adding it to the map
- * by calling the {@param perdoc_cb} function. This is to prevent the out of memory crash that can occur. 
+ * As the response is a large data stream from solr index, read the response into chunks. This can prevent any out of memory crash.
+ * We expose the response into a readable stream and attach a reader, and this will return the next chunk by the read operation. 
+ * After reading a single chunk, process it to generate points. 
+ * We do this by extracting json objects from the chunk. Then we store the extracted json objects in the {@link pointsArr}. 
+ * When the {@link pointsArr} becomes {@link BATCH_NUM_POINTS} size, {@link JsonStrum} is then used to emit single json objects and applies the {@param perdoc_cb} function to draw a single point for each json object.
  * 
+ * @example
+ * // Response received from solr 
+ * {
+ * "result-set":{
+ *  "docs":[{
+ *      "x":-149.817,
+ *      "$gdfunc":0.16323651,
+ *      "y":-17.45,
+ *      "z":5.227829,
+ *      "id":"ark:/65665/39e18d893-7484-41fd-9a30-7d422497ad27",
+ *      "source":"SMITHSONIAN"}
+ *     ,{ 
+ *   ...
  */
 async function pointStream(query, perdoc_cb = null, finaldoc_cb = null, error_cb = null) {
   let url = window.config.solr_stream + "?" + setSolrQuery(query)
@@ -115,9 +130,8 @@ async function pointStream(query, perdoc_cb = null, finaldoc_cb = null, error_cb
       return;
     }
   }
-
   const strum = JsonStrum({
-    object: (object) => perdoc_cb(object),
+    object: (object) => perdoc_cb(object), // display the point 
     array: (array) => console.log('invalid data type', array),
     level: 1,
   })
@@ -127,10 +141,11 @@ async function pointStream(query, perdoc_cb = null, finaldoc_cb = null, error_cb
   const reader = response.body.getReader();
   let pointsArr = [];
   try {
-    let responseArrStarted = false;
+    let responseArrStarted = false; // flag indicating whether we started to read the "docs" array from the response
     while (true) {
       let { done, value } = await reader.read();
       if (done) {
+        // process what is remained in buffer 
         if (buffer) {
           try {
             let jsonObj = JSON.parse(buffer);
@@ -142,9 +157,9 @@ async function pointStream(query, perdoc_cb = null, finaldoc_cb = null, error_cb
         }
         break;
       }
-      let openBraces = 0;
-      let closeBraces = 0;
-      let decoded = textDecoder.decode(value);
+      let openBraces = 0; // count of "{" seen in the response
+      let closeBraces = 0; // count of "}" seen in the response 
+      let decoded = textDecoder.decode(value); // decode the stream of bytes to string
       buffer += decoded;
       for (let i = 0; i < buffer.length; i++) {
         if (buffer[i] === '{') {
@@ -152,7 +167,7 @@ async function pointStream(query, perdoc_cb = null, finaldoc_cb = null, error_cb
         } else if (buffer[i] === '}') {
           closeBraces++;
         } else if (buffer[i] === '[') {
-          // start of docs array : discard previous part 
+          // start of "docs" array : discard previous part of the response
           buffer = buffer.substring(i+1);
           openBraces = 0 ; // initialize back to 0 
           responseArrStarted = true;
@@ -161,15 +176,16 @@ async function pointStream(query, perdoc_cb = null, finaldoc_cb = null, error_cb
           buffer = ''; 
           done = true; // end of array 
         }
-        // parsing json string into an object 
-        if (responseArrStarted && openBraces > 0 && openBraces === closeBraces) {
+        // parsing json string into a json object 
+        if (responseArrStarted && openBraces > 0 && openBraces === closeBraces) { // single json string has been read 
           let jsonString = buffer.substring(0,i+1);
           pointsArr.push(jsonString);
-          //done reading one json obj, discard current object from buffer 
-          buffer = buffer.substring(i); // continue on next part of string
+          //done reading one json obj, discard the json string from buffer 
+          buffer = buffer.substring(i); 
+          // discard comma that comes before the next json 
           let commaIdx = buffer.indexOf(",");
           if (commaIdx !== -1 ){
-            buffer = buffer.substring(commaIdx+1); // discard the comma
+            buffer = buffer.substring(commaIdx+1); 
           }
           openBraces = 0;
           closeBraces = 0;
