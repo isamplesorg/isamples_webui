@@ -6,7 +6,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import TreeItem, { useTreeItem } from "@mui/lab/TreeItem";
+import { TreeItem, useTreeItem } from '@mui/x-tree-view/TreeItem'
 import clsx from 'clsx';
 import { Typography } from '@mui/material';
 
