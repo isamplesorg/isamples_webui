@@ -301,7 +301,7 @@ class CesiumMap extends React.Component {
     showGrid = e.target.checked;
     // update the state so the map can re-render
     if (showGrid && setPrimitive){
-      viewer.addGrid();
+      viewer.addGrid().catch((error)=>{console.log(error)})
     }
     else {
       viewer.removeGrid();
@@ -392,7 +392,7 @@ class CesiumMap extends React.Component {
 
   // This is a initial function in react liftcycle.
   // Only call once when this component first render
-  componentDidMount() {
+  async componentDidMount() {
     const { mapInfo, setCamera, newSearchFields, newBbox, onSetFields } = this.props;
     // set the initial position based on the parameters from parent components
     const initialPosition = new SpatialView(
@@ -401,74 +401,76 @@ class CesiumMap extends React.Component {
       mapInfo.height,
       mapInfo.heading,
       mapInfo.pitch);
-    viewer = new ISamplesSpatial("cesiumContainer", initialPosition || moorea);
-  
-    // remove the Ceisum information with custom button group
-    render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
-    viewer.addHud("cesiumContainer");
-    viewer.trackMouseCoordinates(showCoordinates);
-    viewer.enableTracking(api, (bb) => selectedBoxCallbox(bb, true));
-    setPrimitive = new PointStreamPrimitiveCollection(viewer.terrain, display);
-    viewer.addPointPrimitives(setPrimitive);
-    searchFields = newSearchFields;
-    onChange = onSetFields;
+    viewer = await new ISamplesSpatial("cesiumContainer", initialPosition);
 
-    // keep track of zoom in event and zoom out event to decide whether 
-    this.enableZoomTracking(viewer)
-    // get the facet control vocabulary
-    this.getFacetInfo("source").then((res) => {
-      facet = res;
-      addButton(facet['source'], viewer, this.updatePrimitive);
-      if (searchFields) {
-        this.updatePrimitive(initialPosition.latitude, initialPosition.longitude);
-      }
-    });
+    //let initializeSuccess = await viewer.create( initialPosition || moorea );
+      // remove the Ceisum information with custom button group
+      render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
+      viewer.addHud("cesiumContainer");
+      viewer.trackMouseCoordinates(showCoordinates);
+      viewer.enableTracking(api, (bb) => selectedBoxCallbox(bb, true));
+      setPrimitive = new PointStreamPrimitiveCollection(viewer.terrain, display);
+      viewer.addPointPrimitives(setPrimitive);
+      searchFields = newSearchFields;
+      onChange = onSetFields;
 
-    // initial bbox
-    if (newBbox && Object.keys(newBbox).length > 0) {
-      try {
-        selectedBoxCallbox(viewer.generateRectByLL(newBbox));
-      } catch (e) {
-        console.warn("Adding bbox failed.");
+      // keep track of zoom in event and zoom out event to decide whether 
+      this.enableZoomTracking(viewer)
+      // get the facet control vocabulary
+      this.getFacetInfo("source").then((res) => {
+        facet = res;
+        addButton(facet['source'], viewer, this.updatePrimitive);
+        if (searchFields) {
+          this.updatePrimitive(initialPosition.latitude, initialPosition.longitude);
+        }
+      });
+
+      // initial bbox
+      if (newBbox && Object.keys(newBbox).length > 0) {
+        try {
+          selectedBoxCallbox(viewer.generateRectByLL(newBbox));
+        } catch (e) {
+          console.warn("Adding bbox failed.");
+        };
       };
-    };
-    // set time interval to check the current view every 5 seconds and update points
-    this.checkPosition = setInterval(() => {
-      if (!display) return ; 
-      const loading = document.getElementById("loading").style.display;
-      const diffDistanceMove = distanceInKm(
-        cameraLat,
-        cameraLong,
-        viewer.currentView.latitude,
-        viewer.currentView.longitude);
-      const diffDistanceFarthest = distanceInKm(
-        setPrimitive.farthest.y,
-        setPrimitive.farthest.x,
-        cameraLat,
-        cameraLong);
-      // update the points every 5 seconds
-      // Update:
-      //      A new parameter loading to indicate if the users cick somewhere and avoid intervel to check positions.
-      // New method:
-      //      The update condition is based on if the move distance is larger than the ratio of radius of the primitive points.
-      if (loading && diffDistanceMove > diffDistanceFarthest * UPDATE_RATIO) {
-        clearBoundingBox(true);
-        this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
-        // update camera position to the url
-        setCamera({ facet: "Map", ...viewer.currentView.viewDict });
-      };
-    }, REFRESH_TIME_MS);
+      // set time interval to check the current view every 10 seconds and update points
+      this.checkPosition = setInterval(() => {
+        if (!display) return ; 
+        const loading = document.getElementById("loading").style.display;
+        const diffDistanceMove = distanceInKm(
+          cameraLat,
+          cameraLong,
+          viewer.currentView.latitude,
+          viewer.currentView.longitude);
+        const diffDistanceFarthest = distanceInKm(
+          setPrimitive.farthest.y,
+          setPrimitive.farthest.x,
+          cameraLat,
+          cameraLong);
+        // update the points every 30 seconds
+        // Update:
+        //      A new parameter loading to indicate if the users cick somewhere and avoid intervel to check positions.
+        // New method:
+        //      The update condition is based on if the move distance is larger than the ratio of radius of the primitive points.
+        if (loading && diffDistanceMove > diffDistanceFarthest * UPDATE_RATIO) {
+          clearBoundingBox(true);
+          this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
+          // update camera position to the url
+          setCamera({ facet: "Map", ...viewer.currentView.viewDict });
+        };
+      }, REFRESH_TIME_MS);
 
-    // store the users' viewpoint
-    this.viewpoint = setInterval(() => {
-      if (!display) return; 
-      const loading = document.getElementById("loading").style.display;
-      if (loading && JSON.stringify(viewer.currentView.viewDict) !== JSON.stringify(preView)) {
-        preView = viewer.currentView.viewDict;
-        setCamera({ facet: "Map", ...viewer.currentView.viewDict });
-      }
-    }, [VIEWPOINT_TIME_MS])
-  };
+      // store the users' viewpoint
+      this.viewpoint = setInterval(() => {
+        if (!display) return; 
+        const loading = document.getElementById("loading").style.display;
+        if (loading && JSON.stringify(viewer.currentView.viewDict) !== JSON.stringify(preView)) {
+          preView = viewer.currentView.viewDict;
+          setCamera({ facet: "Map", ...viewer.currentView.viewDict });
+        }
+      }, [VIEWPOINT_TIME_MS])
+
+  }
 
   // https://medium.com/@garrettmac/reactjs-how-to-safely-manipulate-the-dom-when-reactjs-cant-the-right-way-8a20928e8a6
   // manipulate Dom outside the react model

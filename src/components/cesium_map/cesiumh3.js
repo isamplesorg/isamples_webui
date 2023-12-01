@@ -1,7 +1,8 @@
 import * as Cesium from 'cesium';
 import chroma from "chroma-js";
 
-const GLOBAL_RECT = "-180,90,180,-90";
+const GLOBAL_RECT1 = "-180,90,180,-90";
+const GLOBAL_RECT2 = "-180,-90,180,90";
 const color_scale = chroma.scale(["yellow","red"]).padding(0.1).classes(16);
 let COLORS = [];
 for (let i=0; i < 16; i++) {
@@ -53,7 +54,7 @@ export class H3Grid {
         this.rect_str = rstr;
         this.loading = true;
         let url = new URL(this._service + "/");
-        if (this.rect_str !== GLOBAL_RECT) {
+        if (this.rect_str !== GLOBAL_RECT1 && this.rect !== GLOBAL_RECT2) {
             url.searchParams.set('bb', this.rect_str);
         } else {
             url.searchParams.set('resolution', 1);
@@ -66,27 +67,9 @@ export class H3Grid {
         try {
             console.log(`Loading ${url} ...`);
             const ds = await Cesium.GeoJsonDataSource.load(url, options);
-            ds.name = this.rect_str;
             console.log("Loaded. ", ds);
-            this.data = ds;
-            let entities = ds.entities.values;
-            for (var i = 0; i < entities.length; i++) {
-                let entity = entities[i];
-                try {
-                    let ln = parseFloat(entity.properties.ln);
-                    //let color = Cesium.Color.fromHsl(0.6 - ln * 0.5, 1.0, 0.5, 0.7);
-                    //entity.polygon.material = Cesium.Color.YELLOW.withAlpha(ln);
-                    entity.polygon.material = v2color(ln);
-                    //entity.polygon.extrudedHeight = parseFloat(entity.properties.n);
-                    //entity.polygon.extrudedHeightReference = Cesium.HeightReference.RELATIVE_TO_GROUND
-                    entity.polygon.extrudedHeight = entity.properties.parent_id;
-                    //entity.polygon.height = 100;
-                  
-                } catch (err) {
-                    console.log(err);
-                    entity.polygon.material = Cesium.Color.RED.withAlpha(0.5);
-                }
-            }
+            ds.name = this.rect_str;
+            this.data = ds;           
         } catch (err) {
             console.log(err);
         }
@@ -106,7 +89,7 @@ export class H3GridManager {
         console.log("gm constructor");
         this.global_grid = new H3Grid();
         this.current_grid = this.global_grid;
-        this.current_rect = GLOBAL_RECT;
+        this.current_rect = GLOBAL_RECT1;
         this.old_grid_rstr = "";
     }
 
@@ -117,24 +100,63 @@ export class H3GridManager {
             console.log(`Grid ${rstr} already in collection`);
             return;
         }
-        if (rect !== GLOBAL_RECT) {
+        if (rect !== GLOBAL_RECT1) {
             this.global_grid = new H3Grid();
         }
         this.global_grid.rect_str = rstr;
-        // delete old grid
         let toRemove = cview.dataSources.getByName(this.old_grid_rstr)[0];
         cview.dataSources.remove(toRemove, true);
         const _this = this;
         this.global_grid.load(rstr).then((ds) => {
+            // delete existing grid
             try {
                 cview.dataSources.add(ds);
                 _this.current_grid = this.global_grid;
                 _this.current_rect = rect;
                 _this.old_grid_rstr = ds.name; // update 
+                let entities = ds.entities.values;
+                if (rstr === GLOBAL_RECT1 || rstr === GLOBAL_RECT2){
+                    //console.log("drawing on globe");
+                    for (let i = 0; i < entities.length; i++) {
+                        let entity = entities[i];
+                        try {
+                                let ln = parseFloat(entity.properties.ln);
+                                //let color = Cesium.Color.fromHsl(0.6 - ln * 0.5, 1.0, 0.5, 0.7);
+                                //entity.polygon.material = Cesium.Color.YELLOW.withAlpha(ln);
+                                entity.polygon.material = v2color(ln);
+                                //entity.polygon.extrudedHeight = parseFloat(entity.properties.n);
+                                //entity.polygon.extrudedHeightReference = Cesium.HeightReference.RELATIVE_TO_GROUND
+                                entity.polygon.outline = false;
+                                entity.polygon.extrudedHeight = entity.properties.n;
+                                entity.polygon.height = 0;
+                                //entity.polygon.height = 100;
+                        
+                        } catch (err) {
+                            console.log(err);
+                            entity.polygon.material = Cesium.Color.RED.withAlpha(0.5);
+                        }
+                    }
+                }else {
+                    for (let i = 0; i < entities.length; i++) {
+                        let entity = entities[i];
+                        try {
+                            let ln = parseFloat(entity.properties.ln);
+                            //let color = Cesium.Color.fromHsl(0.6 - ln * 0.5, 1.0, 0.5, 0.7);
+                            //entity.polygon.material = Cesium.Color.YELLOW.withAlpha(ln);
+                            entity.polygon.material = v2color(ln);
+                            //entity.polygon.extrudedHeight = parseFloat(entity.properties.n);
+                            //entity.polygon.extrudedHeightReference = Cesium.HeightReference.RELATIVE_TO_GROUND
+                            //entity.polygon.extrudedHeight = entity.properties.parent_id;
+                            //entity.polygon.height = 100;
+                        }catch (err) {
+                            console.log(err);
+                            entity.polygon.material = Cesium.Color.RED.withAlpha(0.5);
+                        }
+                    }
+                }
             } catch (err) {
                 console.log(err);
             }
-            console.log("then loop: ",cview.dataSources)
         }).then(()=>{
             // remove all the sources that are not the current grid layer 
             for (var i  = 0 ; i < cview.dataSources._dataSources.length ; i++){
@@ -144,7 +166,6 @@ export class H3GridManager {
                 }
             }
         })
-        
     }
 
     remove(cview){

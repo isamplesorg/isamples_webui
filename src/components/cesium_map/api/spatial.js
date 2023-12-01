@@ -213,79 +213,88 @@ export class ISamplesSpatial {
    * @param element Element or elementId
    */
   constructor(element, initialLocation) {
-    this.tracking_info = {
-      color: Cesium.Color.BLUE,
-      width: 10,
-      tracking: false,
-      polyline: null,
-      positions: [],
-    };
-    this.worldTerrain = Cesium.createWorldTerrain({});
+    /**
+     * Call the async methods that are required for building the viewer.
+     * CesiumJS API readyPromise pattern originally allowed to work with the Viewer once it is finished initialized and fully loaded. Now this is changed to using an async/await pattern.
+     */
 
-    this.viewer = new Cesium.Viewer(element, {
-      timeline: false,
-      animation: false,
-      sceneModePicker: false,
-      terrainProvider: this.worldTerrain,
-      fullscreenElement: element
-    });
-
-    // limit the map max height
-    // 20000000 is the maxium zoom distance so the users wouldn't zoom too far way from earth
-    // 10 the minimum height for the points so the users wouldn't zoom to the ground.
-    this.viewer.scene.screenSpaceCameraController.maximumZoomDistance = MAXIMUM_ZOOM_DISTANCE;
-    this.viewer.scene.screenSpaceCameraController.minimumZoomDistance = MINIMUM_ZOOM_DISTANCE;
-    // set camera inital position
-    if (initialLocation) {
-      this.viewer.camera.setView(initialLocation.getView);
-    }
-    this.buildingTileset = this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
-    this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
-    this.viewer.scene.globe.depthTestAgainstTerrain = true;
-    this.mouseCoordinateCallback = null;
-    this.selectBoxCallback = null;
-    this.selectedBox = null;
-
-    // entity label for point primitive identifier
-    this.pointLabel = this.viewer.entities.add({
-      label: {
-        show: false,
-        showBackground: true,
-        font: "14px monospace",
-        horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
-        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-        pixelOffset: new Cesium.Cartesian2(15, 0),
-        // this attribute will prevent this entity clipped by the terrain
-        disableDepthTestDistance: Number.POSITIVE_INFINITY,
-      },
-    });
-
-    // entity for infoBox
-    this.selectedPoints = this.viewer.entities.add({
-      point: {
-        show: false
+    return ( async () => {
+      this.tracking_info = {
+        color: Cesium.Color.BLUE,
+        width: 10,
+        tracking: false,
+        polyline: null,
+        positions: [],
+      };
+      this.viewer = new Cesium.Viewer(element, {
+        timeline: false,
+        animation: false,
+        sceneModePicker: false,
+        terrainProvider: this.worldTerrain,
+        fullscreenElement: element
+      });
+      this.worldTerrain = await Cesium.createWorldTerrainAsync();
+      this.osmBuildingsTileset = await Cesium.createOsmBuildingsAsync();
+      this.viewer.scene.primitives.add(this.osmBuildingsTileset);
+      this.viewer.scene.terrainProvider = this.worldTerrain;
+      // limit the map max height
+      // 20000000 is the maxium zoom distance so the users wouldn't zoom too far way from earth
+      // 10 the minimum height for the points so the users wouldn't zoom to the ground.
+      this.viewer.scene.screenSpaceCameraController.maximumZoomDistance = MAXIMUM_ZOOM_DISTANCE;
+      this.viewer.scene.screenSpaceCameraController.minimumZoomDistance = MINIMUM_ZOOM_DISTANCE;
+      // set camera inital position
+      if (initialLocation) {
+        this.viewer.camera.setView(initialLocation.getView);
       }
-    })
+      this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
+      this.viewer.scene.globe.depthTestAgainstTerrain = true;
+      this.mouseCoordinateCallback = null;
+      this.selectBoxCallback = null;
+      this.selectedBox = null;
 
-    // record the last interactive point primitive
-    this.pointprimitive = null;
+      // entity label for point primitive identifier
+      this.pointLabel = this.viewer.entities.add({
+        label: {
+          show: false,
+          showBackground: true,
+          font: "14px monospace",
+          horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
+          verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+          pixelOffset: new Cesium.Cartesian2(15, 0),
+          // this attribute will prevent this entity clipped by the terrain
+          disableDepthTestDistance: Number.POSITIVE_INFINITY,
+        },
+      });
 
-    // we need to enable allow-scripts to open link in the iframe
-    // but this might not be a safe way if we don't trust the link source
-    this.viewer.infoBox.frame.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms');
-    this.viewer.infoBox.frame.removeAttribute("src");
-    
-    // enable esc key support for closing the info box
-    document.addEventListener("keydown", ({key}) =>{
-      if (key === "Escape"){
-        this.viewer.selectedEntity = undefined; // close the info box
-      }
-    })
+      // entity for infoBox
+      this.selectedPoints = this.viewer.entities.add({
+        point: {
+          show: false
+        }
+      })
 
-    this.gridder = false; // save the grid manager
-    this.gridTrackerListener = null;
+      // record the last interactive point primitive
+      this.pointprimitive = null;
+
+      // we need to enable allow-scripts to open link in the iframe
+      // but this might not be a safe way if we don't trust the link source
+      this.viewer.infoBox.frame.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms');
+      this.viewer.infoBox.frame.removeAttribute("src");
+      
+      // enable esc key support for closing the info box
+      document.addEventListener("keydown", ({key}) =>{
+        if (key === "Escape"){
+          this.viewer.selectedEntity = undefined; // close the info box
+        }
+      })
+      this.gridder = false; // save the grid manager
+      this.gridTrackerListener = null;
+      return this;
+    })();
   }
 
+
+  
   get canvas() {
     return this.viewer.canvas;
   }
@@ -626,9 +635,10 @@ export class ISamplesSpatial {
     gridder.update(viewer, rect);
   }
 
-  addGrid() {
+  async addGrid() {
       // Add Cesium OSM Buildings, a global 3D buildings layer.
-      this.viewer.scene.primitives.add(Cesium.createOsmBuildings());
+      let buildings = await Cesium.createOsmBuildingsAsync();
+      this.viewer.scene.primitives.add(buildings);
       this.gridder = new H3GridManager();
       const viewer = this.viewer;
       this.gridTracker(viewer, this.gridder);
