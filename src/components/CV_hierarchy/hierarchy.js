@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { alpha, styled, Typography } from '@mui/material';
-import { TreeView, treeItemClasses } from '@mui/lab';
+import { TreeView, treeItemClasses } from '@mui/x-tree-view/TreeItem';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import CustomTreeItem from './customContent';
