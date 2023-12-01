@@ -146,7 +146,7 @@ export class H3GridManager {
                             entity.polygon.material = v2color(ln);
                             //entity.polygon.extrudedHeight = parseFloat(entity.properties.n);
                             //entity.polygon.extrudedHeightReference = Cesium.HeightReference.RELATIVE_TO_GROUND
-                            //entity.polygon.extrudedHeight = entity.properties.parent_id;
+                            entity.polygon.extrudedHeight = entity.properties.parent_id;
                             //entity.polygon.height = 100;
                         }catch (err) {
                             console.log(err);
