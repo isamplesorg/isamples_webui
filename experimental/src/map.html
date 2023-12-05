@@ -158,7 +158,8 @@
     });
 
     // Add Cesium OSM Buildings, a global 3D buildings layer.
-    const buildingTileset = viewer.scene.primitives.add(Cesium.createOsmBuildings());
+    let osmBuildingsTileset = await Cesium.createOsmBuildingsAsync();
+    const buildingTileset = viewer.scene.primitives.add(osmBuildingsTileset);
 
     var tileset = viewer.scene.primitives.add(new Cesium.Cesium3DTileset({
         url: Cesium.IonResource.fromAssetId(642092),
