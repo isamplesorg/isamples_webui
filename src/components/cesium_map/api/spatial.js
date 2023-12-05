@@ -300,9 +300,9 @@ export class ISamplesSpatial {
   }
 
   static async create(element, initialLocation) {
-    const o = new ISamplesSpatial();
-    await o.init(element, initialLocation);
-    return o;
+    const spatial = new ISamplesSpatial();
+    await spatial.init(element, initialLocation);
+    return spatial;
   }
 
 

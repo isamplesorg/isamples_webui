@@ -403,7 +403,6 @@ class CesiumMap extends React.Component {
       mapInfo.pitch);
     viewer = await ISamplesSpatial.create("cesiumContainer", initialPosition);
     if (viewer !== null){
-    //let initializeSuccess = await viewer.create( initialPosition || moorea );
       // remove the Ceisum information with custom button group
       render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
       viewer.addHud("cesiumContainer");

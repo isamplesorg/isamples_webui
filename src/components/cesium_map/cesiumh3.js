@@ -121,15 +121,10 @@ export class H3GridManager {
                         let entity = entities[i];
                         try {
                                 let ln = parseFloat(entity.properties.ln);
-                                //let color = Cesium.Color.fromHsl(0.6 - ln * 0.5, 1.0, 0.5, 0.7);
-                                //entity.polygon.material = Cesium.Color.YELLOW.withAlpha(ln);
                                 entity.polygon.material = v2color(ln);
-                                //entity.polygon.extrudedHeight = parseFloat(entity.properties.n);
-                                //entity.polygon.extrudedHeightReference = Cesium.HeightReference.RELATIVE_TO_GROUND
                                 entity.polygon.outline = false;
                                 entity.polygon.extrudedHeight = entity.properties.n;
                                 entity.polygon.height = 0;
-                                //entity.polygon.height = 100;
                         
                         } catch (err) {
                             console.log(err);
@@ -141,13 +136,8 @@ export class H3GridManager {
                         let entity = entities[i];
                         try {
                             let ln = parseFloat(entity.properties.ln);
-                            //let color = Cesium.Color.fromHsl(0.6 - ln * 0.5, 1.0, 0.5, 0.7);
-                            //entity.polygon.material = Cesium.Color.YELLOW.withAlpha(ln);
                             entity.polygon.material = v2color(ln);
-                            //entity.polygon.extrudedHeight = parseFloat(entity.properties.n);
-                            //entity.polygon.extrudedHeightReference = Cesium.HeightReference.RELATIVE_TO_GROUND
                             entity.polygon.extrudedHeight = entity.properties.parent_id;
-                            //entity.polygon.height = 100;
                         }catch (err) {
                             console.log(err);
                             entity.polygon.material = Cesium.Color.RED.withAlpha(0.5);
