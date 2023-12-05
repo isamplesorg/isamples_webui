@@ -200,9 +200,15 @@ class CesiumMap extends React.Component {
             </button>
           </div>
         </div>
-        <button className="cesium-visit-button cesium-button" onClick={this.toggle}>Viewer Change</button>
+        <div><button className="cesium-visit-button cesium-button" onClick={this.toggle}>Viewer Change</button></div>
         <p className="cesium-checkbox"><input type="checkbox" id="display" onChange={this.handleChange}/> <label for="display">Display Points </label> &nbsp; <input type="checkbox" id="display" onChange={this.handleGrid}/> <label for="display">Display Grid </label></p>
       </>;
+     this.alert = (
+      <>
+        {this.dropdown}
+        <div className="cesium-notifyBox">Max points exceeded, stopped rendering points...</div>
+      </>
+    );
   };
 
   /**
@@ -227,6 +233,7 @@ class CesiumMap extends React.Component {
     cameraLat = latitude;
     cameraLong = longitude;
     if (!display){
+      render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
       return;
     }
     if (setPrimitive) {
@@ -241,9 +248,13 @@ class CesiumMap extends React.Component {
     if (currNumPoints > MAXIMUM_NUMBER_OF_POINTS){
       // do not load points 
       exceedMaxPoints = true; 
+      render(this.alert, document.querySelector("div.cesium-viewer-bottom"));
       return; 
     }
-    exceedMaxPoints = false; 
+    else{ 
+      exceedMaxPoints = false; 
+      render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
+    }
     const res = await setPrimitive.load(facet, {
       Q: "producedBy_samplingSite_location_cesium_height%3A*",
       field: "source",
@@ -405,6 +416,7 @@ class CesiumMap extends React.Component {
     if (viewer !== null){
       // remove the Ceisum information with custom button group
       render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
+    
       viewer.addHud("cesiumContainer");
       viewer.trackMouseCoordinates(showCoordinates);
       viewer.enableTracking(api, (bb) => selectedBoxCallbox(bb, true));
