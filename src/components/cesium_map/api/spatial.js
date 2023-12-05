@@ -208,17 +208,23 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
  */
 export class ISamplesSpatial {
 
+
+  constructor() {
+    console.log("initialized isamples spatial");
+  }
+
   /**
    * Create a new viewer
    * @param element Element or elementId
    */
-  constructor(element, initialLocation) {
+  async init(element, initialLocation){
     /**
      * Call the async methods that are required for building the viewer.
      * CesiumJS API readyPromise pattern originally allowed to work with the Viewer once it is finished initialized and fully loaded. Now this is changed to using an async/await pattern.
      */
-
-    return ( async () => {
+    try {
+      this.worldTerrain = await Cesium.createWorldTerrainAsync();
+      this.osmBuildingsTileset = await Cesium.createOsmBuildingsAsync();
       this.tracking_info = {
         color: Cesium.Color.BLUE,
         width: 10,
@@ -233,10 +239,9 @@ export class ISamplesSpatial {
         terrainProvider: this.worldTerrain,
         fullscreenElement: element
       });
-      this.worldTerrain = await Cesium.createWorldTerrainAsync();
-      this.osmBuildingsTileset = await Cesium.createOsmBuildingsAsync();
       this.viewer.scene.primitives.add(this.osmBuildingsTileset);
       this.viewer.scene.terrainProvider = this.worldTerrain;
+      
       // limit the map max height
       // 20000000 is the maxium zoom distance so the users wouldn't zoom too far way from earth
       // 10 the minimum height for the points so the users wouldn't zoom to the ground.
@@ -289,8 +294,15 @@ export class ISamplesSpatial {
       })
       this.gridder = false; // save the grid manager
       this.gridTrackerListener = null;
-      return this;
-    })();
+    } catch(error){
+      console.log(error);
+    }
+  }
+
+  static async create(element, initialLocation) {
+    const o = new ISamplesSpatial();
+    await o.init(element, initialLocation);
+    return o;
   }
 
 

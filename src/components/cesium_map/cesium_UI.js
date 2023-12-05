@@ -401,8 +401,8 @@ class CesiumMap extends React.Component {
       mapInfo.height,
       mapInfo.heading,
       mapInfo.pitch);
-    viewer = await new ISamplesSpatial("cesiumContainer", initialPosition);
-
+    viewer = await ISamplesSpatial.create("cesiumContainer", initialPosition);
+    if (viewer !== null){
     //let initializeSuccess = await viewer.create( initialPosition || moorea );
       // remove the Ceisum information with custom button group
       render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
@@ -436,12 +436,14 @@ class CesiumMap extends React.Component {
       // set time interval to check the current view every 10 seconds and update points
       this.checkPosition = setInterval(() => {
         if (!display) return ; 
+        if (typeof setPrimitive.farthest === 'undefined' || typeof viewer.currentView.latitude !== 'undefined' || typeof viewer.currentView.longitude !== 'undefined') return;
         const loading = document.getElementById("loading").style.display;
         const diffDistanceMove = distanceInKm(
           cameraLat,
           cameraLong,
           viewer.currentView.latitude,
           viewer.currentView.longitude);
+        
         const diffDistanceFarthest = distanceInKm(
           setPrimitive.farthest.y,
           setPrimitive.farthest.x,
@@ -456,7 +458,9 @@ class CesiumMap extends React.Component {
           clearBoundingBox(true);
           this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
           // update camera position to the url
-          setCamera({ facet: "Map", ...viewer.currentView.viewDict });
+          if (typeof viewer.currentView.latitude !== 'undefined' || typeof viewer.currentView.longitude !== 'undefined'){
+            setCamera({ facet: "Map", ...viewer.currentView.viewDict });
+          }
         };
       }, REFRESH_TIME_MS);
 
@@ -466,10 +470,12 @@ class CesiumMap extends React.Component {
         const loading = document.getElementById("loading").style.display;
         if (loading && JSON.stringify(viewer.currentView.viewDict) !== JSON.stringify(preView)) {
           preView = viewer.currentView.viewDict;
-          setCamera({ facet: "Map", ...viewer.currentView.viewDict });
+          if (typeof viewer.currentView.latitude !== 'undefined' && typeof viewer.currentView.longitude !== 'undefined'){
+            setCamera({ facet: "Map", ...viewer.currentView.viewDict });
+          }
         }
       }, [VIEWPOINT_TIME_MS])
-
+    }
   }
 
   // https://medium.com/@garrettmac/reactjs-how-to-safely-manipulate-the-dom-when-reactjs-cant-the-right-way-8a20928e8a6
@@ -480,24 +486,25 @@ class CesiumMap extends React.Component {
     searchFields = nextProps.newSearchFields;
     clearBoundingBox(true);
     // update the point layer
-    this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
-    // update bounding box based on bbox
-    const bb1 = JSON.stringify(nextProps.newBbox);
-    const bb2 = JSON.stringify(this.props.newBbox);
-    if (bb1 !== bb2 && bb1 !== JSON.stringify(bboxLoc)) {
+    if (viewer !== null) {
+      this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
+      // update bounding box based on bbox
+      const bb1 = JSON.stringify(nextProps.newBbox);
+      const bb2 = JSON.stringify(this.props.newBbox);
+      if (bb1 !== bb2 && bb1 !== JSON.stringify(bboxLoc)) {
 
-      // draw the bounding box or remove the bounding box
-      if (Object.keys(nextProps.newBbox).length > 0) {
-        try {
-          selectedBoxCallbox(viewer.generateRectByLL(nextProps.newBbox));
-        } catch (e) {
-          console.warn("Adding bbox failed.");
-        }
-      } else {
-        clearBoundingBox();
+        // draw the bounding box or remove the bounding box
+        if (Object.keys(nextProps.newBbox).length > 0) {
+          try {
+            selectedBoxCallbox(viewer.generateRectByLL(nextProps.newBbox));
+          } catch (e) {
+            console.warn("Adding bbox failed.");
+          }
+        } else {
+          clearBoundingBox();
+        };
       };
-    };
-
+    }
     // return false to force react not to rerender
     return false;
   };
