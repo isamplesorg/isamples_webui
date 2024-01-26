@@ -247,12 +247,16 @@ class CesiumMap extends React.Component {
     if (currNumPoints > MAXIMUM_NUMBER_OF_POINTS){
       // do not load points 
       exceedMaxPoints = true; 
-      // render alert message to the toolbar 
+      // render alert message to the toolbar if it is not already rendered
       const toolbar = document.querySelector("div.cesium-viewer-toolbar");
-      const infoBox = document.createElement("span");
-      infoBox.id = "maxPoint-infoBox"; 
-      toolbar?.prepend(infoBox);
-      render(<div id="maxPointBox">Max points exceeded, stop rendering...</div>, infoBox);
+      const prevInfoBox = document.getElementById("maxPointBox");
+      if (prevInfoBox === null) {
+        // create 
+        const infoBox = document.createElement("span");
+        infoBox.id = "maxPoint-infoBox"; 
+        toolbar?.prepend(infoBox);
+        render(<div id="maxPointBox">Max points exceeded, point rendering stopped...</div>, infoBox);
+      }
     }
     else{ 
       exceedMaxPoints = false; 
