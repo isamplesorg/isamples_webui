@@ -426,7 +426,6 @@ class CesiumMap extends React.Component {
     if (viewer !== null){
       // remove the Ceisum information with custom button group
       render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
-    
       viewer.addHud("cesiumContainer");
       viewer.trackMouseCoordinates(showCoordinates);
       viewer.enableTracking(api, (bb) => selectedBoxCallbox(bb, true));
