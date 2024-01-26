@@ -93,3 +93,10 @@
   font-size: 20px;
 }
 
+#maxPointBox{
+  font-size: 20px;
+  color:white;
+  display: inline-block;
+  border: solid 1px #444;
+  background-color: rgba(40, 40, 40, 0.7);
+}
