@@ -17,7 +17,9 @@ class HierarchyFacet extends React.Component{
           // state that indicates whether we expand the field or not
           expandMaterial: false,
           expandSpecimen: false,
-          expandContext: false
+          expandContext: false,
+          // state that indicates whether to remove zero count labels from display
+          renderZeroCount: false
         };
     }
 
@@ -169,7 +171,7 @@ class HierarchyFacet extends React.Component{
                         onClick={()=>this.handleHierarchyExpand(label)} 
                     /> <h6>Select Children</h6>
                 </div>
-                <CustomizedTreeView label={label} value={value} facetCounts={facetCounts} facetValues={facetValues} onClick={this.handleClick} hierarchy= {this.hierarchy}/>
+                <CustomizedTreeView label={label} value={value} facetCounts={facetCounts} facetValues={facetValues} onClick={this.handleClick} hierarchy= {this.hierarchy} renderZeroCount={this.state.renderZeroCount}/>
                 </>
              )
             :  null}

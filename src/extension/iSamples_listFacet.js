@@ -18,7 +18,7 @@ class ListFacet extends React.Component {
       filter: "",
       truncateFacetListsAt: props.truncateFacetListsAt,
       // state that indicates whether to remove zero count labels from display
-      renderZeroCount: true
+      renderZeroCount: false
     };
   }
 
