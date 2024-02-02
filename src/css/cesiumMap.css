@@ -11,6 +11,23 @@
   font-weight: lighter;
 }
 
+.cesium-notifyBox {
+  border: solid 1px #444;
+  background-color: #303336;
+  display: inline;
+  float:right;
+  color:#edfffe;
+  border-radius: 5px;
+  box-sizing: border-box;
+  font-weight: lighter;
+  bottom:10px;
+  margin-left: 90px;
+  margin-top:10px;
+  margin-bottom: 1px;
+  padding: 3px;
+  font-size: 13px;
+}
+
 .Cesium-popBox {
   position: absolute;
   top: -230px;
@@ -74,4 +91,12 @@
 .Cesium__norecord {
   padding: 10px;
   font-size: 20px;
+}
+
+#maxPointBox{
+  font-size: 20px;
+  color:white;
+  display: inline-block;
+  border: solid 1px #444;
+  background-color: rgba(40, 40, 40, 0.7);
 }

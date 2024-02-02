@@ -200,9 +200,14 @@ class CesiumMap extends React.Component {
             </button>
           </div>
         </div>
-        <button className="cesium-visit-button cesium-button" onClick={this.toggle}>Viewer Change</button>
+        <div><button className="cesium-visit-button cesium-button" onClick={this.toggle}>Viewer Change</button></div>
         <p className="cesium-checkbox"><input type="checkbox" id="display" onChange={this.handleChange}/> <label for="display">Display Points </label> &nbsp; <input type="checkbox" id="display" onChange={this.handleGrid}/> <label for="display">Display Grid </label></p>
       </>;
+     this.alert = (
+      <>
+        <div className="cesium-notifyBox">Max points exceeded, stopped rendering points...</div>
+      </>
+    );
   };
 
   /**
@@ -227,6 +232,7 @@ class CesiumMap extends React.Component {
     cameraLat = latitude;
     cameraLong = longitude;
     if (!display){
+      render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
       return;
     }
     if (setPrimitive) {
@@ -241,18 +247,37 @@ class CesiumMap extends React.Component {
     if (currNumPoints > MAXIMUM_NUMBER_OF_POINTS){
       // do not load points 
       exceedMaxPoints = true; 
-      return; 
+      // render alert message to the toolbar if it is not already rendered
+      const toolbar = document.querySelector("div.cesium-viewer-toolbar");
+      const prevInfoBox = document.getElementById("maxPointBox");
+      if (prevInfoBox === null) {
+        // create 
+        const infoBox = document.createElement("span");
+        infoBox.id = "maxPoint-infoBox"; 
+        toolbar?.prepend(infoBox);
+        render(<div id="maxPointBox">Max points exceeded, point rendering stopped...</div>, infoBox);
+      }
     }
-    exceedMaxPoints = false; 
-    const res = await setPrimitive.load(facet, {
-      Q: "producedBy_samplingSite_location_cesium_height%3A*",
-      field: "source",
-      lat: latitude,
-      long: longitude,
-      searchFields: searchFields,
-      rows: MAXIMUM_NUMBER_OF_POINTS
-    })
-    oboePrimitive = res;
+    else{ 
+      exceedMaxPoints = false; 
+      // remove the alert box from map if exists 
+      const infoBox = document.getElementById("maxPoint-infoBox");
+      if (infoBox !== null) {
+        const maxPointBox = document.getElementById("maxPointBox");
+        if (maxPointBox !== null)
+          infoBox.removeChild(maxPointBox);
+      }
+      const res = await setPrimitive.load(facet, {
+        Q: "producedBy_samplingSite_location_cesium_height%3A*",
+        field: "source",
+        lat: latitude,
+        long: longitude,
+        searchFields: searchFields,
+        rows: MAXIMUM_NUMBER_OF_POINTS
+      })
+      oboePrimitive = res;
+
+    }
   }
 
   /**
@@ -405,6 +430,7 @@ class CesiumMap extends React.Component {
     if (viewer !== null){
       // remove the Ceisum information with custom button group
       render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
+    
       viewer.addHud("cesiumContainer");
       viewer.trackMouseCoordinates(showCoordinates);
       viewer.enableTracking(api, (bb) => selectedBoxCallbox(bb, true));
