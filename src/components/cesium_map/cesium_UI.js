@@ -17,6 +17,10 @@ import {
 } from "./api/spatial";
 import { ISamplesAPI } from "./api/server";
 import { addButton } from "./elements/navigationButton";
+import Cookies from 'universal-cookie';
+
+// encode and decode parameter
+import { decode } from "plantuml-encoder"
 
 // Defined ceisum access token
 // Current one is Dave's token
@@ -64,6 +68,8 @@ let exceedMaxPoints = false;
 // flag to indicate whether it is grid point view
 let showGrid = false; 
 
+// initializa a cookie instance
+const cookies = new Cookies();
 /**
  * This method queries the record amount in the bbox
  *
@@ -389,11 +395,28 @@ class CesiumMap extends React.Component {
     });
   }
 
-
+  getCurrSearchFields = () => {
+    const curURL = window.location.href;
+    const url = new URL(curURL);
+    // Read the encoded fields out of the dictionary.  Note that these *must* match up with what we're encoding up above
+    const hash = url.hash;
+    let searchFields = null;
+    if (hash.includes('?')) {
+      let searchParams = new URLSearchParams(url.hash.split("?")[1]);
+      searchFields = searchParams.get('searchFields');
+    }
+    else {
+       if (cookies.get('previousParams')) {
+        searchFields = cookies.get('previousParams')['searchFields'];
+      }
+    }
+    const decodedSearchFields = searchFields ? JSON.parse(decode(searchFields)) : [];
+    return decodedSearchFields;
+  }
   // This is a initial function in react liftcycle.
   // Only call once when this component first render
   async componentDidMount() {
-    const { mapInfo, setCamera, newSearchFields, newBbox, onSetFields } = this.props;
+    const { mapInfo, setCamera, newBbox, onSetFields } = this.props;
     // set the initial position based on the parameters from parent components
     const initialPosition = new SpatialView(
       mapInfo.longitude,
@@ -410,7 +433,7 @@ class CesiumMap extends React.Component {
       viewer.enableTracking(api, (bb) => selectedBoxCallbox(bb, true));
       setPrimitive = new PointStreamPrimitiveCollection(viewer.terrain, display);
       viewer.addPointPrimitives(setPrimitive);
-      searchFields = newSearchFields;
+      searchFields = this.getCurrSearchFields(); // use saved params to get current facet
       onChange = onSetFields;
 
       // keep track of zoom in event and zoom out event to decide whether 
