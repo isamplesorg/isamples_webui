@@ -47,20 +47,25 @@ const labelContent = (label, labelInfo) => {
  * @param {Object} param0
  * @returns
  */
-const CreateTree = ({ data, onClick, countMap }) => {
+const CreateTree = ({ data, onClick, countMap, renderZeroCount }) => {
   // The function to create tree items
   const treeItems = (json) => {
     return Object.entries(json).map(([key, val]) => {
       const label = val["label"]["en"];
       let labelCnt = countMap && countMap.get(label) ? countMap.get(label) : 0 ;
-      if (val["children"].length === 0) {
-        return <StyledTreeItem key={label} nodeId={label} label={labelContent(label, labelCnt)} onClick={onClick} />;
-      } else {
-        return (
-          <StyledTreeItem key={label} nodeId={label} label={labelContent(label, labelCnt)} onClick={onClick}>
-            <CreateTree data={val["children"]} onClick={onClick} countMap={countMap}/>
-          </StyledTreeItem>
-        );
+      if (labelCnt === 0 && !renderZeroCount) { // condition to not render 
+        return null; 
+      }
+      else {
+        if (val["children"].length === 0) {
+          return <StyledTreeItem key={label} nodeId={label} label={labelContent(label, labelCnt)} onClick={onClick} />;
+        } else {
+          return (
+            <StyledTreeItem key={label} nodeId={label} label={labelContent(label, labelCnt)} onClick={onClick}>
+              <CreateTree data={val["children"]} onClick={onClick} countMap={countMap} renderZeroCount={renderZeroCount} />
+            </StyledTreeItem>
+          );
+        }
       }
     });
   };
@@ -103,7 +108,7 @@ const findPath = (tree, target) => {
 };
 
 function CustomizedTreeView(props) {
-  const { label, value, onClick, facetCounts, facetValues, hierarchy} = props;
+  const { label, value, onClick, facetCounts, facetValues, hierarchy, renderZeroCount } = props;
   const schema = hierarchy(label);
   const firstLevel = schema[Object.keys(schema)[0]]["label"]["en"];
   const [filter, setFilter] = useState("");
@@ -220,7 +225,7 @@ function CustomizedTreeView(props) {
           onNodeSelect={handleSelect}
           multiSelect
         >
-          <CreateTree data={schema} onClick={onClick} countMap={countMap} />
+          <CreateTree data={schema} onClick={onClick} countMap={countMap} renderZeroCount={renderZeroCount}/>
         </TreeView>
         <input onChange={handleFilter} value={filter} placeholder="Filter..." />
    

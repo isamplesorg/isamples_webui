@@ -16,7 +16,9 @@ class ListFacet extends React.Component {
 
     this.state = {
       filter: "",
-      truncateFacetListsAt: props.truncateFacetListsAt
+      truncateFacetListsAt: props.truncateFacetListsAt,
+      // state that indicates whether to remove zero count labels from display
+      renderZeroCount: false
     };
   }
 
@@ -52,7 +54,7 @@ class ListFacet extends React.Component {
     const prevNode = <div>
       <ul className={cx({ "list-group": bootstrapCss, "list-facet__custom--height": true})}>
         {facetValues.filter((facetValue, i) => truncateFacetListsAt < 0 || i < truncateFacetListsAt).map((facetValue, i) =>
-          this.state.filter.length === 0 || facetValue.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1 ? (
+          ((!this.state.renderZeroCount && facetCounts[i] > 0) || (this.state.renderZeroCount && (this.state.filter.length === 0 || facetValue.toLowerCase().indexOf(this.state.filter.toLowerCase()) > -1))) ? (
             <li className={cx(`facet-item-type-${field}`, { "list-group-item": bootstrapCss })}
               key={`${facetValue}_${facetCounts[i]}`} onClick={() => this.handleClick(facetValue)}>
               {value.indexOf(facetValue) > -1 ? <CheckedIcon /> : <UncheckedIcon />} {facetValue}
