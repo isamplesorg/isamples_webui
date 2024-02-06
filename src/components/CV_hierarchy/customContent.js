@@ -60,13 +60,14 @@ const CustomContent = React.forwardRef(function CustomContent(props, ref) {
       ref={ref}
     >
       {icon &&
-        <div onClick={handleExpansionClick} className={classes.iconContainer}>
+        <div onClick={handleExpansionClick} className={classes.iconContainer} data-testid="tree-toggle">
           {icon}
         </div>}
       <Typography
         onClick={handleSelectionClick}
         component="div"
         className={classes.label}
+        data-testid="tree-item"
         style={{ fontSize: '14px' }}
       >
         {label}
