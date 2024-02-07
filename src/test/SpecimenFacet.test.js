@@ -1,34 +1,54 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import HierarchyFacet from 'extension/iSamples_hierarchyFacet';
+import CustomizedTreeView from 'components/CV_hierarchy/hierarchy';
 
-describe('SpecimenFacet', () => {
-    it('should render the highest label of specimen hierarchy', () => {
-        const highestSpecimenLabel = "Physical specimen"; // hardcoded value 
-        render(<HierarchyFacet label={"Specimen"} expanded={true} facets={[]} field={""}/>);
-        
-        const specimen = screen.getAllByText(highestSpecimenLabel);
-        let specimenTreeItem = null;
+mockedHierarchyFunc = () => {
+    return {
+        "https://w3id.org/isample/vocabulary/specimentype/0.9/physicalspecimen": {
+        "label": {
+            "en": "Physical specimen"
+          },
+          "children": [
+            {
+                "https://w3id.org/isample/vocabulary/specimentype/0.9/anyaggregation": {
+                "label": {
+                  "en": "Any aggregation specimen"
+                },
+                "children": []
+              }
+            },
+        ]
+    }
+    }
+}
+
+
+describe('ContextFacet', () => {
+    it('should render the highest label of context hierarchy', () => {
+        const highestContextLabel = "Physical specimen"; // hardcoded value
+        render(<CustomizedTreeView label={"Specimen"} value={[]} expanded={true} facetValues={["Physical specimen", "Any aggregation specimen"]} facetCounts={[1000,100]} hierarchy={mockedHierarchyFunc} renderZeroCount={true}/>);
+
+        const context = screen.getAllByText(highestContextLabel);
+        let contextTreeItem = null;
         // traverse and see if there is a one that has tree item as test id
-        for ( let i = 0 ; i < specimen.length ; i++){
-            let specimenComponent = specimen[i];
-            if (specimenComponent.getAttribute("data-testid") === "tree-item"){
-                specimenTreeItem = specimenComponent;
+        for ( let i = 0 ; i < context.length ; i++){
+            let contextComponent = context[i];
+            if (contextComponent.getAttribute("data-testid") === "tree-item"){
+                contextTreeItem = contextComponent;
             }
         }
-        expect(specimenTreeItem).not.toBeNull();
+        expect(contextTreeItem).not.toBeNull();
     });
 
-    it('should render the extension label of specimen hierarchy', () => {
-        const extensionSpecimenLabel = "Weapon";
-        render(<HierarchyFacet label={"Specimen"} expanded={true} facets={[]} field={""}/>);
+    it('should render the child label of context hierarchy', () => {
+        const childContextLabel = "Any aggregation specimen"; // hardcoded value
+        render(<CustomizedTreeView label={"Specimen"} value={[]} expanded={true} facetValues={["Physical specimen", "Any aggregation specimen"]} facetCounts={[1000,100]} hierarchy={mockedHierarchyFunc} renderZeroCount={true}/>);
         const toggles = screen.getAllByTestId("tree-toggle");
-        
-        // expand toggles to get extensions
+        // expand toggles to see extensions
         for ( let i = 0; i< toggles.length ; i++ ){
             let toggle = toggles[i];
             fireEvent.click(toggle);
         }
-        expect(screen.getByText(extensionSpecimenLabel)).toBeInTheDocument();
+        expect(screen.getByText(childContextLabel)).toBeInTheDocument();
     });
 })
