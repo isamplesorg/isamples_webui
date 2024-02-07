@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import CustomizedTreeView from 'components/CV_hierarchy/hierarchy';
 
-mockedHierarchyFunc = () => {
+function mockedHierarchyFunc () {
     return {
         "https://w3id.org/isample/vocabulary/material/0.9/anyanthropogenicmaterial": {
          "label": {
