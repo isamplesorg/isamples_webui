@@ -2,7 +2,6 @@ import PropTypes from 'prop-types';
 import React from "react";
 import cx from "classnames";
 import CustomizedTreeView from 'components/CV_hierarchy/hierarchy';
-import { ISamplesAPI } from "components/cesium_map/api/server";
 import Switch from '@mui/material/Switch';
 
 class HierarchyFacet extends React.Component{
@@ -19,7 +18,6 @@ class HierarchyFacet extends React.Component{
           // state that indicates whether to remove zero count labels from display
           renderZeroCount: false
         };
-        this.api = new ISamplesAPI();
     }
 
     // helper function
@@ -63,11 +61,11 @@ class HierarchyFacet extends React.Component{
     hierarchy = (label) => {
         switch (label) {
         case "Material":
-            return this.api.vocabularyMaterialType();
+            return window.config.vocabularyMaterialType;
         case "Context":
-            return this.api.vocabularySampledFeatureType();
+            return window.config.vocabularySampledFeatureType;
         case "Specimen":
-            return this.api.vocabularyMaterialSampleType();
+            return window.config.vocabularyMaterialSampleType;
         default:
             return null;
         }

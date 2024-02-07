@@ -51,6 +51,7 @@ import NavFooter from "pages/navFooter";
 import DOIs from 'pages/DOIs';
 import UserInfo from 'pages/userInfo';
 import HierarchyFacet from 'extension/iSamples_hierarchyFacet';
+import { ISamplesAPI } from "components/cesium_map/api/server";
 
 // initializa a cookie instance
 const cookies = new Cookies();
@@ -183,6 +184,13 @@ export const appendAnalytics = () => {
   document.head.appendChild(script);
 };
 
+async function fetchVocabulary() {
+  const api = new ISamplesAPI();
+  window.config.vocabularyMaterialType = await api.vocabularyMaterialType();
+  window.config.vocabularySampledFeatureType = await api.vocabularySampledFeatureType();
+  window.config.vocabularyMaterialSampleType = await api.vocabularyMaterialSampleType();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
 
   // this will send an initial search initializing the app
@@ -235,7 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     solrClient.initialize();
   }
-
+  fetchVocabulary();
   appendAnalytics();
 });
 reportWebVitals();
