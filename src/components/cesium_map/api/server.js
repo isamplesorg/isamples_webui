@@ -94,6 +94,33 @@ export class ISamplesAPI {
       console.error(e)
     }
   }
+
+  async vocabularyMaterialSampleType() {
+    try {
+      let data = await this._fetchPromise(window.config.vocabulary_url + "/material_sample_type");
+      return data;
+    } catch (e) {
+      console.error(e)
+    }  
+  }
+
+  async vocabularyMaterialType() {
+    try {
+      let data = await this._fetchPromise(window.config.vocabulary_url + "/material_type");
+      return data;
+    } catch (e) {
+      console.error(e)
+    }  
+  }  
+
+  async vocabularySampledFeatureType() {
+    try {
+      let data = await this._fetchPromise(window.config.vocabulary_url + "/sampled_feature_type");
+      return data;
+    } catch (e) {
+      console.error(e)
+    }  
+  }    
 }
 
 /**
