@@ -192,7 +192,7 @@ async function fetchVocabulary() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-
+  fetchVocabulary();
   // this will send an initial search initializing the app
   // We just need to set state when we firstly open the page with url
   // So, we only need to set the initalize solrClient rather than set them in the useEffect
@@ -243,7 +243,6 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     solrClient.initialize();
   }
-  fetchVocabulary();
   appendAnalytics();
 });
 reportWebVitals();
