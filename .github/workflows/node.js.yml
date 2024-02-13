@@ -26,13 +26,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: snickerbockers/submodules-init@v4
-    - name: Vocabulary action
-      uses: isamplesorg/vocabularies@main
-      with:
-        action: uijson
-        path: ${{ github.workspace }}/src/CVJSON
-        inputttl: material_sample_type|material_type|sampled_feature_type
-        inputvocaburi: spec:specimentypevocabulary|mat:materialsvocabulary|sf:sampledfeaturevocabulary
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:        
