@@ -18,7 +18,8 @@ const config = {
   "datacite_prefix": "10.82273",
   "datacite_publisher": DATACITE_PUBLISHER,
   "h3_count": _server_base + "/h3_counts",
-  "enable_login": false
+  "enable_login": false,
+  "vocabulary_url": _server_base + "vocabulary"
 };
 
 window.config = config;

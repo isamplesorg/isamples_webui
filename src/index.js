@@ -51,6 +51,7 @@ import NavFooter from "pages/navFooter";
 import DOIs from 'pages/DOIs';
 import UserInfo from 'pages/userInfo';
 import HierarchyFacet from 'extension/iSamples_hierarchyFacet';
+import { ISamplesAPI } from "components/cesium_map/api/server";
 
 // initializa a cookie instance
 const cookies = new Cookies();
@@ -183,8 +184,15 @@ export const appendAnalytics = () => {
   document.head.appendChild(script);
 };
 
-document.addEventListener("DOMContentLoaded", () => {
+async function fetchVocabulary() {
+  const api = new ISamplesAPI();
+  window.config.vocabularyMaterialType = await api.vocabularyMaterialType();
+  window.config.vocabularySampledFeatureType = await api.vocabularySampledFeatureType();
+  window.config.vocabularyMaterialSampleType = await api.vocabularyMaterialSampleType();
+}
 
+document.addEventListener("DOMContentLoaded", () => {
+  fetchVocabulary();
   // this will send an initial search initializing the app
   // We just need to set state when we firstly open the page with url
   // So, we only need to set the initalize solrClient rather than set them in the useEffect
@@ -235,7 +243,6 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     solrClient.initialize();
   }
-
   appendAnalytics();
 });
 reportWebVitals();

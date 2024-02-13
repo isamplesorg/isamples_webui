@@ -2,9 +2,6 @@ import PropTypes from 'prop-types';
 import React from "react";
 import cx from "classnames";
 import CustomizedTreeView from 'components/CV_hierarchy/hierarchy';
-import material from 'CVJSON/material_hierarchy.json';
-import sampledFeature from "CVJSON/sampledFeature_hierarchy.json";
-import specimanType from "CVJSON/specimenType_hierarchy.json";
 import Switch from '@mui/material/Switch';
 
 class HierarchyFacet extends React.Component{
@@ -64,11 +61,11 @@ class HierarchyFacet extends React.Component{
     hierarchy = (label) => {
         switch (label) {
         case "Material":
-            return material;
+            return window.config.vocabularyMaterialType;
         case "Context":
-            return sampledFeature;
+            return window.config.vocabularySampledFeatureType;
         case "Specimen":
-            return specimanType;
+            return window.config.vocabularyMaterialSampleType;
         default:
             return null;
         }
