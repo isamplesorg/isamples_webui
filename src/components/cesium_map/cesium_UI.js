@@ -66,7 +66,7 @@ let display = false;
 let currNumPoints = 0 ;
 let exceedMaxPoints = false; 
 // flag to indicate whether it is grid point view
-let showGrid = false; 
+let showGrid = true; // default grid view
 let isPointCheckBoxSelected = false;
 let isGridCheckBoxSelected = true; // default grid checkbox : true  
 
