@@ -40,7 +40,6 @@ const GLOBAL_HEADING = 90;
 const GLOBAL_PITCH = -90;
 const api = new ISamplesAPI();
 const moorea = new SpatialView(-149.8169236266867, -17.451466233002286, 2004.7347996772614, 201.84408760864753, -20.853642866175978);
-const patagonia = new SpatialView(-69.60169132023925, -54.315990127766646, 1781.4560051617016, 173.54573250470798, -15.85292472305027);
 
 // the initial map setup
 // keep track the camera location
@@ -67,6 +66,9 @@ let currNumPoints = 0 ;
 let exceedMaxPoints = false; 
 // flag to indicate whether it is grid point view
 let showGrid = false; 
+
+// storing previous viewpoints
+let viewpoints = new Map(JSON.parse(window.localStorage.getItem('previousView'))) ;
 
 // initializa a cookie instance
 const cookies = new Cookies();
@@ -153,35 +155,7 @@ class CesiumMap extends React.Component {
     this.dropdown =
       <>
         <div id="viewerChange" className="Cesium-popBox">
-          <div>
-            <table>
-              <tbody>
-                <tr>
-                  <td>
-                    <button
-                      className="btn btn-default btm-sm  margin-right-xs cesium-button"
-                      onClick={() => this.visitLocation(moorea)}>Visit Moorea</button>
-                  </td>
-                  <td>
-                    <button
-                      className="btn btn-default btm-sm  margin-right-xs cesium-button"
-                      onClick={() => this.visitLocation(patagonia)}>Visit Patagonia</button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <button
-                      className="btn btn-default btm-sm  margin-right-xs cesium-button"
-                      onClick={() => this.changeView(true)}>Visit Global</button>
-                  </td>
-                  <td>
-                    <button
-                      className="btn btn-default btm-sm  margin-right-xs cesium-button"
-                      onClick={() => this.changeView(false)}>Visit horizon</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div id='container'>
           </div>
           <div className="geoSearchGroup">
             <label className="margin-right-xs Cesium-label">Longitude: </label>
@@ -215,6 +189,47 @@ class CesiumMap extends React.Component {
       </>
     );
   };
+
+  deleteItem(locationName) {
+    const listItems = document.querySelectorAll('.list-item');
+    listItems.forEach(listItem => {
+      const button = listItem.querySelector('button');
+      if (button && button.textContent === locationName) {
+        // remove the list item from the container
+        listItem.parentNode.removeChild(listItem);
+        // also delete from localstorage
+        viewpoints.delete(locationName);
+        window.localStorage.setItem("previousView", JSON.stringify(Array.from(viewpoints.entries()))); 
+      }
+    });
+  }
+
+  
+  // generate a list of previous views based on localStorage object 
+  generateLocationTable = () => {
+    let container = document.getElementById('container');
+    if (viewpoints !== undefined && viewpoints !== null && viewpoints.size > 0){
+      container.innerHTML = "";
+      viewpoints.forEach((cameraState, locationName) => {
+        const listItem = document.createElement('div');
+        listItem.className = 'list-item';
+
+        const locNameButton = document.createElement('button');
+        locNameButton.className = 'locationNameButton';
+        locNameButton.textContent = locationName;
+        locNameButton.onclick = () => this.visitLocation(new SpatialView(cameraState["longitude"], cameraState["latitude"], cameraState["height"], cameraState["heading"], cameraState["pitch"]));
+    
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'btn btn-danger btn-xsm deleteButton';
+        deleteButton.textContent = 'Delete';
+        deleteButton.onclick = () => this.deleteItem(locationName); // Assuming there's a function called deleteItem
+
+        listItem.appendChild(locNameButton);
+        listItem.appendChild(deleteButton);
+        container.append(listItem)
+      });
+    }
+  }
 
   /**
  * A function to get all field from solr for legend
@@ -438,6 +453,29 @@ class CesiumMap extends React.Component {
     const decodedSearchFields = searchFields ? JSON.parse(decode(searchFields)) : [];
     return decodedSearchFields;
   }
+
+  generateKey = (dictionary) => {
+    let dictKey = '';
+    for (let [key, value] of Object.entries(dictionary)){
+      dictKey += key + ":" + value; 
+    }
+    return dictKey;
+  }
+
+  /**
+   * Store the current camera state in the local storage. 
+   */
+  storeCurrentView = (viewer) => {
+    //let key = this.generateKey(viewer.currentView); // TODO : receive user input for key 
+    const key = document.getElementById("locNameInput");
+    if (viewpoints !== null  && key!== null && key.value !== null && key.value !== "") {
+      viewpoints.set(key.value, viewer.currentView); // update map 
+      // add to local storage
+      window.localStorage.setItem("previousView", JSON.stringify(Array.from(viewpoints.entries())));
+      this.generateLocationTable(); // update table 
+    }
+  }
+
   // This is a initial function in react liftcycle.
   // Only call once when this component first render
   async componentDidMount() {
@@ -453,7 +491,7 @@ class CesiumMap extends React.Component {
     if (viewer !== null){
       // remove the Ceisum information with custom button group
       render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
-    
+      this.generateLocationTable();
       viewer.addHud("cesiumContainer");
       viewer.trackMouseCoordinates(showCoordinates);
       viewer.enableTracking(api, (bb) => selectedBoxCallbox(bb, true));
@@ -467,7 +505,7 @@ class CesiumMap extends React.Component {
       // get the facet control vocabulary
       this.getFacetInfo("source").then((res) => {
         facet = res;
-        addButton(facet['source'], viewer, this.updatePrimitive);
+        addButton(facet['source'], viewer, this.updatePrimitive, this.storeCurrentView);
         if (searchFields) {
           this.updatePrimitive(initialPosition.latitude, initialPosition.longitude);
         }
