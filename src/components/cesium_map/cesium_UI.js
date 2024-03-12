@@ -156,6 +156,7 @@ class CesiumMap extends React.Component {
       <>
         <div id="viewerChange" className="Cesium-popBox">
           <div id='container'>
+            Previous visited locations
           </div>
           <div className="geoSearchGroup">
             <label className="margin-right-xs Cesium-label">Longitude: </label>
@@ -209,7 +210,7 @@ class CesiumMap extends React.Component {
   generateLocationTable = () => {
     let container = document.getElementById('container');
     if (viewpoints !== undefined && viewpoints !== null && viewpoints.size > 0){
-      container.innerHTML = "";
+      container.innerHTML = "Previous visited locations<br/>";
       viewpoints.forEach((cameraState, locationName) => {
         const listItem = document.createElement('div');
         listItem.className = 'list-item';
