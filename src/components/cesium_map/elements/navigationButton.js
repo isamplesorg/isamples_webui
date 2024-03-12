@@ -123,7 +123,7 @@ export const BookmarkLocationButton = (props) => {
         style={{ minWidth: "200px" }}>
         <div className="cesium-click-navigation-help-visible">
           <label style = {{fontSize:"15px", color:"white"}}>Location name: </label> &nbsp; <br/>
-          <input id="locNameInput" style ={{fontSize: "10px", height:"15px" , width:"150px"}} ></input><br/>
+          <input id="locNameInput" style ={{fontSize: "10px", height:"20px" , width:"150px", marginBottom:"5px"}} /> 
           <button onClick={()=>bookmark(viewer)}>Save location</button>
         </div>
       </div>
