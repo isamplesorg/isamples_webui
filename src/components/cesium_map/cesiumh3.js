@@ -54,10 +54,11 @@ export class H3Grid {
         this.rect_str = rstr;
         this.loading = true;
         let url = new URL(this._service + "/");
-        if (this.rect_str !== GLOBAL_RECT1 && this.rect !== GLOBAL_RECT2) {
-            url.searchParams.set('bb', this.rect_str);
+        if (this.rect_str === GLOBAL_RECT1 || this.rect_str === GLOBAL_RECT2) { 
+            url.searchParams.set('resolution', 1); // globe view resolution value should be small
         } else {
-            url.searchParams.set('resolution', 1);
+            url.searchParams.set('bb', this.rect_str);
+            url.searchParams.set('resolution', 5);
         }
         url = decodeURIComponent(url);
         const options = {

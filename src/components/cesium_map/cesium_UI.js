@@ -66,7 +66,9 @@ let display = false;
 let currNumPoints = 0 ;
 let exceedMaxPoints = false; 
 // flag to indicate whether it is grid point view
-let showGrid = false; 
+let showGrid = true; // default grid view
+let isPointCheckBoxSelected = false;
+let isGridCheckBoxSelected = true; // default grid checkbox : true  
 
 // initializa a cookie instance
 const cookies = new Cookies();
@@ -150,7 +152,20 @@ class CesiumMap extends React.Component {
 
   constructor() {
     super()
-    this.dropdown =
+     this.alert = (
+      <>
+        <div className="cesium-notifyBox">Max points exceeded, stopped rendering points...</div>
+      </>
+    );
+  };
+
+  /**
+   * Return a drop down with checkbox selection as input 
+   */
+  generateDropdown = (isPointCheckBoxSelected, isGridCheckBoxSelected) => {
+    let pointCheckBoxElement = isPointCheckBoxSelected ? <input type="checkbox" id="display" onChange={this.handleChange} checked/> : <input type="checkbox" id="display" onChange={this.handleChange}/>
+    let gridCheckBoxElement = isGridCheckBoxSelected ? <input type="checkbox" id="display" onChange={this.handleGrid} checked/> : <input type="checkbox" id="display" onChange={this.handleGrid}/>  
+    let dropdown =
       <>
         <div id="viewerChange" className="Cesium-popBox">
           <div>
@@ -207,14 +222,10 @@ class CesiumMap extends React.Component {
           </div>
         </div>
         <div><button className="cesium-visit-button cesium-button" onClick={this.toggle}>Viewer Change</button></div>
-        <p className="cesium-checkbox"><input type="checkbox" id="display" onChange={this.handleChange}/> <label for="display">Display Points </label> &nbsp; <input type="checkbox" id="display" onChange={this.handleGrid}/> <label for="display">Display Grid </label></p>
+        <p className="cesium-checkbox"> {pointCheckBoxElement} <label for="display">Display Points </label> &nbsp; {gridCheckBoxElement} <label for="display">Display Grid </label></p>
       </>;
-     this.alert = (
-      <>
-        <div className="cesium-notifyBox">Max points exceeded, stopped rendering points...</div>
-      </>
-    );
-  };
+      return dropdown; 
+  }
 
   /**
  * A function to get all field from solr for legend
@@ -238,6 +249,7 @@ class CesiumMap extends React.Component {
     cameraLat = latitude;
     cameraLong = longitude;
     if (!display){
+      this.dropdown = this.generateDropdown(isPointCheckBoxSelected, isGridCheckBoxSelected);
       render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
       return;
     }
@@ -263,6 +275,14 @@ class CesiumMap extends React.Component {
         toolbar?.prepend(infoBox);
         render(<div id="maxPointBox">Max points exceeded, point rendering stopped...</div>, infoBox);
       }
+      // display grid view instead of rendering empty screen 
+      showGrid = true;
+      isGridCheckBoxSelected = true; // automatically selected 
+      if (setPrimitive){
+        this.dropdown = this.generateDropdown(isPointCheckBoxSelected, isGridCheckBoxSelected); 
+        render(this.dropdown, document.querySelector("div.cesium-viewer-bottom")); // re-render the checkbox so grid checkbox is selected 
+        viewer.addGrid().catch((error)=>{console.log(error)})
+      }
     }
     else{ 
       exceedMaxPoints = false; 
@@ -282,7 +302,6 @@ class CesiumMap extends React.Component {
         rows: MAXIMUM_NUMBER_OF_POINTS
       })
       oboePrimitive = res;
-
     }
   }
 
@@ -336,6 +355,11 @@ class CesiumMap extends React.Component {
     }
     else {
       viewer.removeGrid();
+      showGrid = false; 
+      isGridCheckBoxSelected = false; 
+      // re-render the grid checkbox as it is not rendered anymore 
+      this.dropdown = this.generateDropdown(isPointCheckBoxSelected, isGridCheckBoxSelected); 
+      render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
     }
   }
 
@@ -452,13 +476,13 @@ class CesiumMap extends React.Component {
     viewer = await ISamplesSpatial.create("cesiumContainer", initialPosition);
     if (viewer !== null){
       // remove the Ceisum information with custom button group
-      render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
-    
+      render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));;
       viewer.addHud("cesiumContainer");
       viewer.trackMouseCoordinates(showCoordinates);
       viewer.enableTracking(api, (bb) => selectedBoxCallbox(bb, true));
       setPrimitive = new PointStreamPrimitiveCollection(viewer.terrain, display);
       viewer.addPointPrimitives(setPrimitive);
+      viewer.addGrid().catch((error)=>{console.log(error)}) // default view : grid 
       searchFields = this.getCurrSearchFields(); // use saved params to get current facet
       onChange = onSetFields;
 
