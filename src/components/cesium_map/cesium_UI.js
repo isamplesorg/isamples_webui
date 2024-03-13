@@ -619,7 +619,7 @@ class CesiumMap extends React.Component {
     }
     // return false to force react not to rerender
     return false;
-
+  }
   /**
    * A function to avoid memory leak
    */
