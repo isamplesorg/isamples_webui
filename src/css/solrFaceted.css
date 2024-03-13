@@ -297,6 +297,7 @@ td {
 
 .geoSearchGroup {
   margin: 5px;
+  bottom : 20px;
 }
 
 #cesiumContainer {

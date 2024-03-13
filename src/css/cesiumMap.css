@@ -32,6 +32,7 @@
   position: absolute;
   top: -230px;
   left: 5px;
+  height: 220px;
   background-color: rgba(38, 38, 38, 0.75);
   border: solid #ddd 1px;
   width: 300px;
@@ -99,4 +100,31 @@
   display: inline-block;
   border: solid 1px #444;
   background-color: rgba(40, 40, 40, 0.7);
+}
+
+#container {
+  height: 100px;
+  overflow: auto; 
+  color:white;
+  font-size:15px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.list-item {
+  font-weight:lighter;
+  overflow: hidden; 
+  text-overflow: ellipsis;
+}
+
+.locationNameButton {
+  background-color: #303336;
+  color:white;
+  border:none;
+}
+
+.deleteButton {
+  float: right;
+  height: 20px;
+  padding: 0;
 }

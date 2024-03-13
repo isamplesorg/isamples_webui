@@ -1,6 +1,7 @@
 import { render } from "react-dom";
 import info from "images/NavigationHelp/info.svg";
 import reset from "images/NavigationHelp/reset.png";
+import bookmarkIcon from "images/NavigationHelp/bookmark.svg";
 import { colorbind, source } from "fields";
 
 
@@ -91,10 +92,50 @@ export const RefreshButton = (props) => {
   );
 }
 
+
+/**
+ * a location store button component
+ * @param {*} props a variable to contain all required information
+ */
+export const BookmarkLocationButton = (props) => {
+  const { viewer, bookmark } = props;
+
+  /**
+   * toggle function for addiiton buttons.
+   */
+  const toggle = () => {
+    const bookmarkDiv = document.getElementById('bookmark');
+    if (bookmarkDiv.classList.contains("cesium-navigation-help-visible")) {
+      bookmarkDiv.classList.remove('cesium-navigation-help-visible')
+    } else {
+      bookmarkDiv.classList.add('cesium-navigation-help-visible')
+    };
+  };
+
+  return (
+    <>
+    <button className="cesium-toolbar-button cesium-navigation-help-button"
+        onClick={toggle}>
+        <img src={bookmarkIcon} alt="bookmark icon" width="24" height="24" ></img>
+    </button>
+    <div id="bookmark"
+        className="cesium-navigation-help cesium-navigation-help-instructions"
+        style={{ minWidth: "200px" }}>
+        <div className="cesium-click-navigation-help-visible">
+          <label style = {{fontSize:"15px", color:"white"}}>Location name: </label> &nbsp; <br/>
+          <input id="locNameInput" style ={{fontSize: "10px", height:"20px" , width:"150px", marginBottom:"5px"}} /> 
+          <button onClick={()=>bookmark(viewer)}>Save location</button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+
 /**
  * A function to add legend button into the Cesium map toolbar
  */
-export function addButton(facet, SpatialViewer, refresh) {
+export function addButton(facet, SpatialViewer, refresh, bookmark) {
   const toolbar = document.querySelector("div.cesium-viewer-toolbar")
 
   if (document.querySelector("span#isamples-legend") === null) {
@@ -117,4 +158,11 @@ export function addButton(facet, SpatialViewer, refresh) {
   refreshButton.className = "cesium-navigationHelpButton-wrapper Cesium-refresh";
   viewer?.insertBefore(refreshButton, viewer.firstChild.nextSibling);
   render(<RefreshButton viewer={SpatialViewer} refresh={refresh} />, refreshButton);
+
+  // add bookmark location button
+  const bookmarkLocationButton = document.createElement("div");
+  bookmarkLocationButton.className = "cesium-navigationHelpButton-wrapper Cesium-bookmark";
+  toolbar?.appendChild(bookmarkLocationButton);
+  //viewer?.appendChild(bookmarkLocationButton);
+  render(<BookmarkLocationButton viewer={SpatialViewer} bookmark={bookmark} />, bookmarkLocationButton);
 }
