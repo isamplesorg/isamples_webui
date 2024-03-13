@@ -13,6 +13,25 @@ const infoBox =
     </ul>
   </div>;
 
+const RESERVED_CHAR_LIST = [
+  "+",
+  "-",
+  "&",
+  "|",
+  "!",
+  "(",
+  ")",
+  "{",
+  "}",
+  "[",
+  "]",
+  "^",
+  '"',
+  "~",
+  "?",
+  ":",
+]
+
 class TextSearch extends React.Component {
   constructor(props) {
     super(props);
@@ -41,8 +60,20 @@ class TextSearch extends React.Component {
     }
   }
 
+  formatSearchIdentifier(inputString, specialCharacters) {
+    specialCharacters.forEach(rgxSpecChar => 
+      inputString = inputString.replace(new RegExp("\\" + rgxSpecChar,"gm"), "\\" + 
+  rgxSpecChar))
+    return inputString;
+  }
+  
+  
   handleSubmit() {
-    this.props.onChange(this.props.field, this.state.value);
+    let searchValue = this.state.value;
+    if (this.props.label === "Identifier") {
+      searchValue = this.formatSearchIdentifier(searchValue, RESERVED_CHAR_LIST);
+    } 
+    this.props.onChange(this.props.field, searchValue);
   }
 
   toggleExpand() {
