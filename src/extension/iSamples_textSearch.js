@@ -38,14 +38,21 @@ class TextSearch extends React.Component {
 
     this.state = {
       value: "",
-      hint: false
+      numFound: 0
     };
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({
-      value: nextProps.value
-    });
+    if (this.state.numFound !== nextProps.results.numFound){
+      let replacedValue = nextProps.value;
+      if (replacedValue !== undefined) {
+        replacedValue = replacedValue.replace("\\","")
+      }
+      this.setState({
+        value: replacedValue,
+        numFound : nextProps.results.numFound
+      });
+    }
   }
 
   handleInputChange(ev) {
