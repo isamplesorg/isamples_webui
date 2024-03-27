@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { alpha, styled, Typography } from '@mui/material';
 import { treeItemClasses } from '@mui/x-tree-view/TreeItem';
-import { TreeView } from '@mui/x-tree-view/TreeView'
+import { SimpleTreeView } from '@mui/x-tree-view';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import CustomTreeItem from './customContent';
@@ -215,7 +215,7 @@ function CustomizedTreeView(props) {
   return (
   <div className='list-facet__custom'>
     
-     <TreeView
+     <SimpleTreeView
           aria-label="customized"
           defaultCollapseIcon={<ExpandLessIcon />}
           defaultExpandIcon={<ExpandMoreIcon />}
@@ -226,7 +226,7 @@ function CustomizedTreeView(props) {
           multiSelect
         >
           <CreateTree data={schema} onClick={onClick} countMap={countMap} renderZeroCount={renderZeroCount}/>
-        </TreeView>
+        </SimpleTreeView>
         <input onChange={handleFilter} value={filter} placeholder="Filter..." />
    
     </div> 

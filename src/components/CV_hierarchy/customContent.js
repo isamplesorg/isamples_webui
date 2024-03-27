@@ -6,7 +6,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { TreeItem, useTreeItem } from '@mui/x-tree-view/TreeItem'
+import { TreeItem, useTreeItemState } from '@mui/x-tree-view/TreeItem'
 import clsx from 'clsx';
 import { Typography } from '@mui/material';
 
@@ -30,7 +30,7 @@ const CustomContent = React.forwardRef(function CustomContent(props, ref) {
     handleExpansion,
     handleSelection,
     preventSelection
-  } = useTreeItem(nodeId);
+  } = useTreeItemState(nodeId);
 
   const icon = iconProp || expansionIcon || displayIcon;
 
