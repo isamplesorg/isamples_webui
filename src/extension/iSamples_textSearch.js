@@ -45,7 +45,7 @@ class TextSearch extends React.Component {
   componentWillReceiveProps(nextProps) {
     if (this.state.numFound !== nextProps.results.numFound){
       let replacedValue = nextProps.value;
-      if (replacedValue !== undefined) {
+      if (nextProps.label === "Identifier" && replacedValue !== undefined) {
         replacedValue = replacedValue.replace("\\","")
       }
       this.setState({
