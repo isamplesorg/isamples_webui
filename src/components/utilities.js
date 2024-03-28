@@ -9,7 +9,11 @@ export function ResultWrapper(props) {
 
   if (field.type === 'text' && field.value !== undefined) {
     // replace "&", "|", "(", ")", "*", "'", """ and duplicated whitespace with only one whitespace
-    const values = field.value.replaceAll(/&|\*|\(|\)|\||"|'/g, "").replaceAll(/\s+/g, " ").split(" ");
+    let fieldValue = field.value;
+    if (field.field === "id" && value !== undefined){
+      fieldValue = field.value.replace("\\","")
+    }
+    const values = fieldValue.replaceAll(/&|\*|\(|\)|\||"|'/g, "").replaceAll(/\s+/g, " ").split(" ");
 
     // split original text by search words insensitively by regex pattern
     // g is for regex global and i is for insensitive.
