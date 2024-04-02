@@ -26,7 +26,7 @@ function mockedHierarchyFunc (){
 describe('SpecimenFacet', () => {
     it('should render the highest label of specimen hierarchy', () => {
         const highestSpecimenLabel = "Physical specimen"; // hardcoded value
-        render(<CustomizedTreeView label={"Specimen"} value={[]} expanded={true} facetValues={["Physical specimen", "Any aggregation specimen"]} facetCounts={[1000,100]} hierarchy={mockedHierarchyFunc} renderZeroCount={true}/>);
+        render(<CustomizedTreeView label={"Specimen"} value={[]} expanded={["Physical specimen", "Any aggregation specimen"]} facetValues={["Physical specimen", "Any aggregation specimen"]} facetCounts={[1000,100]} hierarchy={mockedHierarchyFunc} renderZeroCount={true}/>);
 
         const specimen = screen.getAllByText(highestSpecimenLabel);
         let specimenTreeItem = null;
@@ -42,7 +42,7 @@ describe('SpecimenFacet', () => {
 
     it('should render the child label of specimen hierarchy', () => {
         const childSpecimenLabel = "Any aggregation specimen"; // hardcoded value
-        render(<CustomizedTreeView label={"Specimen"} value={[]} expanded={true} facetValues={["Physical specimen", "Any aggregation specimen"]} facetCounts={[1000,100]} hierarchy={mockedHierarchyFunc} renderZeroCount={true}/>);
+        render(<CustomizedTreeView label={"Specimen"} value={[]} expanded={["Physical specimen", "Any aggregation specimen"]} facetValues={["Physical specimen", "Any aggregation specimen"]} facetCounts={[1000,100]} hierarchy={mockedHierarchyFunc} renderZeroCount={true}/>);
         const toggles = screen.getAllByTestId("tree-toggle");
         // expand toggles to see extensions
         for ( let i = 0; i< toggles.length ; i++ ){

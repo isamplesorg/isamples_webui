@@ -26,7 +26,7 @@ function mockedHierarchyFunc () {
 describe('MaterialFacet', () => {
     it('should render the highest label of material hierarchy', () => {
         const highestMaterialLabel = "Material"; // hardcoded value
-        render(<CustomizedTreeView label={"Material"} value={[]} expanded={true} facetValues={["Any sampled feature", "Anthropogenic environment"]} facetCounts={[1000,100]} hierarchy={mockedHierarchyFunc} renderZeroCount={true}/>);
+        render(<CustomizedTreeView label={"Material"} value={[]} expanded={["Material", "Any anthropogenic material"]} facetValues={["Material", "Any anthropogenic material"]} facetCounts={[1000,100]} hierarchy={mockedHierarchyFunc} renderZeroCount={true}/>);
    
         const material = screen.getAllByText(highestMaterialLabel);
         let materialTreeItem = null;
@@ -42,7 +42,7 @@ describe('MaterialFacet', () => {
 
     it('should render the child label of material hierarchy', () => {
         const childMaterialLabel = "Any anthropogenic material"; // hardcoded value
-        render(<CustomizedTreeView label={"Material"} value={[]} expanded={true} facetValues={["Any sampled feature", "Anthropogenic environment"]} facetCounts={[1000,100]} hierarchy={mockedHierarchyFunc} renderZeroCount={true}/>);
+        render(<CustomizedTreeView label={"Material"} value={[]} expanded={["Material", "Any anthropogenic material"]} facetValues={["Material", "Any anthropogenic material"]} facetCounts={[1000,100]} hierarchy={mockedHierarchyFunc} renderZeroCount={true}/>);
         const toggles = screen.getAllByTestId("tree-toggle");
         // expand toggles to see extensions
         for ( let i = 0; i< toggles.length ; i++ ){
