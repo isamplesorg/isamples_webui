@@ -58,10 +58,10 @@ const CreateTree = ({ data, onClick, countMap, renderZeroCount }) => {
       }
       else {
         if (val["children"].length === 0) {
-          return <StyledTreeItem key={label} nodeId={label} label={labelContent(label, labelCnt)} onClick={onClick} />;
+          return <StyledTreeItem key={label} itemId={key} label={labelContent(label, labelCnt)} onClick={onClick} />;
         } else {
           return (
-            <StyledTreeItem key={label} nodeId={label} label={labelContent(label, labelCnt)} onClick={onClick}>
+            <StyledTreeItem key={label} itemId={key} label={labelContent(label, labelCnt)} onClick={onClick}>
               <CreateTree data={val["children"]} onClick={onClick} countMap={countMap} renderZeroCount={renderZeroCount} />
             </StyledTreeItem>
           );
@@ -111,9 +111,11 @@ function CustomizedTreeView(props) {
   const { label, value, onClick, facetCounts, facetValues, hierarchy, renderZeroCount } = props;
   const schema = hierarchy(label);
   const firstLevel = schema[Object.keys(schema)[0]]["label"]["en"];
+  const [idToLabelMap, setIdToLabelMap] = useState(new Map());
+  const [labelToIdMap, setLabelToIdMap] = useState(new Map());
+  const [expandedItems, setExpandedItems] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]);
   const [filter, setFilter] = useState("");
-  const [expanded, setExpanded] = useState([firstLevel]);
-  const [selected, setSelected] = useState(value);
   const [countMap, setCountMap] = useState(new Map());
 
   /** 
@@ -167,38 +169,90 @@ function CustomizedTreeView(props) {
     }
   }, [facetValues,facetCounts, value, countMap]);
 
+  /**
+  * Convert an array of ids to its labels 
+  */
+  const parseIdArrayToLabelArray = (idArray, idToLabelMap) => {
+    let labelArray = [];
+    // Apply map values to each element in the original array
+    idArray.forEach(element => {
+        if (idToLabelMap.has(element)) {
+            labelArray.push(idToLabelMap.get(element));
+        }
+    });
+    return labelArray;
+  }
+
+  /**
+   * Convert an array of labels to its ids
+   */
+  const parseLabelArrayToIdArray = (labelArray, labelToIdMap) => {
+      let idArray = [];
+      // Apply map values to each element in the original array
+      labelArray.forEach(element => {
+          if (labelToIdMap.has(element)) {
+              idArray.push(labelToIdMap.get(element));
+          }
+      });
+      return idArray;
+  }
+
   // Update tree view based on the facet filter
   useEffect(() => {
+    if (idToLabelMap.size === 0 && labelToIdMap.size === 0) {
+      const newIdToLabelMap = new Map(idToLabelMap);
+      const newLabelToIdMap = new Map(labelToIdMap);
+
+      // Function to recursively populate idToLabelMap and labelToIdMap
+      const updateMaps = (currSchema) => {
+        for (let key in currSchema) {
+          newIdToLabelMap.set(key, currSchema[key]["label"]["en"]);
+          newLabelToIdMap.set(currSchema[key]["label"]["en"], key);
+
+          for (const childSchema of currSchema[key]["children"]) {
+            updateMaps(childSchema); // Recursively update maps
+          }
+        }
+      };
+
+      // Call the recursive function to update maps
+      updateMaps(schema);
+
+      // Update state after the recursion is completed
+      setIdToLabelMap(newIdToLabelMap);
+      setLabelToIdMap(newLabelToIdMap);
+    }
     const path = Array.from(new Set(value.map(v => findPath(schema, v)).flat()));
-    setExpanded(prevExpaned => path.length > prevExpaned.length ? path : prevExpaned)
+    setExpandedItems(prevExpaned => path.length !== prevExpaned.length ? parseLabelArrayToIdArray(path, labelToIdMap) : prevExpaned)
     // calculate the counts 
     if (Array.isArray(facetValues)){
       setCountMap(new Map()); // initialize counts 
       calculateCounts(schema);
     }
-    setSelected(value);
-  }, [schema, value, facetValues, calculateCounts])
+    setSelectedItems(parseLabelArrayToIdArray(value, labelToIdMap));
+  }, [schema, value, facetValues, calculateCounts, labelToIdMap, idToLabelMap])
 
-  const handleToggle = (event, nodeIds) => {
-    const difference = nodeIds
-      .filter(x => !expanded.includes(x))
-      .concat(expanded.filter(x => !nodeIds.includes(x)));
+  const handleToggle = (event, itemIds) => {
+    const difference = itemIds
+      .filter(x => !expandedItems.includes(x))
+      .concat(expandedItems.filter(x => !itemIds.includes(x)));
     // For toggle items, we could use ctrl + enter to select the tree item
     if (event.ctrlKey && event.code === 'Enter') {
-      onClick(difference[0]);
+      onClick(parseIdArrayToLabelArray(difference[0], idToLabelMap), "add");
     } else {
-      setExpanded(nodeIds);
+        setExpandedItems(itemIds);
     }
   };
 
-  const handleSelect = (event, nodeIds) => {
-    // nodeIds[0] is the selected label 
-    if (value.includes(nodeIds[0])){
+  const handleSelect = (event, itemIds) => {
+    // itemIds[0] is the selected label 
+    let labelIds = parseIdArrayToLabelArray(itemIds, idToLabelMap)
+    if (value.includes(labelIds[0])){
       // remove the selected label
-      onClick(nodeIds[0], "delete");
+      onClick(labelIds[0], "delete");
     } else{
       // add the selected label
-      onClick(nodeIds[0], "add" )
+      onClick(labelIds[0], "add" )
     }
   };
 
@@ -206,9 +260,9 @@ function CustomizedTreeView(props) {
     const { value } = event.target;
     setFilter(value);
     if (value.trim().length === 0) {
-      setExpanded([firstLevel]);
+      setExpandedItems(parseLabelArrayToIdArray([firstLevel], labelToIdMap));
     } else {
-      setExpanded(findPath(schema, value));
+      setExpandedItems(parseLabelArrayToIdArray(findPath(schema, value), labelToIdMap));
     }
   };
 
@@ -217,12 +271,14 @@ function CustomizedTreeView(props) {
     
      <SimpleTreeView
           aria-label="customized"
-          defaultCollapseIcon={<ExpandLessIcon />}
-          defaultExpandIcon={<ExpandMoreIcon />}
-          expanded={expanded}
-          selected={selected}
-          onNodeToggle={handleToggle}
-          onNodeSelect={handleSelect}
+          slotes = {{
+            collapseIcon: ExpandLessIcon,
+            expandIcon : ExpandMoreIcon
+          }}
+          expandedItems={expandedItems}
+          selectedItems={selectedItems}
+          onExpandedItemsChange={handleToggle}
+          onSelectedItemsChange={handleSelect}
           multiSelect
         >
           <CreateTree data={schema} onClick={onClick} countMap={countMap} renderZeroCount={renderZeroCount}/>

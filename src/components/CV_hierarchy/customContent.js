@@ -15,7 +15,7 @@ const CustomContent = React.forwardRef(function CustomContent(props, ref) {
     classes,
     className,
     label,
-    nodeId,
+    itemId,
     icon: iconProp,
     expansionIcon,
     displayIcon,
@@ -30,7 +30,7 @@ const CustomContent = React.forwardRef(function CustomContent(props, ref) {
     handleExpansion,
     handleSelection,
     preventSelection
-  } = useTreeItemState(nodeId);
+  } = useTreeItemState(itemId);
 
   const icon = iconProp || expansionIcon || displayIcon;
 
@@ -44,7 +44,7 @@ const CustomContent = React.forwardRef(function CustomContent(props, ref) {
 
   const handleSelectionClick = (event) => {
     handleSelection(event);
-    onClick(nodeId)
+    onClick(itemId)
   };
 
 
@@ -104,7 +104,7 @@ CustomContent.propTypes = {
   /**
    * The id of the node.
    */
-  nodeId: PropTypes.string.isRequired,
+  itemId: PropTypes.string.isRequired,
 
 };
 

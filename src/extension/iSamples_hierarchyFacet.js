@@ -168,7 +168,15 @@ class HierarchyFacet extends React.Component{
                         onClick={()=>this.handleHierarchyExpand(label)} 
                     /> <h6>Select Children</h6>
                 </div>
-                <CustomizedTreeView label={label} value={value} facetCounts={facetCounts} facetValues={facetValues} onClick={this.handleClick} hierarchy= {this.hierarchy} renderZeroCount={this.state.renderZeroCount}/>
+                <CustomizedTreeView 
+                    label={label}
+                    value={value}
+                    facetCounts={facetCounts} 
+                    facetValues={facetValues} 
+                    onClick={this.handleClick} 
+                    hierarchy= {this.hierarchy}
+                    renderZeroCount={this.state.renderZeroCount}
+                />
                 </>
              )
             :  null}
