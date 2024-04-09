@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import CustomizedTreeView from 'components/CV_hierarchy/hierarchy';
 
 function mockedHierarchyFunc (){
@@ -34,9 +34,12 @@ jest.mock('react', () => ({
   
   
 describe('SpecimenFacet', () => {
+    let log;
+    beforeAll(() => {
+     log =  jest.spyOn(console, 'log'); // create a new mock function for each test
+    });
     // Mocked implementation for useEffect
     useEffect.mockImplementation(() => {
-        // Mocked implementation goes here...
         callback();
         setIdToLabelMap(mockIdToLabelMap);
         setLabelToIdMap(mockLabelToIdMap);
@@ -67,4 +70,22 @@ describe('SpecimenFacet', () => {
         }
         expect(specimenTreeItem).not.toBeNull();
     });
+
+    it('should invoke the handle select operation on click', () => {
+        render(<CustomizedTreeView 
+            label={"Specimen"} 
+            value={[]} 
+            facetValues={["Physical specimen", "Any aggregation specimen"]} 
+            facetCounts={[1000,100]} 
+            hierarchy={mockedHierarchyFunc} 
+            onClick={()=>{console.log("handle select called")}}
+            renderZeroCount={true}/>
+        );
+        const treeItems = screen.getAllByTestId("tree-item");
+        for ( let i = 0; i< treeItems.length ; i++ ){
+            let treeItem = treeItems[i]
+            fireEvent.click(treeItem);
+        }
+    });
+
 })

@@ -109,7 +109,7 @@ CustomContent.propTypes = {
 };
 
 const CustomTreeItem = (props) => (
-  <TreeItem ContentComponent={CustomContent} {...props} onKeyDown={(e) => console.log(e)} />
+  <TreeItem ContentComponent={CustomContent} {...props} onKeyDown={(e) => console.log(e)} data-testid="tree-item" />
 );
 
 export default CustomTreeItem;

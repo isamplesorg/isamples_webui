@@ -1,5 +1,5 @@
 import React, { useEffect }from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import CustomizedTreeView from 'components/CV_hierarchy/hierarchy';
 
 function mockedHierarchyFunc (label) {
@@ -33,8 +33,11 @@ jest.mock('react', () => ({
   
 
 describe('MaterialFacet', () => {
+    let log;
+    beforeAll(() => {
+    log =  jest.spyOn(console, 'log'); // create a new mock function for each test
+    });
     useEffect.mockImplementation(() => {
-        // Mocked implementation goes here...
         callback();
         setIdToLabelMap(mockIdToLabelMap);
         setLabelToIdMap(mockLabelToIdMap);
@@ -65,4 +68,23 @@ describe('MaterialFacet', () => {
         }
         expect(materialTreeItem).not.toBeNull();
     });
+
+    it('should invoke the handle select operation on click', () => {
+      render(
+        <CustomizedTreeView 
+        label={"Material"} 
+        value={[]} 
+        facetValues={["Material", "Any anthropogenic material"]} 
+        facetCounts={[1000,100]}
+        hierarchy={mockedHierarchyFunc} 
+        onClick={()=>{console.log("handle select called")}}
+        renderZeroCount={true}/>
+      );
+      const treeItems = screen.getAllByTestId("tree-item");
+      for ( let i = 0; i< treeItems.length ; i++ ){
+        let treeItem = treeItems[i]
+        fireEvent.click(treeItem);
+      }
+      expect(log).toHaveBeenCalledWith('handle select called');
+  });
 })
