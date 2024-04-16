@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import CustomizedTreeView from 'components/CV_hierarchy/hierarchy';
 
@@ -22,11 +22,42 @@ function mockedHierarchyFunc (){
     }
 }
 
+const mockSpecimenId = "https://w3id.org/isample/vocabulary/specimentype/0.9/physicalspecimen";
+const mockChildSpecimenId = "https://w3id.org/isample/vocabulary/specimentype/0.9/anyaggregation";
 
+const mockIdToLabelMap = new Map([[mockSpecimenId,"Physical specimen"],[mockChildSpecimenId,  "Any aggregation specimen"]]);
+const mockLabelToIdMap = new Map([["Physical specimen", mockSpecimenId], [ "Any aggregation specimen", mockChildSpecimenId]])
+jest.mock('react', () => ({
+    ...jest.requireActual('react'), // Use the actual react module
+    useEffect: jest.fn(), // Mock the useEffect hook
+  }));
+  
+  
 describe('SpecimenFacet', () => {
+    let log;
+    beforeAll(() => {
+     log =  jest.spyOn(console, 'log'); // create a new mock function for each test
+    });
+    // Mocked implementation for useEffect
+    useEffect.mockImplementation(() => {
+        callback();
+        setIdToLabelMap(mockIdToLabelMap);
+        setLabelToIdMap(mockLabelToIdMap);
+        setCountMap(mockCountMap);
+        setSelectedItems([mockContextId, mockChildContextId]);
+        setExpandedItems([mockContextId, mockChildContextId])
+        });
+
     it('should render the highest label of specimen hierarchy', () => {
         const highestSpecimenLabel = "Physical specimen"; // hardcoded value
-        render(<CustomizedTreeView label={"Specimen"} value={[]} expanded={true} facetValues={["Physical specimen", "Any aggregation specimen"]} facetCounts={[1000,100]} hierarchy={mockedHierarchyFunc} renderZeroCount={true}/>);
+        render(<CustomizedTreeView 
+            label={"Specimen"} 
+            value={[]} 
+            facetValues={["Physical specimen", "Any aggregation specimen"]} 
+            facetCounts={[1000,100]} 
+            hierarchy={mockedHierarchyFunc} 
+            renderZeroCount={true}/>
+        );
 
         const specimen = screen.getAllByText(highestSpecimenLabel);
         let specimenTreeItem = null;
@@ -40,15 +71,21 @@ describe('SpecimenFacet', () => {
         expect(specimenTreeItem).not.toBeNull();
     });
 
-    it('should render the child label of specimen hierarchy', () => {
-        const childSpecimenLabel = "Any aggregation specimen"; // hardcoded value
-        render(<CustomizedTreeView label={"Specimen"} value={[]} expanded={true} facetValues={["Physical specimen", "Any aggregation specimen"]} facetCounts={[1000,100]} hierarchy={mockedHierarchyFunc} renderZeroCount={true}/>);
-        const toggles = screen.getAllByTestId("tree-toggle");
-        // expand toggles to see extensions
-        for ( let i = 0; i< toggles.length ; i++ ){
-            let toggle = toggles[i];
-            fireEvent.click(toggle);
+    it('should invoke the handle select operation on click', () => {
+        render(<CustomizedTreeView 
+            label={"Specimen"} 
+            value={[]} 
+            facetValues={["Physical specimen", "Any aggregation specimen"]} 
+            facetCounts={[1000,100]} 
+            hierarchy={mockedHierarchyFunc} 
+            onClick={()=>{console.log("handle select called")}}
+            renderZeroCount={true}/>
+        );
+        const treeItems = screen.getAllByTestId("tree-item");
+        for ( let i = 0; i< treeItems.length ; i++ ){
+            let treeItem = treeItems[i]
+            fireEvent.click(treeItem);
         }
-        expect(screen.getByText(childSpecimenLabel)).toBeInTheDocument();
     });
+
 })

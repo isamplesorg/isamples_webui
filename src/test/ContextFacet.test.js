@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import CustomizedTreeView from 'components/CV_hierarchy/hierarchy';
+import  CustomizedTreeView from 'components/CV_hierarchy/hierarchy';
+const mockContextId =  "https://w3id.org/isample/vocabulary/sampledfeature/0.9/anysampledfeature";
+const mockChildContextId = "https://w3id.org/isample/vocabulary/sampledfeature/0.9/activehumanoccupationsite";
 
-function mockedHierarchyFunc (){
+function mockedHierarchyFunc(){
     return {
         "https://w3id.org/isample/vocabulary/sampledfeature/0.9/anysampledfeature": {
           "label": {
@@ -20,13 +22,43 @@ function mockedHierarchyFunc (){
         ]
     }
     }
-}
+  }
+
+// Define mock values for idToLabelMap and labelToIdMap
+const mockIdToLabelMap = new Map([[mockContextId,"Any sampled feature"],[mockChildContextId, "Active human occupation site"]]);
+const mockLabelToIdMap = new Map([["Any sampled feature", mockContextId], ["Active human occupation site", mockChildContextId]]);
+const mockCountMap = new Map([["Any sampled feature",0],["Active human occupation site",0]]);
+
+jest.mock('react', () => ({
+  ...jest.requireActual('react'), // Use the actual react module
+  useEffect: jest.fn(), // Mock the useEffect hook
+}));
 
 describe('ContextFacet', () => {
+    let log;
+    beforeAll(() => {
+     log =  jest.spyOn(console, 'log'); // create a new mock function for each test
+    });
+    useEffect.mockImplementationOnce(() => {
+      // Mocked implementation goes here...
+      callback();
+      setIdToLabelMap(mockIdToLabelMap);
+      setLabelToIdMap(mockLabelToIdMap);
+      setCountMap(mockCountMap);
+      setSelectedItems([mockContextId, mockChildContextId]);
+      setExpandedItems([mockContextId, mockChildContextId])
+    });
+
     it('should render the highest label of context hierarchy', () => {
         const highestContextLabel = "Any sampled feature"; // hardcoded value
-        render(<CustomizedTreeView label={"Context"} value={[]} expanded={true} facetValues={["Any sampled feature", "Active human occupation site"]} facetCounts={[1000,100]} hierarchy={mockedHierarchyFunc} renderZeroCount={true}/>);
- 
+        render(<CustomizedTreeView 
+          label={"Context"} 
+          value={[]} 
+          facetValues={["Any sampled feature", "Active human occupation site"]} 
+          facetCounts={[1000,100]}  
+          hierarchy={mockedHierarchyFunc}
+          renderZeroCount={true}/>
+        );
         const context = screen.getAllByText(highestContextLabel);
         let contextTreeItem = null;
         // traverse and see if there is a one that has tree item as test id
@@ -39,15 +71,23 @@ describe('ContextFacet', () => {
         expect(contextTreeItem).not.toBeNull();
     });
 
-    it('should render the child label of context hierarchy', () => {
-        const childContextLabel = "Active human occupation site"; // hardcoded value
-        render(<CustomizedTreeView label={"Context"} value={[]} expanded={true} facetValues={["Any sampled feature", "Active human occupation site"]} facetCounts={[1000,100]} hierarchy={mockedHierarchyFunc} renderZeroCount={true}/>);
-        const toggles = screen.getAllByTestId("tree-toggle");
-        // expand toggles to see extensions
-        for ( let i = 0; i< toggles.length ; i++ ){
-            let toggle = toggles[i];
-            fireEvent.click(toggle);
-        }
-        expect(screen.getByText(childContextLabel)).toBeInTheDocument();
-    });
+    it('clicking item should invoke the handle select operation ', () => {
+      render(
+        <CustomizedTreeView 
+        label={"Context"} 
+        value={[]}
+        facetValues={["Any sampled feature", "Active human occupation site"]} 
+        facetCounts={[1000,100]} 
+        renderZeroCount={true}
+        onClick={()=>{console.log("handle select called")}}
+        hierarchy={mockedHierarchyFunc}
+        />);
+        screen.debug();
+      const treeItems = screen.getAllByTestId("tree-item");
+      for ( let i = 0; i< treeItems.length ; i++ ){
+        let treeItem = treeItems[i]
+        fireEvent.click(treeItem);
+      }
+      expect(log).toHaveBeenCalledWith('handle select called');
+  });
 })

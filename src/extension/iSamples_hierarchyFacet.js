@@ -55,9 +55,9 @@ class HierarchyFacet extends React.Component{
     }
 
     /**
-     * Static json for now.
-     * Will use REST api to get json file from server
-     */
+        * Static json for now.
+        * Will use REST api to get json file from server
+    */
     hierarchy = (label) => {
         switch (label) {
         case "Material":
@@ -168,7 +168,15 @@ class HierarchyFacet extends React.Component{
                         onClick={()=>this.handleHierarchyExpand(label)} 
                     /> <h6>Select Children</h6>
                 </div>
-                <CustomizedTreeView label={label} value={value} facetCounts={facetCounts} facetValues={facetValues} onClick={this.handleClick} hierarchy= {this.hierarchy} renderZeroCount={this.state.renderZeroCount}/>
+                <CustomizedTreeView 
+                    label={label}
+                    value={value}
+                    facetCounts={facetCounts} 
+                    facetValues={facetValues} 
+                    onClick={this.handleClick} 
+                    hierarchy= {this.hierarchy}
+                    renderZeroCount={this.state.renderZeroCount}
+                />
                 </>
              )
             :  null}

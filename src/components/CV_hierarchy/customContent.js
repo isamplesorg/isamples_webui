@@ -6,7 +6,7 @@
  */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { TreeItem, useTreeItem } from '@mui/x-tree-view/TreeItem'
+import { TreeItem, useTreeItemState } from '@mui/x-tree-view/TreeItem'
 import clsx from 'clsx';
 import { Typography } from '@mui/material';
 
@@ -15,7 +15,7 @@ const CustomContent = React.forwardRef(function CustomContent(props, ref) {
     classes,
     className,
     label,
-    nodeId,
+    itemId,
     icon: iconProp,
     expansionIcon,
     displayIcon,
@@ -30,7 +30,7 @@ const CustomContent = React.forwardRef(function CustomContent(props, ref) {
     handleExpansion,
     handleSelection,
     preventSelection
-  } = useTreeItem(nodeId);
+  } = useTreeItemState(itemId);
 
   const icon = iconProp || expansionIcon || displayIcon;
 
@@ -44,7 +44,7 @@ const CustomContent = React.forwardRef(function CustomContent(props, ref) {
 
   const handleSelectionClick = (event) => {
     handleSelection(event);
-    onClick(nodeId)
+    onClick(itemId)
   };
 
 
@@ -104,12 +104,12 @@ CustomContent.propTypes = {
   /**
    * The id of the node.
    */
-  nodeId: PropTypes.string.isRequired,
+  itemId: PropTypes.string.isRequired,
 
 };
 
 const CustomTreeItem = (props) => (
-  <TreeItem ContentComponent={CustomContent} {...props} onKeyDown={(e) => console.log(e)} />
+  <TreeItem ContentComponent={CustomContent} {...props} onKeyDown={(e) => console.log(e)} data-testid="tree-item" />
 );
 
 export default CustomTreeItem;
