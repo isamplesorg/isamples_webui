@@ -21,7 +21,7 @@ recommended_fields.forEach((field) => recommended_info[field] = false);
 
 function DOIs() {
   const cookies = new Cookies();
-  cookies.set('logged', true, { path: "/" });
+  cookies.set('authenticated', true, { path: "/" });
   // State for form inputs
   const [inputs, setInputs] = useState({});
 

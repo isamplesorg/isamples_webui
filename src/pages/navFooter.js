@@ -13,7 +13,7 @@ const NavBar = function (props) {
   // initializa a cookie instance
   const cookies = new Cookies();
 
-  const btn_login = window.config.enable_login ? <a href={window.config.login}>
+  const btn_login = window.config.enable_login || cookies.get('authenticated') ? <a href={window.config.login}>
     <button
       className="btn btn-default navbar-btn">
       Login 
@@ -40,7 +40,7 @@ const NavBar = function (props) {
 
   const btn_logout = <a href={window.config.logout}>
     <button className="btn btn-default navbar-btn" onClick={() => {
-      cookies.remove('logged', { path: "/" });
+      cookies.remove('authenticated', { path: "/" });
     }}>Logout</button></a>;
 
   // Create button group based on different pages
@@ -57,7 +57,7 @@ const NavBar = function (props) {
                   {btn_logout}
                 </>);
             case 'records':
-              if (cookies.get('logged')) {
+              if (cookies.get('authenticated')) {
                 return (
                   <>
                     {btn_dois}
