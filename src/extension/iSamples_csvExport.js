@@ -79,7 +79,32 @@ const CsvExport = (props) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetchCsvResult();
+    // check if user is authorized to download
+    let authorized = false; 
+    fetch(window.config.userinfo, {
+      'method': 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': undefined,
+      }
+    })
+      .then(res => res.json())
+      .then(res => {
+        if (res["id_token"] !== undefined){
+          authorized = true; 
+        }
+        return authorized;
+      })
+      .then((authorized) => {
+        if (authorized === true){
+          fetchCsvResult();
+        }
+        else {
+          alert('Unauthorized, please login.');
+        }
+      })
+
+    
   }
 
   useEffect(() => {
