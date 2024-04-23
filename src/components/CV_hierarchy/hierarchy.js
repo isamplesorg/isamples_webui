@@ -140,7 +140,7 @@ function CustomizedTreeView(props) {
         const label = currSchema[key]["label"]["en"];
         let totalCnt = 0; // total cnt of this label 
         // leaf node
-        if (childLabels.length === 0) {
+        if (childLabels.length === 0 ) {
           // get the count by directly comparing to facetValues
           for (const idx in facetValues){
             const facetValue = facetValues[idx];
@@ -159,6 +159,15 @@ function CustomizedTreeView(props) {
           for (const childLabel of childLabels){
             // add up the count from child labels
             totalCnt += countMap.get(childLabel); 
+          }
+          // add itself label count
+          for (const idx in facetValues){
+            const facetValue = facetValues[idx];
+            if (value.length === 0 && facetValue.toLocaleLowerCase()=== label.toLocaleLowerCase()){ 
+              // when no labels are selected for search,
+              // display all label count
+              totalCnt += facetCounts[idx];
+            }
           }
         }
         setCountMap(countMap.set(label, totalCnt))
