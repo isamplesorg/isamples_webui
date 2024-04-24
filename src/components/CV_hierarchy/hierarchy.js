@@ -156,18 +156,19 @@ function CustomizedTreeView(props) {
           }
         } else{
           // non - leaf node
-          for (const childLabel of childLabels){
-            // add up the count from child labels
-            totalCnt += countMap.get(childLabel); 
-          }
           // add itself label count
           for (const idx in facetValues){
             const facetValue = facetValues[idx];
-            if (facetValue.toLocaleLowerCase()=== label.toLocaleLowerCase()){ 
-              // when no labels are selected for search,
-              // display all label count
+            if ( (value.length === 0 || value.indexOf(facetValue) !== -1) && facetValue.toLocaleLowerCase()=== label.toLocaleLowerCase()){ 
+              // when no labels are selected for search, or itself is selected for search
+              // when another label is selected, do not add up counts 
+              // add itself's label count 
               totalCnt += facetCounts[idx];
             }
+          }
+          for (const childLabel of childLabels){
+            // add up the count from child labels
+            totalCnt += countMap.get(childLabel); 
           }
         }
         setCountMap(countMap.set(label, totalCnt))
@@ -232,7 +233,7 @@ function CustomizedTreeView(props) {
       setLabelToIdMap(newLabelToIdMap);
     }
     const path = Array.from(new Set(value.map(v => findPath(schema, v)).flat()));
-    setExpandedItems(prevExpaned => path.length >= prevExpaned.length ? parseLabelArrayToIdArray(path, labelToIdMap) : prevExpaned)
+    setExpandedItems(prevExpaned => path.length !== prevExpaned.length ? parseLabelArrayToIdArray(path, labelToIdMap) : prevExpaned)
     // calculate the counts 
     if (Array.isArray(facetValues)){
       setCountMap(new Map()); // initialize counts 
