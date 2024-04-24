@@ -159,15 +159,15 @@ class HierarchyFacet extends React.Component{
                     </span>) : null}
                     {label}
                 </h5>
-            </header>
-            {expanded ?
-             (  <>
                 <div className="switch">
                     <Switch 
                         checked={this.checkExpand(label)}
                         onClick={()=>this.handleHierarchyExpand(label)} 
                     /> <h6>Select Children</h6>
                 </div>
+            </header>
+            {expanded ?
+             (  <>
                 <CustomizedTreeView 
                     label={label}
                     value={value}
