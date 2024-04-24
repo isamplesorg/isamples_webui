@@ -9,7 +9,7 @@
     "@emotion/styled": "^11.9.3",
     "@mui/icons-material": "^5.8.4",
     "@mui/material": "^5.9.0",
-    "@mui/x-tree-view": "^7.0.0",
+    "@mui/x-tree-view": "7.1.0",
     "cesium": "^1.111.0",
     "chroma-js": "^2.4.2",
     "classnames": "^2.3.1",
