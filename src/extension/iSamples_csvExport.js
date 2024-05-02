@@ -103,8 +103,6 @@ const CsvExport = (props) => {
           alert('Unauthorized, please login.');
         }
       })
-
-    
   }
 
   useEffect(() => {
@@ -157,6 +155,8 @@ const CsvExport = (props) => {
             onChange={handleChange}
             value={formInfo["rows"] || MAX_ROWS} />
         </div>
+        <div> q : {solrQuery.getQFQSolrQueryParamValues(store.getState()['query']).q} </div>
+        <div> fq : {solrQuery.getQFQSolrQueryParamValues(store.getState()['query']).fq} </div>
         <span><span className="glyphicon glyphicon-info-sign"></span> &nbsp; Record limit: 100000</span>
         <div className="loadingExport" style={{ display: isLoading ? 'block' : "none" }}>
           <div className="loadingTrack bg-primary"></div>
