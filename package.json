@@ -42,7 +42,7 @@
     "localdev": "scripts/localdev.sh",
     "predeploy": "npm run build",
     "deploy": "gh-pages -a -d build",
-    "postinstall": "npm update && npm install solr-faceted-search-react"
+    "postinstall": "npm install solr-faceted-search-react"
   },
   "eslintConfig": {
     "extends": [
