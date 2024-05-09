@@ -14,6 +14,7 @@ import { pointStream } from 'components/cesium_map/api/server';
 import { colorbind, source } from 'fields';
 import { wellFormatField } from 'components/utilities';
 import { H3GridManager } from "components/cesium_map/cesiumh3";
+import { store } from "redux/store";
 
 const MAXIMUM_ZOOM_DISTANCE = 20000000;
 const MINIMUM_ZOOM_DISTANCE = 10;
@@ -292,8 +293,9 @@ export class ISamplesSpatial {
           this.viewer.selectedEntity = undefined; // close the info box
         }
       })
-      this.gridder = false; // save the grid manager
+      this.gridder = null; // save the grid manager
       this.gridTrackerListener = null;
+      this.prevNumFound = store.getState()['results']['numFound']; // first num of points found 
     } catch(error){
       console.log(error);
     }
@@ -641,17 +643,21 @@ export class ISamplesSpatial {
   gridTracker(viewer, gridder){
     let scratchRectangle = new Cesium.Rectangle();
     let rect = viewer.camera.computeViewRectangle(viewer.scene.globe.ellipsoid, scratchRectangle);
-    if (this.r2str(rect) === this.gridder.global_grid.rect_str){
+    let resultCntChanged = this.prevNumFound !== store.getState()['results']['numFound'];
+    if (this.r2str(rect) === this.gridder.global_grid.rect_str && !resultCntChanged){ // when same boundary and count did not change
       return; // no need to update 
     }
-    gridder.update(viewer, rect);
+    gridder.update(viewer, rect, resultCntChanged);
+    this.prevNumFound = store.getState()['results']['numFound'];
   }
 
   async addGrid() {
       // Add Cesium OSM Buildings, a global 3D buildings layer.
       let buildings = await Cesium.createOsmBuildingsAsync();
       this.viewer.scene.primitives.add(buildings);
-      this.gridder = new H3GridManager();
+      if (this.gridder === null) { // if not initialized
+       this.gridder = new H3GridManager();
+      }
       const viewer = this.viewer;
       this.gridTracker(viewer, this.gridder);
       // add event listener that is triggered on camera move end 

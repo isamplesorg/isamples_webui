@@ -599,6 +599,10 @@ class CesiumMap extends React.Component {
     clearBoundingBox(true);
     // update the point layer
     if (viewer !== null) {
+      // update grid
+      if (showGrid){
+        viewer.addGrid().catch((error)=>{console.log(error)})
+      }
       this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
       // update bounding box based on bbox
       const bb1 = JSON.stringify(nextProps.newBbox);
