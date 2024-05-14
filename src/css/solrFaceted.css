@@ -320,7 +320,7 @@ td {
   padding: 0 15px;
   max-height: 0;
   transition: all 0.2s ease-out;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .csv__choice.active {
