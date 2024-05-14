@@ -1,5 +1,7 @@
 import * as Cesium from 'cesium';
 import chroma from "chroma-js";
+import { solrQuery } from "solr-faceted-search-react";
+import { store } from "redux/store";
 
 const GLOBAL_RECT1 = "-180,90,180,-90";
 const GLOBAL_RECT2 = "-180,-90,180,90";
@@ -53,6 +55,9 @@ export class H3Grid {
         }
         this.rect_str = rstr;
         this.loading = true;
+        // read q and fq solr query param values
+        let qArray = solrQuery.getQFQSolrQueryParamValues(store.getState()['query']).q.split(",")
+        let fqArray = solrQuery.getQFQSolrQueryParamValues(store.getState()['query']).fq.split(",")
         let url = new URL(this._service + "/");
         if (this.rect_str === GLOBAL_RECT1 || this.rect_str === GLOBAL_RECT2) { 
             url.searchParams.set('resolution', 1); // globe view resolution value should be small
@@ -60,6 +65,10 @@ export class H3Grid {
             url.searchParams.set('bb', this.rect_str);
             url.searchParams.set('resolution', 5);
         }
+        // convert it to q query param values
+        let queryArray = [...qArray, ...fqArray];
+        let combinedQuery = queryArray.join(' AND ');
+        url.searchParams.set('q', combinedQuery);
         url = decodeURIComponent(url);
         const options = {
             clampToGround: true,
@@ -94,10 +103,10 @@ export class H3GridManager {
         this.old_grid_rstr = "";
     }
 
-    update(cview, rect) {
+    update(cview, rect, resultCntChanged) {
         const rstr = r2str(rect);
         const existing = cview.dataSources.getByName(rstr);
-        if (existing.length > 0) {
+        if (existing.length > 0 && !resultCntChanged) {
             console.log(`Grid ${rstr} already in collection`);
             return;
         }
