@@ -34,6 +34,8 @@ const CsvExport = (props) => {
     .filter(word => word.length)
     .join("_")}.csv`;
 
+  const formattedQueryParam = solrQuery.getQFQSolrQueryParamValues(store.getState()['query']).fq.split(',').join(' AND ');
+  
   const fetchCsvResult = async () => {
     const { query } = store.getState();
     const queryString = solrQuery.solrQuery({
@@ -126,43 +128,15 @@ const CsvExport = (props) => {
           "pull-right": bootstrapCss,
           "btn-xs": bootstrapCss
         })}>
-        Export csv
+        Export
       </button>
-
-      <form className={"csv__choice" + (collapse ? " active" : "")} onSubmit={handleSubmit}>
-        <div>
-          <label>
-            Start:
-          </label>
-          <input
-            name="start"
-            type='number'
-            min={0}
-            max={store.getState()['results']['numFound']}
-            onChange={handleChange}
-            value={formInfo["start"]}
-          />
-        </div>
-        <div>
-          <label>
-            Rows:
-          </label>
-          <input
-            name="rows"
-            type='number'
-            min={0}
-            max={MAX_ROWS}
-            onChange={handleChange}
-            value={formInfo["rows"] || MAX_ROWS} />
-        </div>
-        <div> q : {solrQuery.getQFQSolrQueryParamValues(store.getState()['query']).q} </div>
-        <div> fq : {solrQuery.getQFQSolrQueryParamValues(store.getState()['query']).fq} </div>
-        <span><span className="glyphicon glyphicon-info-sign"></span> &nbsp; Record limit: 100000</span>
-        <div className="loadingExport" style={{ display: isLoading ? 'block' : "none" }}>
-          <div className="loadingTrack bg-primary"></div>
-        </div>
-        {downloadStatus}
-        <button type="submit" className="btn btn-default pull-right btn-xs">Download</button>
+      <form className={"csv__choice" + (collapse ? " active" : "")} >
+        <div>  <a href="https://github.com/isamplesorg/isamples_inabox/blob/develop/docs/export_service.md" target="_blank">query</a> : {formattedQueryParam} </div>
+        <button
+            className="btn btn-default"
+            onClick={() => navigator.clipboard.writeText("q=" + formattedQueryParam || "") }>
+            Copy query 
+        </button>
       </form>
 
       <CSVLink
