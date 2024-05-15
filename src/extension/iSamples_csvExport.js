@@ -34,7 +34,7 @@ const CsvExport = (props) => {
     .filter(word => word.length)
     .join("_")}.csv`;
 
-  const formattedQueryParam = solrQuery.getQFQSolrQueryParamValues(store.getState()['query']).fq.split(',').join(' AND ');
+  const formattedQueryParam = '"' + solrQuery.getQFQSolrQueryParamValues(store.getState()['query']).fq.split(',').join(' AND ') + '"';
   
   const fetchCsvResult = async () => {
     const { query } = store.getState();
@@ -134,7 +134,7 @@ const CsvExport = (props) => {
         <div>  <a href="https://github.com/isamplesorg/isamples_inabox/blob/develop/docs/export_service.md" target="_blank">query</a> : {formattedQueryParam} </div>
         <button
             className="btn btn-default"
-            onClick={() => navigator.clipboard.writeText("q=" + formattedQueryParam || "") }>
+            onClick={() => navigator.clipboard.writeText("-q " + formattedQueryParam || "") }>
             Copy query 
         </button>
       </form>
