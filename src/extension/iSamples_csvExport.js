@@ -8,10 +8,8 @@ const MAX_ROWS = 100000;
 
 const CsvExport = (props) => {
   const { bootstrapCss } = props;
-  const [isLoading, setIsLoading] = useState(false);
   const [collapse, setCollapse] = useState(false);
   const [downloadData, setDownloadData] = useState("");
-  const [downloadStatus, setDownloadStatus] = useState("");
   const [formInfo, setFormInfo] = useState({
     start: 0,
     rows: MAX_ROWS
@@ -36,75 +34,9 @@ const CsvExport = (props) => {
 
   const formattedQueryParam = '"' + solrQuery.getQFQSolrQueryParamValues(store.getState()['query']).fq.split(',').join(' AND ') + '"';
   
-  const fetchCsvResult = async () => {
-    const { query } = store.getState();
-    const queryString = solrQuery.solrQuery({
-      ...query,
-      rows: formInfo.rows,
-      start: formInfo.start
-    }, { wt: "csv" });
-    const API = `${query.url}?${queryString}`;
-
-    setIsLoading(true);
-
-    fetch(API).then(res => res.text()).then(res => {
-      setDownloadData(res);
-      setIsLoading(false);
-      setDownloadStatus("Download SuccessFul!")
-    },
-      err => {
-        setDownloadStatus("Download Failed!")
-      })
-  }
-
   const handleClick = () => {
     setCollapse(prev => !prev);
-    setDownloadStatus("");
     setFormInfo(prev => ({ ...prev, rows: MAX_ROWS }))
-  }
-
-  const handleChange = (e) => {
-    const id = e.target.getAttribute("name");
-    const { value } = e.target;
-
-    let newValue = +value;
-    if (+value > MAX_ROWS && id === 'rows') {
-      newValue = +MAX_ROWS;
-    }
-
-    if (id === 'start' && +value > store.getState()['results']['numFound']) {
-      newValue = +store.getState()['results']['numFound'];
-    }
-
-    setFormInfo(prev => ({ ...prev, [id]: newValue }))
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // check if user is authorized to download
-    let authorized = false; 
-    fetch(window.config.userinfo, {
-      'method': 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': undefined,
-      }
-    })
-      .then(res => res.json())
-      .then(res => {
-        if (res["id_token"] !== undefined){
-          authorized = true; 
-        }
-        return authorized;
-      })
-      .then((authorized) => {
-        if (authorized === true){
-          fetchCsvResult();
-        }
-        else {
-          alert('Unauthorized, please login.');
-        }
-      })
   }
 
   useEffect(() => {
