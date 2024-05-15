@@ -63,7 +63,7 @@ const CsvExport = (props) => {
         Export
       </button>
       <form className={"csv__choice" + (collapse ? " active" : "")} >
-        <div>  <a href="https://github.com/isamplesorg/isamples_inabox/blob/develop/docs/export_service.md" target="_blank">query</a> : {formattedQueryParam} </div>
+        <div>  <a href="https://github.com/isamplesorg/isamples_inabox/blob/develop/docs/export_service.md" target="_blank" rel="noopener noreferrer">query</a> : {formattedQueryParam} </div>
         <button
             className="btn btn-default"
             onClick={() => navigator.clipboard.writeText("-q " + formattedQueryParam || "") }>
