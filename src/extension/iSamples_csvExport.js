@@ -8,10 +8,8 @@ const MAX_ROWS = 100000;
 
 const CsvExport = (props) => {
   const { bootstrapCss } = props;
-  const [isLoading, setIsLoading] = useState(false);
   const [collapse, setCollapse] = useState(false);
   const [downloadData, setDownloadData] = useState("");
-  const [downloadStatus, setDownloadStatus] = useState("");
   const [formInfo, setFormInfo] = useState({
     start: 0,
     rows: MAX_ROWS
@@ -34,75 +32,11 @@ const CsvExport = (props) => {
     .filter(word => word.length)
     .join("_")}.csv`;
 
-  const fetchCsvResult = async () => {
-    const { query } = store.getState();
-    const queryString = solrQuery.solrQuery({
-      ...query,
-      rows: formInfo.rows,
-      start: formInfo.start
-    }, { wt: "csv" });
-    const API = `${query.url}?${queryString}`;
-
-    setIsLoading(true);
-
-    fetch(API).then(res => res.text()).then(res => {
-      setDownloadData(res);
-      setIsLoading(false);
-      setDownloadStatus("Download SuccessFul!")
-    },
-      err => {
-        setDownloadStatus("Download Failed!")
-      })
-  }
-
+  const formattedQueryParam = '"' + solrQuery.getQFQSolrQueryParamValues(store.getState()['query']).fq.split(',').join(' AND ') + '"';
+  
   const handleClick = () => {
     setCollapse(prev => !prev);
-    setDownloadStatus("");
     setFormInfo(prev => ({ ...prev, rows: MAX_ROWS }))
-  }
-
-  const handleChange = (e) => {
-    const id = e.target.getAttribute("name");
-    const { value } = e.target;
-
-    let newValue = +value;
-    if (+value > MAX_ROWS && id === 'rows') {
-      newValue = +MAX_ROWS;
-    }
-
-    if (id === 'start' && +value > store.getState()['results']['numFound']) {
-      newValue = +store.getState()['results']['numFound'];
-    }
-
-    setFormInfo(prev => ({ ...prev, [id]: newValue }))
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // check if user is authorized to download
-    let authorized = false; 
-    fetch(window.config.userinfo, {
-      'method': 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': undefined,
-      }
-    })
-      .then(res => res.json())
-      .then(res => {
-        if (res["id_token"] !== undefined){
-          authorized = true; 
-        }
-        return authorized;
-      })
-      .then((authorized) => {
-        if (authorized === true){
-          fetchCsvResult();
-        }
-        else {
-          alert('Unauthorized, please login.');
-        }
-      })
   }
 
   useEffect(() => {
@@ -126,43 +60,15 @@ const CsvExport = (props) => {
           "pull-right": bootstrapCss,
           "btn-xs": bootstrapCss
         })}>
-        Export csv
+        Export
       </button>
-
-      <form className={"csv__choice" + (collapse ? " active" : "")} onSubmit={handleSubmit}>
-        <div>
-          <label>
-            Start:
-          </label>
-          <input
-            name="start"
-            type='number'
-            min={0}
-            max={store.getState()['results']['numFound']}
-            onChange={handleChange}
-            value={formInfo["start"]}
-          />
-        </div>
-        <div>
-          <label>
-            Rows:
-          </label>
-          <input
-            name="rows"
-            type='number'
-            min={0}
-            max={MAX_ROWS}
-            onChange={handleChange}
-            value={formInfo["rows"] || MAX_ROWS} />
-        </div>
-        <div> q : {solrQuery.getQFQSolrQueryParamValues(store.getState()['query']).q} </div>
-        <div> fq : {solrQuery.getQFQSolrQueryParamValues(store.getState()['query']).fq} </div>
-        <span><span className="glyphicon glyphicon-info-sign"></span> &nbsp; Record limit: 100000</span>
-        <div className="loadingExport" style={{ display: isLoading ? 'block' : "none" }}>
-          <div className="loadingTrack bg-primary"></div>
-        </div>
-        {downloadStatus}
-        <button type="submit" className="btn btn-default pull-right btn-xs">Download</button>
+      <form className={"csv__choice" + (collapse ? " active" : "")} >
+        <div>  <a href="https://github.com/isamplesorg/isamples_inabox/blob/develop/docs/export_service.md" target="_blank" rel="noopener noreferrer">query</a> : {formattedQueryParam} </div>
+        <button
+            className="btn btn-default"
+            onClick={() => navigator.clipboard.writeText("-q " + formattedQueryParam || "") }>
+            Copy query 
+        </button>
       </form>
 
       <CSVLink
