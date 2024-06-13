@@ -36,7 +36,6 @@ export function ResultWrapper(props) {
     } else {
       return parse(text)  
     }
-    return alert("complies with value is " + text)
   } else {
     return parse(text)
   }
