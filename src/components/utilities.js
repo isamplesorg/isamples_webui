@@ -32,7 +32,7 @@ export function ResultWrapper(props) {
     if (text.startsWith(LOCALCONTEXTS_PREFIX)) {
       const project_id = text.substring(LOCALCONTEXTS_PREFIX.length)
       const link_target = "https://localcontextshub.org/projects/" + project_id
-      return <a href={link_target} target="_blank" >Local Contexts Page</a>
+      return <a href={link_target} target="_blank" rel="noopener noreferrer">Local Contexts Page</a>
     } else {
       return parse(text)  
     }
