@@ -1,6 +1,9 @@
 // The utilities files to store functions that would be used in mutiple components.
 import parse from 'html-react-parser'
 
+
+const LOCALCONTEXTS_PREFIX = "localcontexts:projects/"
+
 // functional components to highlight search text and covert indentifers to the links
 // same function from iSamples_results.js
 export function ResultWrapper(props) {
@@ -23,8 +26,19 @@ export function ResultWrapper(props) {
       return text;
     })
   }
-
-  return field.field === 'id' ? <a href={window.config.original_source + "/" + value} target="_blank" rel="noopener noreferrer">{parse(text)}</a> : parse(text)
+  if (field.field === "id") {
+    return <a href={window.config.original_source + "/" + value} target="_blank" rel="noopener noreferrer">{parse(text)}</a>
+  } else if (field.field === "compliesWith") {
+    if (text.startsWith(LOCALCONTEXTS_PREFIX)) {
+      const project_id = text.substring(LOCALCONTEXTS_PREFIX.length)
+      const link_target = "https://localcontextshub.org/projects/" + project_id
+      return <a href={link_target} target="_blank" rel="noopener noreferrer">Local Contexts Page</a>
+    } else {
+      return parse(text)  
+    }
+  } else {
+    return parse(text)
+  }
 }
 
 // default function to convert field names to well format one
