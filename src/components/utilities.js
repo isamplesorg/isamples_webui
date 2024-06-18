@@ -27,7 +27,7 @@ export function ResultWrapper(props) {
     })
   }
   if (field.field === "id") {
-    return <a href={window.config.original_source + "/" + value} target="_blank" rel="noopener noreferrer">{parse(text)}</a>
+    return <a href={window.config.thingpage + "/" + parse(text)} target="_blank" rel="noopener noreferrer">{parse(text)}</a>
   } else if (field.field === "compliesWith") {
     if (text.startsWith(LOCALCONTEXTS_PREFIX)) {
       const project_id = text.substring(LOCALCONTEXTS_PREFIX.length)
