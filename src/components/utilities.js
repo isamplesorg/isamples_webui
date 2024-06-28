@@ -27,7 +27,7 @@ export function ResultWrapper(props) {
     })
   }
   if (field.field === "id") {
-    const link_target = window.config.thingpage + "/" + parse(text)
+    const link_target = window.config.thingpage + "/" + value
     const link_text = parse(text)
     return <a href={link_target} target="_blank" rel="noopener noreferrer">{link_text}</a>
   } else if (field.field === "compliesWith") {
