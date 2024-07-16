@@ -61,16 +61,16 @@ let setPrimitive = null;
 let oboePrimitive = null;
 
 // initial display is false - do not render points
-let display = false; 
-let currNumPoints = 0 ;
-let exceedMaxPoints = false; 
+let display = false;
+let currNumPoints = 0;
+let exceedMaxPoints = false;
 // flag to indicate whether it is grid point view
 let showGrid = true; // default grid view
 let isPointCheckBoxSelected = false;
 let isGridCheckBoxSelected = true; // default grid checkbox : true  
 
 // storing previous viewpoints
-let viewpoints = new Map(JSON.parse(window.localStorage.getItem('previousView'))) ;
+let viewpoints = new Map(JSON.parse(window.localStorage.getItem('previousView')));
 
 // initializa a cookie instance
 const cookies = new Cookies();
@@ -121,7 +121,9 @@ const clearBoundingBox = (updated = false) => {
  */
 const selectedBoxCallbox = async (bb, updated = false) => {
   let text = `Record count : ${await countRecordsInBB(bb)}`;
-  viewer.removeEntity(bbox);
+  if (bbox) {
+    viewer.removeEntity(bbox);
+  }
   bbox = viewer.addRectangle(bb, text);
 
   bboxLoc = bb.toDegrees()
@@ -154,7 +156,7 @@ class CesiumMap extends React.Component {
 
   constructor() {
     super()
-     this.alert = (
+    this.alert = (
       <>
         <div className="cesium-notifyBox">Max points exceeded, stopped rendering points...</div>
       </>
@@ -165,8 +167,8 @@ class CesiumMap extends React.Component {
    * Return a drop down with checkbox selection as input 
    */
   generateDropdown = (isPointCheckBoxSelected, isGridCheckBoxSelected) => {
-    let pointCheckBoxElement = isPointCheckBoxSelected ? <input type="checkbox" id="display" onChange={this.handleChange} checked/> : <input type="checkbox" id="display" onChange={this.handleChange}/>
-    let gridCheckBoxElement = isGridCheckBoxSelected ? <input type="checkbox" id="display" onChange={this.handleGrid} checked/> : <input type="checkbox" id="display" onChange={this.handleGrid}/>  
+    let pointCheckBoxElement = isPointCheckBoxSelected ? <input type="checkbox" id="display" onChange={this.handleChange} checked /> : <input type="checkbox" id="display" onChange={this.handleChange} />
+    let gridCheckBoxElement = isGridCheckBoxSelected ? <input type="checkbox" id="display" onChange={this.handleGrid} checked /> : <input type="checkbox" id="display" onChange={this.handleGrid} />
     let dropdown =
       <>
         <div id="viewerChange" className="Cesium-popBox">
@@ -199,7 +201,7 @@ class CesiumMap extends React.Component {
         <div><button className="cesium-visit-button cesium-button" onClick={this.toggle}>Viewer Change</button></div>
         <p className="cesium-checkbox"> {pointCheckBoxElement} <label for="display">Display Points </label> &nbsp; {gridCheckBoxElement} <label for="display">Display Grid </label></p>
       </>;
-      return dropdown; 
+    return dropdown;
   }
 
   deleteItem(locationName) {
@@ -211,16 +213,16 @@ class CesiumMap extends React.Component {
         listItem.parentNode.removeChild(listItem);
         // also delete from localstorage
         viewpoints.delete(locationName);
-        window.localStorage.setItem("previousView", JSON.stringify(Array.from(viewpoints.entries()))); 
+        window.localStorage.setItem("previousView", JSON.stringify(Array.from(viewpoints.entries())));
       }
     });
   }
 
-  
+
   // generate a list of previous views based on localStorage object 
   generateLocationTable = () => {
     let container = document.getElementById('container');
-    if (viewpoints !== undefined && viewpoints !== null && viewpoints.size > 0){
+    if (viewpoints !== undefined && viewpoints !== null && viewpoints.size > 0) {
       container.innerHTML = "Previous visited locations<br/>";
       viewpoints.forEach((cameraState, locationName) => {
         const listItem = document.createElement('div');
@@ -230,7 +232,7 @@ class CesiumMap extends React.Component {
         locNameButton.className = 'locationNameButton';
         locNameButton.textContent = locationName;
         locNameButton.onclick = () => this.visitLocation(new SpatialView(cameraState["longitude"], cameraState["latitude"], cameraState["height"], cameraState["heading"], cameraState["pitch"]));
-    
+
         const deleteButton = document.createElement('button');
         deleteButton.className = 'btn btn-danger btn-xsm deleteButton';
         deleteButton.textContent = 'Delete';
@@ -261,12 +263,15 @@ class CesiumMap extends React.Component {
  * @param {*} latitude
  * @param {*} longitude
  */
-  updatePrimitive = async(latitude, longitude) => {
+  updatePrimitive = async (latitude, longitude) => {
     cameraLat = latitude;
     cameraLong = longitude;
-    if (!display){
+    if (!display) {
       this.dropdown = this.generateDropdown(isPointCheckBoxSelected, isGridCheckBoxSelected);
-      render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
+      const ele = document.querySelector("div.cesium-viewer-bottom")
+      if (ele) {
+        render(this.dropdown, ele);
+      }
       return;
     }
     if (setPrimitive) {
@@ -278,30 +283,30 @@ class CesiumMap extends React.Component {
     // calculate number of points of entire bounding box 
     let entire_bbox = viewer.currentBounds;
     currNumPoints = await countRecordsInBB(entire_bbox);
-    if (currNumPoints > MAXIMUM_NUMBER_OF_POINTS){
+    if (currNumPoints > MAXIMUM_NUMBER_OF_POINTS) {
       // do not load points 
-      exceedMaxPoints = true; 
+      exceedMaxPoints = true;
       // render alert message to the toolbar if it is not already rendered
       const toolbar = document.querySelector("div.cesium-viewer-toolbar");
       const prevInfoBox = document.getElementById("maxPointBox");
       if (prevInfoBox === null) {
         // create 
         const infoBox = document.createElement("span");
-        infoBox.id = "maxPoint-infoBox"; 
+        infoBox.id = "maxPoint-infoBox";
         toolbar?.prepend(infoBox);
         render(<div id="maxPointBox">Max points exceeded, point rendering stopped...</div>, infoBox);
       }
       // display grid view instead of rendering empty screen 
       showGrid = true;
       isGridCheckBoxSelected = true; // automatically selected 
-      if (setPrimitive){
-        this.dropdown = this.generateDropdown(isPointCheckBoxSelected, isGridCheckBoxSelected); 
-        render(this.dropdown, document.querySelector("div.cesium-viewer-bottom")); // re-render the checkbox so grid checkbox is selected 
-        viewer.addGrid().catch((error)=>{console.log(error)})
+      if (setPrimitive) {
+        this.dropdown = this.generateDropdown(isPointCheckBoxSelected, isGridCheckBoxSelected);
+        //render(this.dropdown, document.querySelector("div.cesium-viewer-bottom")); // re-render the checkbox so grid checkbox is selected 
+        //viewer.addGrid().catch((error)=>{console.log(error)})
       }
     }
-    else{ 
-      exceedMaxPoints = false; 
+    else {
+      exceedMaxPoints = false;
       // remove the alert box from map if exists 
       const infoBox = document.getElementById("maxPoint-infoBox");
       if (infoBox !== null) {
@@ -334,7 +339,7 @@ class CesiumMap extends React.Component {
       this.props.setCamera({ facet: "Map", ...location.viewDict });
     }
     // force an update of primitives whenever visiting location 
-    this.updatePrimitive(location.latitude, location.longitude); 
+    this.updatePrimitive(location.latitude, location.longitude);
   };
 
   /**
@@ -366,15 +371,15 @@ class CesiumMap extends React.Component {
     // turn on showing the grid option
     showGrid = e.target.checked;
     // update the state so the map can re-render
-    if (showGrid && setPrimitive){
-      viewer.addGrid().catch((error)=>{console.log(error)})
+    if (showGrid && setPrimitive) {
+      viewer.addGrid().catch((error) => { console.log(error) })
     }
     else {
       viewer.removeGrid();
-      showGrid = false; 
-      isGridCheckBoxSelected = false; 
+      showGrid = false;
+      isGridCheckBoxSelected = false;
       // re-render the grid checkbox as it is not rendered anymore 
-      this.dropdown = this.generateDropdown(isPointCheckBoxSelected, isGridCheckBoxSelected); 
+      this.dropdown = this.generateDropdown(isPointCheckBoxSelected, isGridCheckBoxSelected);
       render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
     }
   }
@@ -416,12 +421,12 @@ class CesiumMap extends React.Component {
    */
   handleChange = (e) => {
     display = e.target.checked;
-    if (!e.target.checked){
+    if (!e.target.checked) {
       setPrimitive.clear();  // clear all points
       setPrimitive.disableDisplay(); // disable display
     }
-    else{
-      setPrimitive.enableDisplay(); 
+    else {
+      setPrimitive.enableDisplay();
       // fetch back all points 
       this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
     }
@@ -433,7 +438,7 @@ class CesiumMap extends React.Component {
    * and when zoom out, checks if we need to stop rendering the points 
    * @param {*} spatial 
    */
-  enableZoomTracking(spatial){
+  enableZoomTracking(spatial) {
     const camera = spatial.camera;
 
     const scratchCartesian1 = new Cesium.Cartesian3();
@@ -442,21 +447,21 @@ class CesiumMap extends React.Component {
     let startPos, endPos;
 
     camera.moveStart.addEventListener((e) => {
-        startPos = camera.positionWC.clone(scratchCartesian1);
+      startPos = camera.positionWC.clone(scratchCartesian1);
 
     });
 
-    camera.moveEnd.addEventListener( (e) => {
-        endPos = camera.positionWC.clone(scratchCartesian2);
+    camera.moveEnd.addEventListener((e) => {
+      endPos = camera.positionWC.clone(scratchCartesian2);
 
-        const startHeight = Cesium.Cartographic.fromCartesian(startPos).height;
-        const endHeight = Cesium.Cartographic.fromCartesian(endPos).height;
+      const startHeight = Cesium.Cartographic.fromCartesian(startPos).height;
+      const endHeight = Cesium.Cartographic.fromCartesian(endPos).height;
 
-        if (startHeight > endHeight && exceedMaxPoints) {
-            this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude)
-        } else if (startHeight < endHeight && !exceedMaxPoints) {
-            this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude)
-        }
+      if (startHeight > endHeight && exceedMaxPoints) {
+        this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude)
+      } else if (startHeight < endHeight && !exceedMaxPoints) {
+        this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude)
+      }
     });
   }
 
@@ -471,7 +476,7 @@ class CesiumMap extends React.Component {
       searchFields = searchParams.get('searchFields');
     }
     else {
-       if (cookies.get('previousParams')) {
+      if (cookies.get('previousParams')) {
         searchFields = cookies.get('previousParams')['searchFields'];
       }
     }
@@ -481,8 +486,8 @@ class CesiumMap extends React.Component {
 
   generateKey = (dictionary) => {
     let dictKey = '';
-    for (let [key, value] of Object.entries(dictionary)){
-      dictKey += key + ":" + value; 
+    for (let [key, value] of Object.entries(dictionary)) {
+      dictKey += key + ":" + value;
     }
     return dictKey;
   }
@@ -493,7 +498,7 @@ class CesiumMap extends React.Component {
   storeCurrentView = (viewer) => {
     //let key = this.generateKey(viewer.currentView); // TODO : receive user input for key 
     const key = document.getElementById("locNameInput");
-    if (viewpoints !== null  && key!== null && key.value !== null && key.value !== "") {
+    if (viewpoints !== null && key !== null && key.value !== null && key.value !== "") {
       viewpoints.set(key.value, viewer.currentView); // update map 
       // add to local storage
       window.localStorage.setItem("previousView", JSON.stringify(Array.from(viewpoints.entries())));
@@ -513,16 +518,16 @@ class CesiumMap extends React.Component {
       mapInfo.heading,
       mapInfo.pitch);
     viewer = await ISamplesSpatial.create("cesiumContainer", initialPosition);
-    if (viewer !== null){
+    if (viewer !== null) {
       // remove the Ceisum information with custom button group
       render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
       this.generateLocationTable();
       viewer.addHud("cesiumContainer");
-      viewer.trackMouseCoordinates(showCoordinates);
+      //viewer.trackMouseCoordinates(showCoordinates);
       viewer.enableTracking(api, (bb) => selectedBoxCallbox(bb, true));
       setPrimitive = new PointStreamPrimitiveCollection(viewer.terrain, display);
       viewer.addPointPrimitives(setPrimitive);
-      viewer.addGrid().catch((error)=>{console.log(error)}) // default view : grid 
+      viewer.addGrid().catch((error) => { console.log(error) }) // default view : grid 
       searchFields = this.getCurrSearchFields(); // use saved params to get current facet
       onChange = onSetFields;
 
@@ -547,7 +552,7 @@ class CesiumMap extends React.Component {
       };
       // set time interval to check the current view every 10 seconds and update points
       this.checkPosition = setInterval(() => {
-        if (!display) return ; 
+        if (!display) return;
         if (typeof setPrimitive.farthest === 'undefined' || typeof viewer.currentView.latitude !== 'undefined' || typeof viewer.currentView.longitude !== 'undefined') return;
         const loading = document.getElementById("loading").style.display;
         const diffDistanceMove = distanceInKm(
@@ -555,7 +560,7 @@ class CesiumMap extends React.Component {
           cameraLong,
           viewer.currentView.latitude,
           viewer.currentView.longitude);
-        
+
         const diffDistanceFarthest = distanceInKm(
           setPrimitive.farthest.y,
           setPrimitive.farthest.x,
@@ -570,7 +575,7 @@ class CesiumMap extends React.Component {
           clearBoundingBox(true);
           this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
           // update camera position to the url
-          if (typeof viewer.currentView.latitude !== 'undefined' || typeof viewer.currentView.longitude !== 'undefined'){
+          if (typeof viewer.currentView.latitude !== 'undefined' || typeof viewer.currentView.longitude !== 'undefined') {
             setCamera({ facet: "Map", ...viewer.currentView.viewDict });
           }
         };
@@ -578,11 +583,11 @@ class CesiumMap extends React.Component {
 
       // store the users' viewpoint
       this.viewpoint = setInterval(() => {
-        if (!display) return; 
+        if (!display) return;
         const loading = document.getElementById("loading").style.display;
         if (loading && JSON.stringify(viewer.currentView.viewDict) !== JSON.stringify(preView)) {
           preView = viewer.currentView.viewDict;
-          if (typeof viewer.currentView.latitude !== 'undefined' && typeof viewer.currentView.longitude !== 'undefined'){
+          if (typeof viewer.currentView.latitude !== 'undefined' && typeof viewer.currentView.longitude !== 'undefined') {
             setCamera({ facet: "Map", ...viewer.currentView.viewDict });
           }
         }
@@ -600,8 +605,8 @@ class CesiumMap extends React.Component {
     // update the point layer
     if (viewer !== null) {
       // update grid
-      if (showGrid){
-        viewer.addGrid().catch((error)=>{console.log(error)})
+      if (showGrid) {
+        viewer.addGrid().catch((error) => { console.log(error) })
       }
       this.updatePrimitive(viewer.currentView.latitude, viewer.currentView.longitude);
       // update bounding box based on bbox
@@ -633,6 +638,7 @@ class CesiumMap extends React.Component {
   }
 
   render() {
+    console.log("cesium_UI.render");
     return (
       <div id="cesiumContainer"></div>
     );
