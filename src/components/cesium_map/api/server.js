@@ -19,6 +19,7 @@ export class ISamplesAPI {
    * @returns
    */
   async _fetchPromise(url, method = "GET") {
+    console.log(`_fetchPromise ${url}`);
     return (await fetch(url, {
       method: method,
       headers: this.headers

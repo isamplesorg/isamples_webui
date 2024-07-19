@@ -39,7 +39,8 @@ function v2color(v) {
     return COLORS[idx].withAlpha(0.5);
 }
 
-
+//TODO: Turn this into a Cesium DataSource derived class. 
+// See for example https://sandcastle.cesium.com/?src=Custom%20DataSource.html&label=DataSources
 export class H3Grid {
     constructor() {
         this._service = window.config.h3_count
@@ -56,9 +57,11 @@ export class H3Grid {
         this.rect_str = rstr;
         this.loading = true;
         // read q and fq solr query param values
-        let qArray = solrQuery.getQFQSolrQueryParamValues(store.getState()['query']).q.split(",")
-        let fqArray = solrQuery.getQFQSolrQueryParamValues(store.getState()['query']).fq.split(",")
+        const queryState = store.getState()['query'];
+        let qArray = solrQuery.getQFQSolrQueryParamValues(queryState).q.split(",")
+        let fqArray = solrQuery.getQFQSolrQueryParamValues(queryState).fq.split(",")
         let url = new URL(this._service + "/");
+        //TODO: Make resolution a function of view bounding box and camera elevation.
         if (this.rect_str === GLOBAL_RECT1 || this.rect_str === GLOBAL_RECT2) { 
             url.searchParams.set('resolution', 1); // globe view resolution value should be small
         } else {
@@ -68,6 +71,7 @@ export class H3Grid {
         // convert it to q query param values
         let queryArray = [...qArray, ...fqArray];
         let combinedQuery = queryArray.join(' AND ');
+        console.log(`H3Grid.load rstr = ${rstr}  combinedQuery = ${combinedQuery}`);
         url.searchParams.set('q', combinedQuery);
         url = decodeURIComponent(url);
         const options = {
@@ -105,6 +109,7 @@ export class H3GridManager {
 
     update(cview, rect, resultCntChanged) {
         const rstr = r2str(rect);
+        console.log(`H3GridManager.update rstr=${rstr} resultCntChanged=${resultCntChanged}`);
         const existing = cview.dataSources.getByName(rstr);
         if (existing.length > 0 && !resultCntChanged) {
             console.log(`Grid ${rstr} already in collection`);

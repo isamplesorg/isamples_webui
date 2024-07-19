@@ -9,7 +9,6 @@
 */
 
 import * as Cesium from 'cesium';
-import { html, render } from "lit";
 import { pointStream } from 'components/cesium_map/api/server';
 import { colorbind, source } from 'fields';
 import { wellFormatField } from 'components/utilities';
@@ -140,7 +139,7 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
 
   get farthest() {
     return this.lastPos;
-  }
+  } 
 
   enableDisplay(){
     this.display = true; 
@@ -156,7 +155,9 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
     let locations = {};
     // display loading page
     this.loading = document.getElementById("loading");
-    this.loading.style.removeProperty("display");
+    if (this.loading) {
+      this.loading.style.removeProperty("display");
+    }
     this.collection = [];
     this.lastPos = {};
 
@@ -168,9 +169,11 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
       (doc) => {
         // Handle the data records, e.g. response.docs[0].doc
         if (doc.hasOwnProperty('x')) {
-          if (!this.loading.style.display) {
-            // remove loading spinner
-            this.loading.style.display = "none";
+          if (this.loading) {
+            if (!this.loading.style.display) {
+              // remove loading spinner
+              this.loading.style.display = "none";
+            }
           }
           let location = doc.x.toString() + ":" + doc.y.toString();
           if (location in locations) {
@@ -210,111 +213,119 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
 export class ISamplesSpatial {
 
 
-  constructor() {
-    console.log("initialized isamples spatial");
+  constructor(element) {
+    console.log("ISampleSpatial.constructor");
+    this.tracking_info = {
+      color: Cesium.Color.BLUE,
+      width: 10,
+      tracking: false,
+      polyline: null,
+      positions: [],
+    };
+    this.viewer = null;
+    this.handler = null;
+    this.mouseCoordinateCallback = null;
+    this.selectBoxCallback = null;
+    this.selectedBox = null;
+    // record the last interactive point primitive
+    this.pointprimitive = null;
+    this.gridder = null; 
+    this.gridTrackerListener = null;
+    this.prevNumFound = 0;
+
+    this.viewer = new Cesium.Viewer(element, {
+      timeline: false,
+      animation: false,
+      sceneModePicker: false,
+      terrain: Cesium.Terrain.fromWorldTerrain(),
+      fullscreenElement: element
+    });
+    // limit the map max height
+    // 20000000 is the maxium zoom distance so the users wouldn't zoom too far way from earth
+    // 10 the minimum height for the points so the users wouldn't zoom to the ground.
+    this.viewer.scene.screenSpaceCameraController.maximumZoomDistance = MAXIMUM_ZOOM_DISTANCE;
+    this.viewer.scene.screenSpaceCameraController.minimumZoomDistance = MINIMUM_ZOOM_DISTANCE;
+    // we need to enable allow-scripts to open link in the iframe
+    // but this might not be a safe way if we don't trust the link source
+    this.viewer.infoBox.frame.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms');
+    this.viewer.infoBox.frame.removeAttribute("src");
+
+    this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
+    this.viewer.scene.globe.depthTestAgainstTerrain = true;
+
+    // entity label for point primitive identifier
+    this.pointLabel = this.viewer.entities.add({
+      label: {
+        show: false,
+        showBackground: true,
+        font: "14px monospace",
+        horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
+        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+        pixelOffset: new Cesium.Cartesian2(15, 0),
+        // this attribute will prevent this entity clipped by the terrain
+        disableDepthTestDistance: Number.POSITIVE_INFINITY,
+      },
+    });
+
+    // entity for infoBox
+    this.selectedPoints = this.viewer.entities.add({
+      point: {
+        show: false
+      }
+    });
+    // enable esc key support for closing the info box
+    document.addEventListener("keydown", ({key}) =>{
+      if (key === "Escape"){
+        this.viewer.selectedEntity = undefined; // close the info box
+      }
+    })
+  }
+
+  destroy() {
+    this.viewer && this.viewer.destroy();
+  }
+
+
+  static async create(element, initialLocation) {
+    const spatial = new ISamplesSpatial(element);
+    await spatial.init(initialLocation);
+    return spatial;
   }
 
   /**
    * Create a new viewer
    * @param element Element or elementId
    */
-  async init(element, initialLocation){
+  async init(initialLocation){
     /**
      * Call the async methods that are required for building the viewer.
-     * CesiumJS API readyPromise pattern originally allowed to work with the Viewer once it is finished initialized and fully loaded. Now this is changed to using an async/await pattern.
+     * CesiumJS API readyPromise pattern originally allowed to work with the Viewer 
+     * once it is finished initialized and fully loaded. Now this is changed to using 
+     * an async/await pattern.
      */
     try {
-      this.worldTerrain = await Cesium.createWorldTerrainAsync();
+        //this.worldTerrain = await Cesium.createWorldTerrainAsync();
       this.osmBuildingsTileset = await Cesium.createOsmBuildingsAsync();
-      this.tracking_info = {
-        color: Cesium.Color.BLUE,
-        width: 10,
-        tracking: false,
-        polyline: null,
-        positions: [],
-      };
-      this.viewer = new Cesium.Viewer(element, {
-        timeline: false,
-        animation: false,
-        sceneModePicker: false,
-        terrainProvider: this.worldTerrain,
-        fullscreenElement: element
-      });
       this.viewer.scene.primitives.add(this.osmBuildingsTileset);
-      this.viewer.scene.terrainProvider = this.worldTerrain;
-      
-      // limit the map max height
-      // 20000000 is the maxium zoom distance so the users wouldn't zoom too far way from earth
-      // 10 the minimum height for the points so the users wouldn't zoom to the ground.
-      this.viewer.scene.screenSpaceCameraController.maximumZoomDistance = MAXIMUM_ZOOM_DISTANCE;
-      this.viewer.scene.screenSpaceCameraController.minimumZoomDistance = MINIMUM_ZOOM_DISTANCE;
+
       // set camera inital position
       if (initialLocation) {
         this.viewer.camera.setView(initialLocation.getView);
       }
-      this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
-      this.viewer.scene.globe.depthTestAgainstTerrain = true;
-      this.mouseCoordinateCallback = null;
-      this.selectBoxCallback = null;
-      this.selectedBox = null;
-
-      // entity label for point primitive identifier
-      this.pointLabel = this.viewer.entities.add({
-        label: {
-          show: false,
-          showBackground: true,
-          font: "14px monospace",
-          horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
-          verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-          pixelOffset: new Cesium.Cartesian2(15, 0),
-          // this attribute will prevent this entity clipped by the terrain
-          disableDepthTestDistance: Number.POSITIVE_INFINITY,
-        },
-      });
-
-      // entity for infoBox
-      this.selectedPoints = this.viewer.entities.add({
-        point: {
-          show: false
-        }
-      })
-
-      // record the last interactive point primitive
-      this.pointprimitive = null;
-
-      // we need to enable allow-scripts to open link in the iframe
-      // but this might not be a safe way if we don't trust the link source
-      this.viewer.infoBox.frame.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms');
-      this.viewer.infoBox.frame.removeAttribute("src");
       
-      // enable esc key support for closing the info box
-      document.addEventListener("keydown", ({key}) =>{
-        if (key === "Escape"){
-          this.viewer.selectedEntity = undefined; // close the info box
-        }
-      })
-      this.gridder = null; // save the grid manager
-      this.gridTrackerListener = null;
       this.prevNumFound = store.getState()['results']['numFound']; // first num of points found 
     } catch(error){
       console.log(error);
     }
   }
-
-  static async create(element, initialLocation) {
-    const spatial = new ISamplesSpatial();
-    await spatial.init(element, initialLocation);
-    return spatial;
-  }
-
-
   
   get canvas() {
     return this.viewer.canvas;
   }
 
   get terrain() {
-    return this.worldTerrain;
+    //return this.worldTerrain;
+    return this.viewer.terrainProvider;
   }
 
   get camera(){
@@ -384,7 +395,7 @@ export class ISamplesSpatial {
   /**
    * Get the bounding rectangle of the current view.
    *
-   * Values are in decimal degrees. Note that when zoomed out the bounds
+   * Values are in decimal degrees. Note that if the horizon is visible the bounds
    * will generally be the entire world.
    *
    * @returns {{min_lon: (Number|*), max_lat: (Number|*), max_lon: (Number|*), min_lat: (Number|*)}}
@@ -447,7 +458,8 @@ export class ISamplesSpatial {
    */
   async PrimitiveInfo(api, movement) {
     const selectPoint = this.viewer.scene.pick(movement.position);
-    if (Cesium.defined(selectPoint) && selectPoint.hasOwnProperty("primitive")) {
+    if (Cesium.defined(selectPoint) && selectPoint.hasOwnProperty("primitive") && (selectPoint.primitive instanceof Cesium.PointPrimitive)) {
+      console.log(`primitiveInfo ${selectPoint.id}`);
       this.textToClipboard(`"${selectPoint.id}"`);
       const info = await api.recordInformation(selectPoint.id);
       this.selectedPoints.name = selectPoint.id;
@@ -497,6 +509,11 @@ export class ISamplesSpatial {
     }
   }
 
+  /**
+   * Start tracking the position of the mouse.
+   * 
+   * @param {*} click 
+   */
   startTracking(click) {
     const posn = this.viewer.scene.pickPosition(click.position);
     if (this.tracking_info.tracking) {
@@ -532,6 +549,10 @@ export class ISamplesSpatial {
     }
   }
 
+  /**
+   * Private method for tracking mouse movement.
+   * @param {*} movement 
+   */
   _trackMovement(movement) {
     if (this.tracking_info.tracking) {
       const posn = this.viewer.scene.pickPosition(movement.endPosition);
@@ -554,6 +575,11 @@ export class ISamplesSpatial {
     }
   }
 
+  /**
+   * Stop tracking the mouse position. 
+   * 
+   * @returns rectangle entity representing the selected region.
+   */
   stopTracking() {
     this.tracking_info.tracking = false;
     let xyz = Cesium.Cartographic.fromCartesian(this.tracking_info.positions[0]);
@@ -638,39 +664,58 @@ export class ISamplesSpatial {
     let y0 = this.d(r.south);
     let y1 = this.d(r.north);
     return `${x0},${y0},${x1},${y1}`;
-}
+  }
 
+  /**
+   * Called on moveEnd to update the H3 grid based on the view.
+   * 
+   * @param {*} viewer 
+   * @param {*} gridder 
+   * @returns 
+   */
   gridTracker(viewer, gridder){
+    if (!gridder) {
+      return;
+    }
     let scratchRectangle = new Cesium.Rectangle();
     let rect = viewer.camera.computeViewRectangle(viewer.scene.globe.ellipsoid, scratchRectangle);
     let resultCntChanged = this.prevNumFound !== store.getState()['results']['numFound'];
-    if (!this.gridder) {
-      return;
-    }
-    if (this.r2str(rect) === this.gridder.global_grid.rect_str && !resultCntChanged){ // when same boundary and count did not change
+    if (this.r2str(rect) === gridder.global_grid.rect_str && !resultCntChanged){ // when same boundary and count did not change
       return; // no need to update 
     }
     gridder.update(viewer, rect, resultCntChanged);
     this.prevNumFound = store.getState()['results']['numFound'];
   }
 
+  /**
+   * Add a H3 grid heatmap to the view.
+   */
   async addGrid() {
-      // Add Cesium OSM Buildings, a global 3D buildings layer.
-      let buildings = await Cesium.createOsmBuildingsAsync();
-      this.viewer.scene.primitives.add(buildings);
-      if (this.gridder === null) { // if not initialized
-       this.gridder = new H3GridManager();
-      }
-      const viewer = this.viewer;
-      this.gridTracker(viewer, this.gridder);
-      // add event listener that is triggered on camera move end 
-      let _this = this;
-      this.gridTrackerListener = function() {_this.gridTracker(viewer, _this.gridder)}
-      this.viewer.camera.moveEnd.addEventListener(this.gridTrackerListener);
+    console.log('addGrid()');
+    /* Why is this here?
+    // Add Cesium OSM Buildings, a global 3D buildings layer.
+    let buildings = await Cesium.createOsmBuildingsAsync();
+    this.viewer.scene.primitives.add(buildings);
+    */
+    if (this.gridder === null) { // if not initialized
+      this.gridder = new H3GridManager();
+    }
+    const viewer = this.viewer;
+    this.gridTracker(viewer, this.gridder);
+    // add event listener that is triggered on camera move end 
+    let _this = this;
+    this.gridTrackerListener = function() {_this.gridTracker(viewer, _this.gridder)}
+    this.viewer.camera.moveEnd.addEventListener(this.gridTrackerListener);
   }
 
+  /**
+   * Remove the H3 grid heat map from the view.
+   */
   removeGrid(){
     // remove the grid
+    if (this.gridder === null) {
+      return;
+    }
     const viewer = this.viewer;
     this.gridder.remove(viewer);
     if(this.gridTrackerListener){
@@ -680,33 +725,8 @@ export class ISamplesSpatial {
     this.gridder = null; 
   }
 
-  //TODO: This should be a separate class for managing the HUD
-  addHud(canvas_id) {
-    // the first div contains mouse location
-    // the following divs contain loading spinner element
-    // see link:
-    //    https://loading.io/css/
-    let hud = html`<div class="spatial-hud" style="position: absolute; top: 0px; left: 0;">
-                    ${DEBUG?  html`<p><code id='position'>0, 0, 0</code></p>`: ""}
-                    <p><button id='clear-bb' class="cesium-button" style='display:none'>Clear BB</button></p>
-                    <div id="selected-record"></div>
-                  </div>
-                  <div id="loading" style="display: none;">
-                    <div class="background-spinner"></div>
-                    <div class="lds-spinner">
-                      <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-                    </div>
-                  </div>`;
-    const v = document.querySelector("div.cesium-viewer");
-    render(hud, v);
-    const cc = this.canvas;
-    const c = document.getElementById(canvas_id);
-    c.height = cc.height;
-    c.width = cc.width;
-    c.style.left = cc.style.left;
-    c.style.top = cc.style.top;
-
-
+  getCanvas() {
+    return this.canvas;
   }
 
   getScreenPosition(longitude, latitude) {

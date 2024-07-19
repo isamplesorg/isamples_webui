@@ -85,10 +85,12 @@ const InformationButton = (props) => {
 export const RefreshButton = (props) => {
   const { viewer, refresh } = props;
   return (
-    <button className="cesium-button cesium-toolbar-button cesium-navigation-help-button"
+    <label style={{marginLeft:10+'px'}}>Refresh       
+    <button title="Refresh the data display" className="cesium-button cesium-toolbar-button cesium-navigation-help-button"
       onClick={() => refresh(viewer.currentView.latitude, viewer.currentView.longitude)}>
-      <img src={reset} alt="informatioin icon" width="24" height="24" ></img>
+      <img src={reset} alt="Refresh" width="24" height="24" ></img>
     </button>
+    </label>
   );
 }
 
@@ -131,11 +133,33 @@ export const BookmarkLocationButton = (props) => {
   );
 }
 
+/**
+ * A checkbox.
+ * @param {*} props isChecked, onChange()
+ */
+export const Toggler = (props) => {
+  const { isChecked, onChange, label, title } = props;
+  return (
+    <div style={{marginLeft:10 + 'px'}} title={title}>
+    <label>{label}
+    <input 
+      type="checkbox" 
+      onChange={onChange}
+      defaultChecked={isChecked}
+      style={{marginLeft:3 + 'px'}}
+      />
+    </label>
+    </div>
+  );
+}
+
+
 
 /**
  * A function to add legend button into the Cesium map toolbar
  */
-export function addButton(facet, SpatialViewer, refresh, bookmark) {
+export function addButton(facet, SpatialViewer, refresh, bookmark, toggles=[]) {
+  console.log('addButton')
   const toolbar = document.querySelector("div.cesium-viewer-toolbar")
 
   if (document.querySelector("span#isamples-legend") === null) {
@@ -151,18 +175,37 @@ export function addButton(facet, SpatialViewer, refresh, bookmark) {
     render(<InformationButton facet={facet} />, infoButton);
   }
 
-
-  // add refresh button
-  const viewer = document.querySelector("div.cesium-viewer");
-  const refreshButton = document.createElement("span");
-  refreshButton.className = "cesium-navigationHelpButton-wrapper Cesium-refresh";
-  viewer?.insertBefore(refreshButton, viewer.firstChild.nextSibling);
-  render(<RefreshButton viewer={SpatialViewer} refresh={refresh} />, refreshButton);
-
   // add bookmark location button
   const bookmarkLocationButton = document.createElement("div");
   bookmarkLocationButton.className = "cesium-navigationHelpButton-wrapper Cesium-bookmark";
   toolbar?.appendChild(bookmarkLocationButton);
   //viewer?.appendChild(bookmarkLocationButton);
   render(<BookmarkLocationButton viewer={SpatialViewer} bookmark={bookmark} />, bookmarkLocationButton);
+
+  // add a container for toggles and refresh button
+  const viewer = document.querySelector("div.cesium-viewer");
+  const buttonContainer = document.createElement("div");
+  buttonContainer.setAttribute("id", "button_container");
+  buttonContainer.className = "cesium-viewer-toolbar";
+  buttonContainer.style.cssText = "display:block;position:absolute;top:5px;left:5px;background:#aaaaaa66";
+  viewer?.insertBefore(buttonContainer, viewer.firstChild.nextSibling);
+
+  for (const i in toggles) {
+    const toggleElement = document.createElement("span");
+    toggleElement.className = "cesium-navigationHelpButton-wrapper";
+    buttonContainer?.appendChild(toggleElement);
+    render(<Toggler 
+      isChecked={toggles[i].isChecked} 
+      onChange={toggles[i].onCheck} 
+      label={toggles[i].label}
+      title={toggles[i].title}
+      />, toggleElement);
+  }
+
+  const refreshButton = document.createElement("span");
+  refreshButton.className = "cesium-navigationHelpButton-wrapper";
+  buttonContainer?.appendChild(refreshButton);
+  render(<RefreshButton viewer={SpatialViewer} refresh={refresh} />, refreshButton);
 }
+
+
