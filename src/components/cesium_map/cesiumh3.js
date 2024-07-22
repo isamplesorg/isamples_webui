@@ -48,6 +48,12 @@ export class H3Grid {
         this.data = null;
     }
 
+    /**
+     * Load the grid data based t=on the current view and query.
+     * 
+     * @param {*} rstr 
+     * @returns 
+     */
     async load(rstr) {
         if (rstr === this.rect_str) {
             if (this.data !== null) {
@@ -57,9 +63,12 @@ export class H3Grid {
         this.rect_str = rstr;
         this.loading = true;
         // read q and fq solr query param values
+        const __state = store.getState();
         const queryState = store.getState()['query'];
-        let qArray = solrQuery.getQFQSolrQueryParamValues(queryState).q.split(",")
-        let fqArray = solrQuery.getQFQSolrQueryParamValues(queryState).fq.split(",")
+        const queryParams = solrQuery.getQFQSolrQueryParamValues(queryState);
+        //TODO: This fails if there's a comma in the query value...
+        let qArray = queryParams.q.split(",")
+        let fqArray = queryParams.fq.split(",")
         let url = new URL(this._service + "/");
         //TODO: Make resolution a function of view bounding box and camera elevation.
         if (this.rect_str === GLOBAL_RECT1 || this.rect_str === GLOBAL_RECT2) { 

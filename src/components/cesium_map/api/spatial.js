@@ -227,6 +227,8 @@ export class ISamplesSpatial {
     this.mouseCoordinateCallback = null;
     this.selectBoxCallback = null;
     this.selectedBox = null;
+    // The index to the pointPrimitiveCollection in viewer.scene.primitives
+    this.pointPrimitiveCollectionIndex = -1;
     // record the last interactive point primitive
     this.pointprimitive = null;
     this.gridder = null; 
@@ -647,10 +649,22 @@ export class ISamplesSpatial {
   }
 
   addPointPrimitives(primitivesCollection) {
-    return this.viewer.scene.primitives.add(primitivesCollection);
+    this.pointPrimitiveCollectionIndex = this.viewer.scene.primitives.length;
+    return this.viewer.scene.primitives.add(primitivesCollection, this.pointPrimitiveCollectionIndex);
+  }
+
+  /**
+   * Return the pointPrimitiveCollection
+   */
+  getPointPrimitives() {
+    if (this.pointPrimitiveCollectionIndex >= 0) {
+      return this.viewer.scene.primitives.get(this.pointPrimitiveCollectionIndex);
+    }
+    return null;
   }
 
   removeDataSource(dataSource, destroy = false) {
+    this.pointPrimitiveCollectionIndex = -1;
     return this.viewer.dataSources.remove(dataSource, destroy);
   }
 
@@ -689,14 +703,18 @@ export class ISamplesSpatial {
 
   /**
    * Add a H3 grid heatmap to the view.
+   * 
+   * The heatmap needs to be regenerated when the view changes in response to 
+   * user interaction with the cesium viewer (since only a selection of the possible
+   * grid cells are displayed) and also in response to changes in the user specied 
+   * query (since that changes the counts of things in the heatmap).
+   * 
+   * The query is maintained in the redux state. 
+   * 
+   * The view is maintained in the Cesium viewer.
    */
-  async addGrid() {
-    console.log('addGrid()');
-    /* Why is this here?
-    // Add Cesium OSM Buildings, a global 3D buildings layer.
-    let buildings = await Cesium.createOsmBuildingsAsync();
-    this.viewer.scene.primitives.add(buildings);
-    */
+  async updateHeatmapGrid() {
+    console.log('updateHeatmapGrid()');
     if (this.gridder === null) { // if not initialized
       this.gridder = new H3GridManager();
     }
@@ -711,7 +729,7 @@ export class ISamplesSpatial {
   /**
    * Remove the H3 grid heat map from the view.
    */
-  removeGrid(){
+  removeHeatmapGrid(){
     // remove the grid
     if (this.gridder === null) {
       return;
@@ -723,10 +741,6 @@ export class ISamplesSpatial {
       this.gridTrackerListener = null; 
     }
     this.gridder = null; 
-  }
-
-  getCanvas() {
-    return this.canvas;
   }
 
   getScreenPosition(longitude, latitude) {

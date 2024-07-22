@@ -5,7 +5,6 @@
  */
 
 import React from "react";
-import { createRef } from "react";
 import { render } from "react-dom";
 import * as Cesium from "cesium";
 import 'css/loading_spinner.css';
@@ -18,10 +17,6 @@ import {
 } from "./api/spatial";
 import { ISamplesAPI } from "./api/server";
 import { addButton, addToggle } from "./elements/navigationButton";
-import Cookies from 'universal-cookie';
-
-// encode and decode parameter
-import { decode } from "plantuml-encoder"
 
 // Defined ceisum access token
 // Current one is Dave's token
@@ -44,17 +39,13 @@ const moorea = new SpatialView(-149.8169236266867, -17.451466233002286, 2004.734
 
 // the initial map setup
 // keep track the camera location
-let cameraLat = null;
-let cameraLong = null;
+//let cameraLat = null;
+//let cameraLong = null;
 let bbox = null;
 let bboxLoc = null;
-let searchFields = null;
 let onChange = null;
 let facet = null;
 let preView = null;
-
-// this represents the pritimive class to handle data query.
-let setPrimitive = null;
 
 // this represent the oboe stream callback.
 // we might abort the stream fetch
@@ -65,18 +56,14 @@ let oboePrimitive = null;
 let currNumPoints = 0;
 let exceedMaxPoints = false;
 
-// storing previous viewpoints
-let viewpoints = new Map(JSON.parse(window.localStorage.getItem('previousView')));
 
-// initializa a cookie instance
-const cookies = new Cookies();
 /**
  * This method queries the record amount in the bbox
  *
  * @param {*} bb, a DRectangle instance to return bbox info
  * @returns
  */
-const countRecordsInBB = async (bb) => {
+const countRecordsInBB = async (bb, searchFields) => {
   const Q = bb.asSolrQuery('producedBy_samplingSite_location_rpt');
   return await api.countRecordsQuery({ Q: Q, searchFields: searchFields, rows: 0 });
 }
@@ -93,8 +80,6 @@ const showCoordinates = (lon, lat, height) => {
   e.innerText = `${lat.toFixed(4)}, ${lon.toFixed(4)}, ${height.toFixed(1)}`;
 }
 
-
-
 /**
  * This function calculate the distance between two camera positions
  *
@@ -110,19 +95,28 @@ function distanceInKm(lat1, long1, lat2, long2) {
   }
   const p1 = Cesium.Cartographic.fromCartesian(Cesium.Cartesian3.fromDegrees(long1, lat1, 0));
   const p2 = Cesium.Cartographic.fromCartesian(Cesium.Cartesian3.fromDegrees(long2, lat2, 0));
-  return new Cesium.EllipsoidGeodesic(p1, p2).surfaceDistance / 1000;
+  return new Cesium.EllipsoidGeodesic(p1, p2).surfaceDistance / 1000.0;
 }
 
+/**
+ * React component that contains the Cesium view.
+ * 
+ * This handles events from the React framework and updates the data sources accordingly.
+ */
 class CesiumMap extends React.Component {
 
   constructor(props) {
     super(props);
     this.viewer = null;
+    this.cameraLatLon = {
+      lat: 0.0, lon: 0.0
+    };
     this.state = {
       entities: [],
       showGrid: true,
       showPoints: false,
-      camera: {}
+      camera: {},
+      viewLocations: new Map(JSON.parse(window.localStorage.getItem('previousView')))
     };
 
     this.maxPointsNotification = (
@@ -146,16 +140,19 @@ class CesiumMap extends React.Component {
       mapInfo.heading,
       mapInfo.pitch);
     this.viewer = await ISamplesSpatial.create(this.cesiumContainer, initialPosition);
+    this.cameraLatLon.lat = mapInfo.latitude;
+    this.cameraLatLon.lon = mapInfo.longitude;
     if (this.viewer !== null) {
       // remove the Ceisum information with custom button group
       ///render(this.dropdown, document.querySelector("div.cesium-viewer-bottom"));
       this.generateLocationTable();
       //viewer.trackMouseCoordinates(showCoordinates);
       this.viewer.enableTracking(api, (bb) => this.selectedBoxCallbox(bb, true));
-      setPrimitive = new PointStreamPrimitiveCollection(this.viewer.terrain, this.state.showPoints);
-      this.viewer.addPointPrimitives(setPrimitive);
-      this.viewer.addGrid().catch((error) => { console.log(error) }) // default view : grid 
-      searchFields = this.getCurrSearchFields(); // use saved params to get current facet
+      const _setPrimitive = new PointStreamPrimitiveCollection(this.viewer.terrain, this.state.showPoints);
+      this.viewer.addPointPrimitives(_setPrimitive);
+      this.viewer.updateHeatmapGrid().catch((error) => { console.log(error) }) // default view : grid 
+      //searchFields = this.getCurrSearchFields(); // use saved params to get current facet
+      //searchFields = this.props.newSearchFields;
       onChange = onSetFields;
 
       // keep track of zoom in event and zoom out event to decide whether 
@@ -178,7 +175,7 @@ class CesiumMap extends React.Component {
           },
         ]
         addButton(facet['source'], this.viewer, this.updatePrimitive, this.storeCurrentView, toggles);
-        if (searchFields) {
+        if (this.props.newSearchFields) {
           this.updatePrimitive(initialPosition.latitude, initialPosition.longitude);
         }
       });
@@ -196,19 +193,24 @@ class CesiumMap extends React.Component {
       // set time interval to check the current view every 10 seconds and update points
       this.checkPosition = setInterval(() => {
         if (!this.state.showPoints) return;
-        if (typeof setPrimitive.farthest === 'undefined' || typeof this.viewer.currentView.latitude !== 'undefined' || typeof this.viewer.currentView.longitude !== 'undefined') return;
+        const _setPrimitive = this.viewer.getPointPrimitives();
+        if (
+            typeof _setPrimitive.farthest === 'undefined' 
+            || typeof this.viewer.currentView.latitude !== 'undefined' 
+            || typeof this.viewer.currentView.longitude !== 'undefined'
+          ) return;
         const loading = document.getElementById("loading").style.display;
         const diffDistanceMove = distanceInKm(
-          cameraLat,
-          cameraLong,
+          this.cameraLatLon.lat,
+          this.cameraLatLon.lon,
           this.viewer.currentView.latitude,
           this.viewer.currentView.longitude);
 
         const diffDistanceFarthest = distanceInKm(
-          setPrimitive.farthest.y,
-          setPrimitive.farthest.x,
-          cameraLat,
-          cameraLong);
+          _setPrimitive.farthest.y,
+          _setPrimitive.farthest.x,
+          this.cameraLatLon.lat,
+          this.cameraLatLon.lon);
         // update the points every 30 seconds
         // Update:
         //      A new parameter loading to indicate if the users cick somewhere and avoid intervel to check positions.
@@ -255,34 +257,56 @@ class CesiumMap extends React.Component {
     // this method will be called when the search field facet changed 
     // clear all element in cesium
     console.log("cesium_UI.shouldComponentUpdate");
-    let isDirty = false;
+
+    // Check for any change
+    let queryChanged = false;
+    let gridChanged = false;
+    let pointsChanged = false;
 
     if (nextState.showGrid !== this.state.showGrid) {
       this.state.showGrid = nextState.showGrid;
-      isDirty = true;
+      gridChanged = true;
     }
     if (nextState.showPoints !== this.state.showPoints) {
       this.state.showPoints = nextState.showPoints;
-      isDirty = true;
+      pointsChanged = true;
     }
-    //TODO: if the component is not visible, do not load data
-    searchFields = nextProps.newSearchFields;
+    //searchFields = nextProps.newSearchFields;
     this.clearBoundingBox(true);
 
-    if (this.viewer !== null) {
-      // update grid
-      if (isDirty) {
-        if (this.state.showGrid) {
-          this.viewer.addGrid().catch((error) => { console.log(error) })
-        } else {
-          this.viewer.removeGrid();
+    if (!queryChanged) {
+      for (const nsf of nextProps.newSearchFields) {
+        if (queryChanged) {
+          break;
         }
+        for (const tsf of this.props.newSearchFields){
+          if (tsf.field === nsf.field) {
+            if (tsf.value !== nsf.value) {
+              queryChanged = true;
+              break;
+            }
+          }
+        }
+      };  
+    }
+ 
+    if (this.viewer !== null)  {
+      // update grid
+      if (queryChanged || gridChanged) {
+        if (this.state.showGrid) {
+          this.viewer.updateHeatmapGrid().catch((error) => { console.log(error) })
+        } else {
+          this.viewer.removeHeatmapGrid();
+        }
+      }
+      if (queryChanged || pointsChanged) {
+        const _setPrimitive = this.viewer.getPointPrimitives()
         if (this.state.showPoints) {
-          setPrimitive.enableDisplay();
+          _setPrimitive.enableDisplay();
           this.updatePrimitive(this.viewer.currentView.latitude, this.viewer.currentView.longitude);
         } else {
-          setPrimitive.clear();  // clear all points
-          setPrimitive.disableDisplay(); // disable display    
+          _setPrimitive.clear();  // clear all points
+          _setPrimitive.disableDisplay(); // disable display    
         }
       }
 
@@ -403,7 +427,7 @@ class CesiumMap extends React.Component {
    *                    the information to left pane
    */
   selectedBoxCallbox = async (bb, updated = false) => {
-    let text = `Record count : ${await countRecordsInBB(bb)}`;
+    let text = `Record count : ${await countRecordsInBB(bb, this.props.newSearchFields)}`;
     if (bbox) {
       this.viewer.removeEntity(bbox);
     }
@@ -467,8 +491,8 @@ class CesiumMap extends React.Component {
         // remove the list item from the container
         listItem.parentNode.removeChild(listItem);
         // also delete from localstorage
-        viewpoints.delete(locationName);
-        window.localStorage.setItem("previousView", JSON.stringify(Array.from(viewpoints.entries())));
+        this.state.viewLocations.delete(locationName);
+        window.localStorage.setItem("previousView", JSON.stringify(Array.from(this.state.viewLocations.entries())));
       }
     });
   }
@@ -477,9 +501,9 @@ class CesiumMap extends React.Component {
   // generate a list of previous views based on localStorage object 
   generateLocationTable = () => {
     let container = document.getElementById('container');
-    if (viewpoints !== undefined && viewpoints !== null && viewpoints.size > 0) {
+    if (this.state.viewLocations !== undefined && this.state.viewLocations !== null && this.state.viewLocations.size > 0) {
       container.innerHTML = "Previous visited locations<br/>";
-      viewpoints.forEach((cameraState, locationName) => {
+      this.state.viewLocations.forEach((cameraState, locationName) => {
         const listItem = document.createElement('div');
         listItem.className = 'list-item';
 
@@ -518,9 +542,11 @@ class CesiumMap extends React.Component {
  * @param {*} latitude
  * @param {*} longitude
  */
-  updatePrimitive = async (latitude, longitude) => {
-    cameraLat = latitude;
-    cameraLong = longitude;
+  updatePrimitive = async () => {
+    //cameraLat = latitude;
+    //cameraLong = longitude;
+    //cameraLat = this.viewer.currentView.latitude
+    //cameraLong = this.viewer.currentView.longitude
     /*
     if (!this.state.showPoints) {
       this.dropdown = this.generateDropdown(isPointCheckBoxSelected, isGridCheckBoxSelected);
@@ -531,15 +557,16 @@ class CesiumMap extends React.Component {
       return;
     }
       */
-    if (setPrimitive) {
-      setPrimitive.clear();
+    const _setPrimitive = this.viewer.getPointPrimitives();
+    if (_setPrimitive) {
+      _setPrimitive.clear();
     }
     if (oboePrimitive) {
       oboePrimitive.abort();
     }
     // calculate number of points of entire bounding box 
     let entire_bbox = this.viewer.currentBounds;
-    currNumPoints = await countRecordsInBB(entire_bbox);
+    currNumPoints = await countRecordsInBB(entire_bbox, this.props.newSearchFields);
     if (currNumPoints > MAXIMUM_NUMBER_OF_POINTS) {
       // do not load points 
       exceedMaxPoints = true;
@@ -570,12 +597,12 @@ class CesiumMap extends React.Component {
         if (maxPointBox !== null)
           infoBox.removeChild(maxPointBox);
       }
-      const res = await setPrimitive.load(facet, {
+      const res = await _setPrimitive.load(facet, {
         Q: "producedBy_samplingSite_location_cesium_height%3A*",
         field: "source",
-        lat: latitude,
-        long: longitude,
-        searchFields: searchFields,
+        lat: this.viewer.currentView.latitude,
+        long: this.viewer.currentView.longitude,
+        searchFields: this.props.newSearchFields,
         rows: MAXIMUM_NUMBER_OF_POINTS
       })
       oboePrimitive = res;
@@ -606,21 +633,21 @@ class CesiumMap extends React.Component {
   changeView(direct) {
     if (direct) {
       this.viewer.visit(new SpatialView(
-        cameraLong,
-        cameraLat,
+        this.cameraLatLon.lon,
+        this.cameraLatLon.lat,
         MAXIMUM_ZOOM_DISTANCE,
         GLOBAL_HEADING,
         GLOBAL_PITCH));
     } else {
       this.viewer.visit(new SpatialView(
-        cameraLong,
-        cameraLat,
+        this.cameraLatLon.lon,
+        this.cameraLatLon.lat,
         moorea.height,
         moorea.heading,
         moorea.pitch));
     }
     // force an update of primitives whenever changing view 
-    this.updatePrimitive(cameraLat, cameraLong);
+    this.updatePrimitive();
   }
 
   /**
@@ -705,25 +732,6 @@ class CesiumMap extends React.Component {
     });
   }
 
-  getCurrSearchFields = () => {
-    const curURL = window.location.href;
-    const url = new URL(curURL);
-    // Read the encoded fields out of the dictionary.  Note that these *must* match up with what we're encoding up above
-    const hash = url.hash;
-    let searchFields = null;
-    if (hash.includes('?')) {
-      let searchParams = new URLSearchParams(url.hash.split("?")[1]);
-      searchFields = searchParams.get('searchFields');
-    }
-    else {
-      if (cookies.get('previousParams')) {
-        searchFields = cookies.get('previousParams')['searchFields'];
-      }
-    }
-    const decodedSearchFields = searchFields ? JSON.parse(decode(searchFields)) : [];
-    return decodedSearchFields;
-  }
-
   generateKey = (dictionary) => {
     let dictKey = '';
     for (let [key, value] of Object.entries(dictionary)) {
@@ -738,14 +746,13 @@ class CesiumMap extends React.Component {
   storeCurrentView = (viewer) => {
     //let key = this.generateKey(viewer.currentView); // TODO : receive user input for key 
     const key = document.getElementById("locNameInput");
-    if (viewpoints !== null && key !== null && key.value !== null && key.value !== "") {
-      viewpoints.set(key.value, viewer.currentView); // update map 
+    if (this.state.viewLocations !== null && key !== null && key.value !== null && key.value !== "") {
+      this.state.viewLocations.set(key.value, viewer.currentView); // update map 
       // add to local storage
-      window.localStorage.setItem("previousView", JSON.stringify(Array.from(viewpoints.entries())));
+      window.localStorage.setItem("previousView", JSON.stringify(Array.from(this.state.viewLocations.entries())));
       this.generateLocationTable(); // update table 
     }
   }
-
 
 };
 
