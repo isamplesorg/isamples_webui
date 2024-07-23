@@ -81,13 +81,23 @@ export class H3Grid {
         return Math.round(15.891 + Math.log10(area)*-1.643);
     }
 
+    heightToZoom(height) {
+        if (height > 3556341) {
+            return 2;
+        }
+        if (height < 1000) {
+            return 12;
+        }
+        return Math.round(19.608 - Math.log10(height)*2.789);
+    }
+
     /**
      * Load the grid data based t=on the current view and query.
      * 
      * @param {*} rstr 
      * @returns 
      */
-    async load(rstr, rarea) {
+    async load(rstr, rarea, cheight) {
         if (rstr === this.rect_str) {
             if (this.data !== null) {
                 return this.data;
@@ -103,11 +113,12 @@ export class H3Grid {
         let qArray = queryParams.q.split(",")
         let fqArray = queryParams.fq.split(",")
         let url = new URL(this._service + "/");
-        //TODO: Make resolution a function of view bounding box and camera elevation.
         if (this.rect_str === GLOBAL_RECT1 || this.rect_str === GLOBAL_RECT2) { 
             url.searchParams.set('resolution', 1); // globe view resolution value should be small
         } else {
-            const zoomLevel = this.areaToZoom(rarea);
+            // This works ok, but might be better to use the camera distance or elevation rather than bounding box.
+            //const zoomLevel = this.areaToZoom(rarea);
+            const zoomLevel = this.heightToZoom(cheight);
             console.log(`Area: ${rarea} Zoom: ${zoomLevel}`);
             url.searchParams.set('bb', this.rect_str);
             url.searchParams.set('resolution', zoomLevel);
@@ -154,7 +165,8 @@ export class H3GridManager {
     update(cview, rect, resultCntChanged) {
         const rstr = r2str(rect);
         const rarea = rectArea(rect);
-        console.log(`rect: ${rstr} area: ${rarea}`);
+        const cheight = Math.round(cview.camera.positionCartographic.height);
+        console.log(`rect: ${rstr} area: ${rarea} height: ${cheight}`);
         console.log(`H3GridManager.update rstr=${rstr} resultCntChanged=${resultCntChanged}`);
         const existing = cview.dataSources.getByName(rstr);
         if (existing.length > 0 && !resultCntChanged) {
@@ -168,7 +180,7 @@ export class H3GridManager {
         let toRemove = cview.dataSources.getByName(this.old_grid_rstr)[0];
         cview.dataSources.remove(toRemove, true);
         const _this = this;
-        this.global_grid.load(rstr, rarea).then((ds) => {
+        this.global_grid.load(rstr, rarea, cheight).then((ds) => {
             // delete existing grid
             try {
                 cview.dataSources.add(ds);
