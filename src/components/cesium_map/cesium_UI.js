@@ -148,7 +148,7 @@ class CesiumMap extends React.Component {
       this.generateLocationTable();
       //viewer.trackMouseCoordinates(showCoordinates);
       this.viewer.enableTracking(api, (bb) => this.selectedBoxCallbox(bb, true));
-      const _setPrimitive = new PointStreamPrimitiveCollection(this.viewer.terrain, this.state.showPoints);
+      const _setPrimitive = new PointStreamPrimitiveCollection(this.state.showPoints);
       this.viewer.addPointPrimitives(_setPrimitive);
       this.viewer.updateHeatmapGrid().catch((error) => { console.log(error) }) // default view : grid 
       //searchFields = this.getCurrSearchFields(); // use saved params to get current facet

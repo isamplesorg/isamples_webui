@@ -127,10 +127,14 @@ function asDRectangle(rectangle) {
 * Requires that "oboe" is globally available.
 */
 export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollection {
-  constructor(terrain, display) {
-    super(terrain)
-    this.terrain = terrain;
-    this.display = display; // flag that indicates whether we want to fetch points 
+  constructor(show) {
+    //https://cesium.com/learn/ion-sdk/ref-doc/PointPrimitiveCollection.html#blendOption
+    super(
+      {
+        blendOption: Cesium.BlendOption.TRANSLUCENT,
+        show: show
+      }
+    );
   }
 
   clear() {
@@ -142,18 +146,19 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
   } 
 
   enableDisplay(){
-    this.display = true; 
+    this.show = true;
   }
 
   disableDisplay(){
-    this.display = false; 
+    this.show = false;
   }
 
   // function to query results and add point into cesium
   async load(facet, params) {
-    if (!this.display) return;
+    if (!this.show) return;
     let locations = {};
     // display loading page
+    // TODO: Use an event to turn on / off the loading indicator
     this.loading = document.getElementById("loading");
     if (this.loading) {
       this.loading.style.removeProperty("display");

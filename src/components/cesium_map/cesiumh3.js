@@ -16,12 +16,29 @@ function d(rd) {
     return Cesium.Math.toDegrees(rd);
 }
 
+function rad(dg) {
+    return Cesium.Math.toRadians(dg);
+}
+
 function r2str(r) {
     let x0 = d(r.west);
     let x1 = d(r.east);
     let y0 = d(r.south);
     let y1 = d(r.north);
     return `${x0},${y0},${x1},${y1}`;
+}
+
+function rectArea(r) {
+    // returns approximate area in km2
+    const earthRadius = 6371008.8;
+    return Math.abs(
+        (earthRadius *
+          earthRadius *
+          Math.PI *
+          Math.abs(Math.sin(rad(r.south)) - Math.sin(rad(r.north))) *
+          (r.east - r.west)
+        ) / 180.0
+      );
 }
 
 
@@ -49,12 +66,28 @@ export class H3Grid {
     }
 
     /**
+     * Compute zoom level from the area of the visible rectangle.
+     * data at: https://docs.google.com/spreadsheets/d/1u05F-uusqfWWQThqUu8MPaa_w1WvlnV3OioTvJGdBys/edit?gid=0#gid=0
+     * @param {Cesium.Rectangle} area 
+     * @returns H3 resolution
+     */
+    areaToZoom(area) {        
+        if (area > 300000000) {
+            return 2;
+        }
+        if (area < 1000) {
+            return 12;
+        }
+        return Math.round(15.891 + Math.log10(area)*-1.643);
+    }
+
+    /**
      * Load the grid data based t=on the current view and query.
      * 
      * @param {*} rstr 
      * @returns 
      */
-    async load(rstr) {
+    async load(rstr, rarea) {
         if (rstr === this.rect_str) {
             if (this.data !== null) {
                 return this.data;
@@ -74,8 +107,10 @@ export class H3Grid {
         if (this.rect_str === GLOBAL_RECT1 || this.rect_str === GLOBAL_RECT2) { 
             url.searchParams.set('resolution', 1); // globe view resolution value should be small
         } else {
+            const zoomLevel = this.areaToZoom(rarea);
+            console.log(`Area: ${rarea} Zoom: ${zoomLevel}`);
             url.searchParams.set('bb', this.rect_str);
-            url.searchParams.set('resolution', 5);
+            url.searchParams.set('resolution', zoomLevel);
         }
         // convert it to q query param values
         let queryArray = [...qArray, ...fqArray];
@@ -118,6 +153,8 @@ export class H3GridManager {
 
     update(cview, rect, resultCntChanged) {
         const rstr = r2str(rect);
+        const rarea = rectArea(rect);
+        console.log(`rect: ${rstr} area: ${rarea}`);
         console.log(`H3GridManager.update rstr=${rstr} resultCntChanged=${resultCntChanged}`);
         const existing = cview.dataSources.getByName(rstr);
         if (existing.length > 0 && !resultCntChanged) {
@@ -131,7 +168,7 @@ export class H3GridManager {
         let toRemove = cview.dataSources.getByName(this.old_grid_rstr)[0];
         cview.dataSources.remove(toRemove, true);
         const _this = this;
-        this.global_grid.load(rstr).then((ds) => {
+        this.global_grid.load(rstr, rarea).then((ds) => {
             // delete existing grid
             try {
                 cview.dataSources.add(ds);
@@ -147,9 +184,9 @@ export class H3GridManager {
                                 let ln = parseFloat(entity.properties.ln);
                                 entity.polygon.material = v2color(ln);
                                 entity.polygon.outline = false;
-                                entity.polygon.extrudedHeight = entity.properties.n;
-                                entity.polygon.height = 0;
-                        
+                                //entity.polygon.extrudedHeight = entity.properties.n;
+                                //entity.polygon.height = 0;                                
+                                entity.polygon.clampToGround = true;                        
                         } catch (err) {
                             console.log(err);
                             entity.polygon.material = Cesium.Color.RED.withAlpha(0.5);
@@ -161,7 +198,10 @@ export class H3GridManager {
                         try {
                             let ln = parseFloat(entity.properties.ln);
                             entity.polygon.material = v2color(ln);
-                            entity.polygon.extrudedHeight = entity.properties.parent_id;
+                            //entity.polygon.extrudedHeight = entity.properties.parent_id;
+                            entity.polygon.outline = false;
+                            //entity.polygon.extrudedHeight = entity.properties.n;
+                            entity.polygon.clampToGround = true;
                         }catch (err) {
                             console.log(err);
                             entity.polygon.material = Cesium.Color.RED.withAlpha(0.5);
