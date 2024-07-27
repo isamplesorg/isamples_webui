@@ -93,7 +93,11 @@ export class H3Grid {
 
     /**
      * Load the grid data based t=on the current view and query.
-     * 
+     * Notes:
+     * This BB works ok:
+     *   bb=-152.45990827428585,-17.57710964725285,-147.0228532260467,-14.980197339199439
+     * This not so good:
+     *   bb=-152.3837203700605,-17.503284650992086,-147.28884121154445,-14.944143360801418
      * @param {*} rstr 
      * @returns 
      */

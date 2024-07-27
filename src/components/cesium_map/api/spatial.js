@@ -19,6 +19,255 @@ const MAXIMUM_ZOOM_DISTANCE = 20000000;
 const MINIMUM_ZOOM_DISTANCE = 10;
 const DEFAULT_ELEVATION = 1;
 const DEBUG = false;
+
+/**************************************************************************************************
+ * Patch for Cesium camera computeViewRectangle.
+ * 
+ * This path provides a modified implementation of computeViewRectangle that
+ * returns the correct view rectangle when the camera is oriented towards the south
+ * and the horizon is visible. The default implementation truncates the view rectangle
+ * at a lower corner of the view which can significantly reduce the reported view
+ * rectangle. 
+ * 
+ * This chunk of code is copied from around:
+ * 
+ *   https://github.com/CesiumGS/cesium/blob/1.119/packages/engine/Source/Scene/Camera.js#L3828
+ * 
+ * since computeViewRectangle() uses a couple of private methods for its calculations. The actual
+ * change is simple, computing scalarMult based on the camera heading (1.0 north or -1.0 south) 
+ * and using that to alter the sign of scalar when computing the northOffset value in 
+ * the computeHorizonQuad() private method.
+ * 
+ * See also https://gist.github.com/datadavev/5579bc1a30b2c569a5e7e944f7564aeb for a 
+ * sandcastle viz of what's going on.
+ */
+const scratchCartesian3_1 = new Cesium.Cartesian3();
+const scratchCartesian3_2 = new Cesium.Cartesian3();
+const scratchCartesian3_3 = new Cesium.Cartesian3();
+const scratchCartesian3_4 = new Cesium.Cartesian3();
+const horizonPoints = [
+  new Cesium.Cartesian3(),
+  new Cesium.Cartesian3(),
+  new Cesium.Cartesian3(),
+  new Cesium.Cartesian3(),
+];
+
+function computeHorizonQuad(camera, ellipsoid) {
+  const radii = ellipsoid.radii;
+  const p = camera.positionWC;
+
+  // Find the corresponding position in the scaled space of the ellipsoid.
+  const q = Cesium.Cartesian3.multiplyComponents(
+    ellipsoid.oneOverRadii,
+    p,
+    scratchCartesian3_1
+  );
+  
+  const cosHeading = Math.cos(camera.heading);
+  const scalarMult = cosHeading/Math.abs(cosHeading);
+  
+  const qMagnitude = Cesium.Cartesian3.magnitude(q);
+  const qUnit = Cesium.Cartesian3.normalize(q, scratchCartesian3_2);
+
+  // Determine the east and north directions at q.
+  let eUnit;
+  let nUnit;
+  if (
+    Cesium.Cartesian3.equalsEpsilon(qUnit, Cesium.Cartesian3.UNIT_Z, Cesium.Math.EPSILON10)
+  ) {
+    eUnit = new Cesium.Cartesian3(0, 1, 0);
+    nUnit = new Cesium.Cartesian3(0, 0, 1);
+  } else {
+    eUnit = Cesium.Cartesian3.normalize(
+      Cesium.Cartesian3.cross(Cesium.Cartesian3.UNIT_Z, qUnit, scratchCartesian3_3),
+      scratchCartesian3_3
+    );
+    nUnit = Cesium.Cartesian3.normalize(
+      Cesium.Cartesian3.cross(qUnit, eUnit, scratchCartesian3_4),
+      scratchCartesian3_4
+    );
+  }
+
+  // Determine the radius of the 'limb' of the ellipsoid.
+  const wMagnitude = Math.sqrt(Cesium.Cartesian3.magnitudeSquared(q) - 1.0);
+
+  // Compute the center and offsets.
+  const center = Cesium.Cartesian3.multiplyByScalar(
+    qUnit,
+    1.0 / qMagnitude,
+    scratchCartesian3_1
+  );
+  const scalar = wMagnitude / qMagnitude;
+  const eastOffset = Cesium.Cartesian3.multiplyByScalar(
+    eUnit,
+    scalar,
+    scratchCartesian3_2
+  );
+  const northOffset = Cesium.Cartesian3.multiplyByScalar(
+    nUnit,
+    scalarMult*scalar,
+    scratchCartesian3_3
+  );
+
+  // A conservative measure for the longitudes would be to use the min/max longitudes of the bounding frustum.
+  const upperLeft = Cesium.Cartesian3.add(center, northOffset, horizonPoints[0]);
+  Cesium.Cartesian3.subtract(upperLeft, eastOffset, upperLeft);
+  Cesium.Cartesian3.multiplyComponents(radii, upperLeft, upperLeft);
+
+  const lowerLeft = Cesium.Cartesian3.subtract(center, northOffset, horizonPoints[1]);
+  Cesium.Cartesian3.subtract(lowerLeft, eastOffset, lowerLeft);
+  Cesium.Cartesian3.multiplyComponents(radii, lowerLeft, lowerLeft);
+
+  const lowerRight = Cesium.Cartesian3.subtract(center, northOffset, horizonPoints[2]);
+  Cesium.Cartesian3.add(lowerRight, eastOffset, lowerRight);
+  Cesium.Cartesian3.multiplyComponents(radii, lowerRight, lowerRight);
+
+  const upperRight = Cesium.Cartesian3.add(center, northOffset, horizonPoints[3]);
+  Cesium.Cartesian3.add(upperRight, eastOffset, upperRight);
+  Cesium.Cartesian3.multiplyComponents(radii, upperRight, upperRight);
+
+  return horizonPoints;
+}
+
+const scratchPickCartesian2 = new Cesium.Cartesian2();
+const scratchRectCartesian = new Cesium.Cartesian3();
+const cartoArray = [
+  new Cesium.Cartographic(),
+  new Cesium.Cartographic(),
+  new Cesium.Cartographic(),
+  new Cesium.Cartographic(),
+];
+function addToResult(x, y, index, camera, ellipsoid, computedHorizonQuad) {
+  scratchPickCartesian2.x = x;
+  scratchPickCartesian2.y = y;
+  const r = camera.pickEllipsoid(
+    scratchPickCartesian2,
+    ellipsoid,
+    scratchRectCartesian
+  );
+  if (Cesium.defined(r)) {
+    cartoArray[index] = ellipsoid.cartesianToCartographic(r, cartoArray[index]);
+    console.log(`index ${index} = 1`);
+    return 1;
+  }
+  cartoArray[index] = ellipsoid.cartesianToCartographic(
+    computedHorizonQuad[index],
+    cartoArray[index]
+  );
+  console.log(`index ${index} = 0`);
+  return 0;
+}
+/**
+ * Computes the approximate visible rectangle on the ellipsoid.
+ *
+ * @param {Ellipsoid} [ellipsoid=Ellipsoid.default] The ellipsoid that you want to know the visible region.
+ * @param {Rectangle} [result] The rectangle in which to store the result
+ *
+ * @returns {Rectangle|undefined} The visible rectangle or undefined if the ellipsoid isn't visible at all.
+ */
+Cesium.Camera.prototype.computeViewRectangle2 = function (ellipsoid, result) {
+  ellipsoid = Cesium.defaultValue(ellipsoid, Cesium.Ellipsoid.default);
+  const cullingVolume = this.frustum.computeCullingVolume(
+    this.positionWC,
+    this.directionWC,
+    this.upWC
+  );
+  const boundingSphere = new Cesium.BoundingSphere(
+    Cesium.Cartesian3.ZERO,
+    ellipsoid.maximumRadius
+  );
+  const visibility = cullingVolume.computeVisibility(boundingSphere);
+  if (visibility === Cesium.Intersect.OUTSIDE) {
+    return undefined;
+  }
+
+  const canvas = this._scene.canvas;
+  const width = canvas.clientWidth;
+  const height = canvas.clientHeight;
+
+  let successfulPickCount = 0;
+
+  const computedHorizonQuad = computeHorizonQuad(this, ellipsoid);
+
+  successfulPickCount += addToResult(
+    0,
+    0,
+    0,
+    this,
+    ellipsoid,
+    computedHorizonQuad
+  );
+  successfulPickCount += addToResult(
+    0,
+    height,
+    1,
+    this,
+    ellipsoid,
+    computedHorizonQuad
+  );
+  successfulPickCount += addToResult(
+    width,
+    height,
+    2,
+    this,
+    ellipsoid,
+    computedHorizonQuad
+  );
+  successfulPickCount += addToResult(
+    width,
+    0,
+    3,
+    this,
+    ellipsoid,
+    computedHorizonQuad
+  );
+
+  if (successfulPickCount < 2) {
+    // If we have space non-globe in 3 or 4 corners then return the whole globe
+    return Cesium.Rectangle.MAX_VALUE;
+  }
+
+  result = Cesium.Rectangle.fromCartographicArray(cartoArray, result);
+  console.log(`${result}`);
+
+  // Detect if we go over the poles
+  let distance = 0;
+  let lastLon = cartoArray[3].longitude;
+  for (let i = 0; i < 4; ++i) {
+    const lon = cartoArray[i].longitude;
+    const diff = Math.abs(lon - lastLon);
+    if (diff > Cesium.Math.PI) {
+      // Crossed the dateline
+      distance += Cesium.Math.TWO_PI - diff;
+    } else {
+      distance += diff;
+    }
+
+    lastLon = lon;
+  }
+
+  // We are over one of the poles so adjust the rectangle accordingly
+  if (
+    Cesium.Math.equalsEpsilon(
+      Math.abs(distance),
+      Cesium.Math.TWO_PI,
+      Cesium.Math.EPSILON9
+    )
+  ) {
+    result.west = -Cesium.Math.PI;
+    result.east = Cesium.Math.PI;
+    if (cartoArray[0].latitude >= 0.0) {
+      result.north = Cesium.Math.PI_OVER_TWO;
+    } else {
+      result.south = -Cesium.Math.PI_OVER_TWO;
+    }
+  }
+
+  return result;
+};
+
+
+/***************************************************************************************************/
 /**
  * Describes a camera viewpoint for Cesium.
  * All units are degrees.
@@ -206,7 +455,6 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
         if (this.loading) {
           this.loading.style.display = "none";
         }
-
         console.error(err);
       })
   }
@@ -216,7 +464,6 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
  * Wraps a Cesium view
  */
 export class ISamplesSpatial {
-
 
   constructor(element) {
     console.log("ISampleSpatial.constructor");
@@ -291,7 +538,6 @@ export class ISamplesSpatial {
   destroy() {
     this.viewer && this.viewer.destroy();
   }
-
 
   static async create(element, initialLocation) {
     const spatial = new ISamplesSpatial(element);
@@ -697,7 +943,7 @@ export class ISamplesSpatial {
       return;
     }
     let scratchRectangle = new Cesium.Rectangle();
-    let rect = viewer.camera.computeViewRectangle(viewer.scene.globe.ellipsoid, scratchRectangle);
+    let rect = viewer.camera.computeViewRectangle2(viewer.scene.globe.ellipsoid, scratchRectangle);
     let resultCntChanged = this.prevNumFound !== store.getState()['results']['numFound'];
     if (this.r2str(rect) === gridder.global_grid.rect_str && !resultCntChanged){ // when same boundary and count did not change
       return; // no need to update 

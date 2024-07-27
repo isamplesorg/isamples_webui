@@ -356,17 +356,18 @@ class CesiumMap extends React.Component {
 
   render() {
     console.log("cesium_UI.render");
+    const loading = <div id="loading" style={{display: 'none'}}>
+      <div className="background-spinner"></div>
+      <div className="lds-spinner">
+        <div /><div /><div /><div /><div /><div /><div /><div /><div /><div /><div /><div />
+      </div>
+    </div>;
     return (
       <div 
         id="cesiumContainer"
         ref={element => this.cesiumContainer = element}
       >
-        <div id="loading" style={{display: 'none'}}>
-          <div className="background-spinner"></div>
-          <div className="lds-spinner">
-              <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-          </div>
-        </div>
+        {loading}
         <div className="cesium-viewer-bottom">
           <div id="viewerChange" className="Cesium-popBox">
             <div id='container'>
