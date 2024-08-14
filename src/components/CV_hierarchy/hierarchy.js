@@ -81,7 +81,7 @@ const CreateTree = ({ data, onClick, countMap, renderZeroCount }) => {
   return treeItems(data);
 };
 
-// Use BFS to find all possible paths of expaneded nodes
+// Use BFS to find all possible paths of expanded nodes
 const findPath = (tree, target) => {
   let res = [];
   const expanded = [{ obj: tree, path: [] }];
@@ -137,19 +137,25 @@ function CustomizedTreeView(props) {
             childLabels.push(childLabel);
           } 
         }
-        const label = currSchema[key]["label"]["en"];
+        const currVocab = currSchema[key];
+        const label = currVocab["label"]["en"];
         let totalCnt = 0; // total cnt of this label 
         // leaf node
+        var facetValueLabel = "";
         if (childLabels.length === 0 ) {
           // get the count by directly comparing to facetValues
           for (const idx in facetValues){
             const facetValue = facetValues[idx];
-            if (value.length === 0 && facetValue.toLocaleLowerCase()=== label.toLocaleLowerCase()){ 
+            const vocabularyDict = currSchema[facetValue];
+            if (typeof vocabularyDict !== "undefined") {
+              facetValueLabel = vocabularyDict["label"]["en"];
+            }
+            if (value.length === 0 && facetValueLabel.toLocaleLowerCase()=== label.toLocaleLowerCase()){ 
               // when no labels are selected for search,
               // display all label count
               totalCnt += facetCounts[idx];
             }
-            else if (value.indexOf(facetValue) !== -1 && facetValue.toLocaleLowerCase()=== label.toLocaleLowerCase() ){
+            else if (value.indexOf(facetValueLabel) !== -1 && facetValueLabel.toLocaleLowerCase()=== label.toLocaleLowerCase() ){
               // display only selected labels cnt 
               totalCnt += facetCounts[idx];
             }
@@ -159,7 +165,11 @@ function CustomizedTreeView(props) {
           // add itself label count
           for (const idx in facetValues){
             const facetValue = facetValues[idx];
-            if ( (value.length === 0 || value.indexOf(facetValue) !== -1) && facetValue.toLocaleLowerCase()=== label.toLocaleLowerCase()){ 
+            const vocabularyDict = currSchema[facetValue];
+            if (typeof vocabularyDict !== "undefined") {
+              facetValueLabel = vocabularyDict["label"]["en"];
+            }
+            if ( (value.length === 0 || value.indexOf(facetValueLabel) !== -1) && facetValueLabel.toLocaleLowerCase()=== label.toLocaleLowerCase()){ 
               // when no labels are selected for search, or itself is selected for search
               // when another label is selected, do not add up counts 
               // add itself's label count 
@@ -255,14 +265,12 @@ function CustomizedTreeView(props) {
   };
 
   const handleSelect = (event, itemIds) => {
-    // itemIds[0] is the selected label 
-    let labelIds = parseIdArrayToLabelArray(itemIds, idToLabelMap)
-    if (value.includes(labelIds[0])){
+    if (value.includes(itemIds[0])){
       // remove the selected label
-      onClick(labelIds[0], "delete");
+      onClick(itemIds[0], "delete");
     } else{
       // add the selected label
-      onClick(labelIds[0], "add" )
+      onClick(itemIds[0], "add" )
     }
   };
 

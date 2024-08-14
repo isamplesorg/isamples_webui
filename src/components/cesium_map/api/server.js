@@ -97,7 +97,7 @@ export class ISamplesAPI {
 
   async vocabularyMaterialSampleType() {
     try {
-      let data = await this._fetchPromise(window.config.vocabulary_url + "/material_sample_type");
+      let data = await this._fetchPromise(window.config.vocabulary_url + "/material_sample_object_type");
       return data;
     } catch (e) {
       console.error(e)
