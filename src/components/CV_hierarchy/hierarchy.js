@@ -51,9 +51,16 @@ const CreateTree = ({ data, onClick, countMap, renderZeroCount }) => {
   // The function to create tree items
   const treeItems = (json) => {
     return Object.entries(json).map(([key, val]) => {
+      // console.log("Creating tree item for value " + val);
       const label = val["label"]["en"];
-      let labelCnt = countMap && countMap.get(label) ? countMap.get(label) : 0 ;
-      if (labelCnt === 0 && !renderZeroCount) { // condition to not render 
+      // console.log("using label for value: " + label);
+      var labelCnt = countMap && countMap.get(label) ? countMap.get(label) : 0;
+      if (labelCnt === 0) {
+        // console.log("getting count for key: " + key);
+        labelCnt = countMap && countMap.get(key) ? countMap.get(key) : 0;
+      }
+      if (labelCnt === 0 && !renderZeroCount && val["children"].length === 0) { // condition to not render 
+        console.log("not rendering " + label);
         return null; 
       }
       else {
@@ -126,17 +133,22 @@ function CustomizedTreeView(props) {
   */ 
   const calculateCounts = useCallback( (currSchema) => {
     // when all facetValues are fetched
+    // console.log("facetValues are " + facetValues);
     if(Array.isArray(facetValues)){
+      // console.log("currSchema is " + currSchema);
       for (const key in currSchema){
         const childLabels = []; // the child labels of this label 
         for (const childSchema of currSchema[key]["children"]){
           // recursively save the counts in countMap
           // and get the child node labels
+          // console.log("child schema is " + childSchema);
           let childLabel = calculateCounts(childSchema);
           if (childLabel){
+            // console.log("pushing child label " + childLabel);
             childLabels.push(childLabel);
           } 
         }
+        console.log("checking against key " + key + " and value " + value);
         const currVocab = currSchema[key];
         const label = currVocab["label"]["en"];
         let totalCnt = 0; // total cnt of this label 
@@ -148,15 +160,18 @@ function CustomizedTreeView(props) {
             const facetValue = facetValues[idx];
             const vocabularyDict = currSchema[facetValue];
             if (typeof vocabularyDict !== "undefined") {
+              // console.log("found vocabulary dict!" + vocabularyDict);
               facetValueLabel = vocabularyDict["label"]["en"];
             }
+            // Value is the selected facet value we are comparing against.
             if (value.length === 0 && facetValueLabel.toLocaleLowerCase()=== label.toLocaleLowerCase()){ 
               // when no labels are selected for search,
               // display all label count
               totalCnt += facetCounts[idx];
-            }
-            else if (value.indexOf(facetValueLabel) !== -1 && facetValueLabel.toLocaleLowerCase()=== label.toLocaleLowerCase() ){
+            } else if (value.length !== 0 && value.indexOf(facetValueLabel) !== -1 && facetValueLabel.toLocaleLowerCase()=== label.toLocaleLowerCase() ){
               // display only selected labels cnt 
+              totalCnt += facetCounts[idx];
+            } else if (value.length !== 0 && value.indexOf(key) !== -1) {
               totalCnt += facetCounts[idx];
             }
           }
@@ -174,6 +189,8 @@ function CustomizedTreeView(props) {
               // when another label is selected, do not add up counts 
               // add itself's label count 
               totalCnt += facetCounts[idx];
+            } else if (value.length !== 0 && value.indexOf(key) !== -1) {
+              totalCnt += facetCounts[idx];
             }
           }
           for (const childLabel of childLabels){
@@ -181,6 +198,7 @@ function CustomizedTreeView(props) {
             totalCnt += countMap.get(childLabel); 
           }
         }
+        console.log("setting count " + totalCnt + " for label " + label);
         setCountMap(countMap.set(label, totalCnt))
         return label;
       }
@@ -207,6 +225,7 @@ function CustomizedTreeView(props) {
    * Convert an array of labels to its ids
    */
   const parseLabelArrayToIdArray = (labelArray, labelToIdMap) => {
+    console.log("going to select result of " + labelArray + " out of " + labelToIdMap);
       let idArray = [];
       // Apply map values to each element in the original array
       labelArray.forEach(element => {
@@ -242,6 +261,7 @@ function CustomizedTreeView(props) {
       setIdToLabelMap(newIdToLabelMap);
       setLabelToIdMap(newLabelToIdMap);
     }
+    // console.log("Looking for value: " + value);
     const path = Array.from(new Set(value.map(v => findPath(schema, v)).flat()));
     setExpandedItems(prevExpaned => path.length !== prevExpaned.length ? parseLabelArrayToIdArray(path, labelToIdMap) : prevExpaned)
     // calculate the counts 
