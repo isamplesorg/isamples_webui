@@ -60,7 +60,7 @@ const CreateTree = ({ data, onClick, countMap, renderZeroCount }) => {
         labelCnt = countMap && countMap.get(key) ? countMap.get(key) : 0;
       }
       if (labelCnt === 0 && !renderZeroCount && val["children"].length === 0) { // condition to not render 
-        console.log("not rendering " + label);
+        // console.log("not rendering " + label);
         return null; 
       }
       else {
@@ -90,14 +90,20 @@ const CreateTree = ({ data, onClick, countMap, renderZeroCount }) => {
 
 // Use BFS to find all possible paths of expanded nodes
 const findPath = (tree, target) => {
+  // console.log("looking for " + target + " in tree");  
+  // for (let [key, value] of tree) {
+  //   console.log(`Key: ${key}, Value: ${value}`);
+  // }
   let res = [];
   const expanded = [{ obj: tree, path: [] }];
   while (expanded.length > 0) {
     let { obj, path } = expanded.shift();
     const val = Object.entries(obj)[0][1];
-    const label = val["label"]["en"];
+    const label = Object.entries(obj)[0][0];
+    // console.log("examining " + val + " in label " + label);
     path = [...path, label];
     if (label.toLocaleLowerCase().includes(target.trim().toLocaleLowerCase())) {
+      // console.log("pushing path " + path);
       res.push(path);
     }
 
@@ -148,7 +154,7 @@ function CustomizedTreeView(props) {
             childLabels.push(childLabel);
           } 
         }
-        console.log("checking against key " + key + " and value " + value);
+        // console.log("checking against key " + key + " and value " + value);
         const currVocab = currSchema[key];
         const label = currVocab["label"]["en"];
         let totalCnt = 0; // total cnt of this label 
@@ -198,7 +204,7 @@ function CustomizedTreeView(props) {
             totalCnt += countMap.get(childLabel); 
           }
         }
-        console.log("setting count " + totalCnt + " for label " + label);
+        // console.log("setting count " + totalCnt + " for label " + label);
         setCountMap(countMap.set(label, totalCnt))
         return label;
       }
@@ -225,7 +231,10 @@ function CustomizedTreeView(props) {
    * Convert an array of labels to its ids
    */
   const parseLabelArrayToIdArray = (labelArray, labelToIdMap) => {
-    console.log("going to select result of " + labelArray + " out of " + labelToIdMap);
+    // console.log("going to select result of " + labelArray + " out of labelToIdMap");
+    // for (let [key, value] of labelToIdMap) {
+    //   console.log(`Key: ${key}, Value: ${value}`);
+    // }
       let idArray = [];
       // Apply map values to each element in the original array
       labelArray.forEach(element => {
@@ -234,6 +243,10 @@ function CustomizedTreeView(props) {
           }
       });
       return idArray;
+  }
+
+  const valueForSelection = (value) => {
+    return (value && value.length > 0) ? value : [];  
   }
 
   // Update tree view based on the facet filter
@@ -263,13 +276,14 @@ function CustomizedTreeView(props) {
     }
     // console.log("Looking for value: " + value);
     const path = Array.from(new Set(value.map(v => findPath(schema, v)).flat()));
-    setExpandedItems(prevExpaned => path.length !== prevExpaned.length ? parseLabelArrayToIdArray(path, labelToIdMap) : prevExpaned)
+    // console.log("Setting expanded items to " + valueForSelection(value));
+    setExpandedItems(prevExpaned => path.length !== prevExpaned.length ? valueForSelection(path) : prevExpaned)
     // calculate the counts 
     if (Array.isArray(facetValues)){
       setCountMap(new Map()); // initialize counts 
       calculateCounts(schema);
     }
-    setSelectedItems(parseLabelArrayToIdArray(value, labelToIdMap));
+    setSelectedItems(valueForSelection(value));
   }, [schema, value, facetValues, calculateCounts, labelToIdMap, idToLabelMap])
 
   const handleToggle = (event, itemIds) => {
@@ -285,6 +299,7 @@ function CustomizedTreeView(props) {
   };
 
   const handleSelect = (event, itemIds) => {
+    console.log("handling select");
     if (value.includes(itemIds[0])){
       // remove the selected label
       onClick(itemIds[0], "delete");
@@ -295,6 +310,7 @@ function CustomizedTreeView(props) {
   };
 
   const handleFilter = (event) => {
+    console.log("handling filter");
     const { value } = event.target;
     setFilter(value);
     if (value.trim().length === 0) {
@@ -309,7 +325,7 @@ function CustomizedTreeView(props) {
     
      <SimpleTreeView
           aria-label="customized"
-          slotes = {{
+          slots = {{
             collapseIcon: ExpandLessIcon,
             expandIcon : ExpandMoreIcon
           }}
