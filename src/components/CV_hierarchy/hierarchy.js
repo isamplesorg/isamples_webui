@@ -287,6 +287,7 @@ function CustomizedTreeView(props) {
   }, [schema, value, facetValues, calculateCounts, labelToIdMap, idToLabelMap])
 
   const handleToggle = (event, itemIds) => {
+    // console.log("handling toggle");
     const difference = itemIds
       .filter(x => !expandedItems.includes(x))
       .concat(expandedItems.filter(x => !itemIds.includes(x)));
@@ -299,7 +300,7 @@ function CustomizedTreeView(props) {
   };
 
   const handleSelect = (event, itemIds) => {
-    console.log("handling select");
+    // console.log("handling select");
     if (value.includes(itemIds[0])){
       // remove the selected label
       onClick(itemIds[0], "delete");
@@ -310,13 +311,13 @@ function CustomizedTreeView(props) {
   };
 
   const handleFilter = (event) => {
-    console.log("handling filter");
     const { value } = event.target;
+    // console.log("handling filter using value " + value);
     setFilter(value);
     if (value.trim().length === 0) {
       setExpandedItems(parseLabelArrayToIdArray([firstLevel], labelToIdMap));
     } else {
-      setExpandedItems(parseLabelArrayToIdArray(findPath(schema, value), labelToIdMap));
+      setExpandedItems(valueForSelection(findPath(schema, value)));
     }
   };
 
@@ -325,7 +326,7 @@ function CustomizedTreeView(props) {
     
      <SimpleTreeView
           aria-label="customized"
-          slots = {{
+          slotes = {{
             collapseIcon: ExpandLessIcon,
             expandIcon : ExpandMoreIcon
           }}
