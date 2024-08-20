@@ -1,5 +1,11 @@
 import React from 'react';
 import { render, screen} from '@testing-library/react';
+global.TextEncoder = require('util').TextEncoder;
+
+test('TextEncoder is globally defined in Jest', () => {
+  expect(global.TextEncoder).toBeDefined();
+})
+
 import Enzyme from 'enzyme';
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 import '@testing-library/jest-dom'
