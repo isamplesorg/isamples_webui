@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen} from '@testing-library/react';
-import { configure } from 'enzyme';
+import Enzyme from 'enzyme';
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 import '@testing-library/jest-dom'
 
-configure({ adapter: new Adapter() });
+Enzyme.configure({ adapter: new Adapter() });
 import NavFooter from '../pages/navFooter.js'
 
 const mockedUsedNavigate = jest.fn();
