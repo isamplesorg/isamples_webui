@@ -1,3 +1,6 @@
+import { TextEncoder, TextDecoder } from 'util'
+global.TextEncoder = TextEncoder
+global.TextDecoder = TextDecoder
 import React, { useEffect } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import  CustomizedTreeView from 'components/CV_hierarchy/hierarchy';
