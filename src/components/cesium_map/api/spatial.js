@@ -18,7 +18,6 @@ import { store } from "redux/store";
 const MAXIMUM_ZOOM_DISTANCE = 20000000;
 const MINIMUM_ZOOM_DISTANCE = 10;
 const DEFAULT_ELEVATION = 1;
-const DEBUG = false;
 
 /**************************************************************************************************
  * Patch for Cesium camera computeViewRectangle.
