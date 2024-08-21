@@ -1,7 +1,6 @@
 import React from 'react';
 import { render, screen} from '@testing-library/react';
 import ButGroup from 'components/ButGroup';
-import '@testing-library/jest-dom';
 
 describe('ButGroup', () => {
   it('should render the button with correct label', () => {

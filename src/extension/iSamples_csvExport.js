@@ -32,7 +32,7 @@ const CsvExport = (props) => {
     .filter(word => word.length)
     .join("_")}.csv`;
 
-  const formattedQueryParam = "'" + solrQuery.getQFQSolrQueryParamValues(store.getState()['query']).fq.split(',').join(' AND ') + "'";
+  const formattedQueryParam = '"' + solrQuery.getQFQSolrQueryParamValues(store.getState()['query']).fq.split(',').join(' AND ') + '"';
   
   const handleClick = () => {
     setCollapse(prev => !prev);

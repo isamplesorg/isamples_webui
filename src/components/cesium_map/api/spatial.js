@@ -9,6 +9,7 @@
 */
 
 import * as Cesium from 'cesium';
+import { html, render } from "lit";
 import { pointStream } from 'components/cesium_map/api/server';
 import { colorbind, source } from 'fields';
 import { wellFormatField } from 'components/utilities';
@@ -18,255 +19,7 @@ import { store } from "redux/store";
 const MAXIMUM_ZOOM_DISTANCE = 20000000;
 const MINIMUM_ZOOM_DISTANCE = 10;
 const DEFAULT_ELEVATION = 1;
-
-/**************************************************************************************************
- * Patch for Cesium camera computeViewRectangle.
- * 
- * This path provides a modified implementation of computeViewRectangle that
- * returns the correct view rectangle when the camera is oriented towards the south
- * and the horizon is visible. The default implementation truncates the view rectangle
- * at a lower corner of the view which can significantly reduce the reported view
- * rectangle. 
- * 
- * This chunk of code is copied from around:
- * 
- *   https://github.com/CesiumGS/cesium/blob/1.119/packages/engine/Source/Scene/Camera.js#L3828
- * 
- * since computeViewRectangle() uses a couple of private methods for its calculations. The actual
- * change is simple, computing scalarMult based on the camera heading (1.0 north or -1.0 south) 
- * and using that to alter the sign of scalar when computing the northOffset value in 
- * the computeHorizonQuad() private method.
- * 
- * See also https://gist.github.com/datadavev/5579bc1a30b2c569a5e7e944f7564aeb for a 
- * sandcastle viz of what's going on.
- */
-const scratchCartesian3_1 = new Cesium.Cartesian3();
-const scratchCartesian3_2 = new Cesium.Cartesian3();
-const scratchCartesian3_3 = new Cesium.Cartesian3();
-const scratchCartesian3_4 = new Cesium.Cartesian3();
-const horizonPoints = [
-  new Cesium.Cartesian3(),
-  new Cesium.Cartesian3(),
-  new Cesium.Cartesian3(),
-  new Cesium.Cartesian3(),
-];
-
-function computeHorizonQuad(camera, ellipsoid) {
-  const radii = ellipsoid.radii;
-  const p = camera.positionWC;
-
-  // Find the corresponding position in the scaled space of the ellipsoid.
-  const q = Cesium.Cartesian3.multiplyComponents(
-    ellipsoid.oneOverRadii,
-    p,
-    scratchCartesian3_1
-  );
-  
-  const cosHeading = Math.cos(camera.heading);
-  const scalarMult = cosHeading/Math.abs(cosHeading);
-  
-  const qMagnitude = Cesium.Cartesian3.magnitude(q);
-  const qUnit = Cesium.Cartesian3.normalize(q, scratchCartesian3_2);
-
-  // Determine the east and north directions at q.
-  let eUnit;
-  let nUnit;
-  if (
-    Cesium.Cartesian3.equalsEpsilon(qUnit, Cesium.Cartesian3.UNIT_Z, Cesium.Math.EPSILON10)
-  ) {
-    eUnit = new Cesium.Cartesian3(0, 1, 0);
-    nUnit = new Cesium.Cartesian3(0, 0, 1);
-  } else {
-    eUnit = Cesium.Cartesian3.normalize(
-      Cesium.Cartesian3.cross(Cesium.Cartesian3.UNIT_Z, qUnit, scratchCartesian3_3),
-      scratchCartesian3_3
-    );
-    nUnit = Cesium.Cartesian3.normalize(
-      Cesium.Cartesian3.cross(qUnit, eUnit, scratchCartesian3_4),
-      scratchCartesian3_4
-    );
-  }
-
-  // Determine the radius of the 'limb' of the ellipsoid.
-  const wMagnitude = Math.sqrt(Cesium.Cartesian3.magnitudeSquared(q) - 1.0);
-
-  // Compute the center and offsets.
-  const center = Cesium.Cartesian3.multiplyByScalar(
-    qUnit,
-    1.0 / qMagnitude,
-    scratchCartesian3_1
-  );
-  const scalar = wMagnitude / qMagnitude;
-  const eastOffset = Cesium.Cartesian3.multiplyByScalar(
-    eUnit,
-    scalar,
-    scratchCartesian3_2
-  );
-  const northOffset = Cesium.Cartesian3.multiplyByScalar(
-    nUnit,
-    scalarMult*scalar,
-    scratchCartesian3_3
-  );
-
-  // A conservative measure for the longitudes would be to use the min/max longitudes of the bounding frustum.
-  const upperLeft = Cesium.Cartesian3.add(center, northOffset, horizonPoints[0]);
-  Cesium.Cartesian3.subtract(upperLeft, eastOffset, upperLeft);
-  Cesium.Cartesian3.multiplyComponents(radii, upperLeft, upperLeft);
-
-  const lowerLeft = Cesium.Cartesian3.subtract(center, northOffset, horizonPoints[1]);
-  Cesium.Cartesian3.subtract(lowerLeft, eastOffset, lowerLeft);
-  Cesium.Cartesian3.multiplyComponents(radii, lowerLeft, lowerLeft);
-
-  const lowerRight = Cesium.Cartesian3.subtract(center, northOffset, horizonPoints[2]);
-  Cesium.Cartesian3.add(lowerRight, eastOffset, lowerRight);
-  Cesium.Cartesian3.multiplyComponents(radii, lowerRight, lowerRight);
-
-  const upperRight = Cesium.Cartesian3.add(center, northOffset, horizonPoints[3]);
-  Cesium.Cartesian3.add(upperRight, eastOffset, upperRight);
-  Cesium.Cartesian3.multiplyComponents(radii, upperRight, upperRight);
-
-  return horizonPoints;
-}
-
-const scratchPickCartesian2 = new Cesium.Cartesian2();
-const scratchRectCartesian = new Cesium.Cartesian3();
-const cartoArray = [
-  new Cesium.Cartographic(),
-  new Cesium.Cartographic(),
-  new Cesium.Cartographic(),
-  new Cesium.Cartographic(),
-];
-function addToResult(x, y, index, camera, ellipsoid, computedHorizonQuad) {
-  scratchPickCartesian2.x = x;
-  scratchPickCartesian2.y = y;
-  const r = camera.pickEllipsoid(
-    scratchPickCartesian2,
-    ellipsoid,
-    scratchRectCartesian
-  );
-  if (Cesium.defined(r)) {
-    cartoArray[index] = ellipsoid.cartesianToCartographic(r, cartoArray[index]);
-    console.log(`index ${index} = 1`);
-    return 1;
-  }
-  cartoArray[index] = ellipsoid.cartesianToCartographic(
-    computedHorizonQuad[index],
-    cartoArray[index]
-  );
-  console.log(`index ${index} = 0`);
-  return 0;
-}
-/**
- * Computes the approximate visible rectangle on the ellipsoid.
- *
- * @param {Ellipsoid} [ellipsoid=Ellipsoid.default] The ellipsoid that you want to know the visible region.
- * @param {Rectangle} [result] The rectangle in which to store the result
- *
- * @returns {Rectangle|undefined} The visible rectangle or undefined if the ellipsoid isn't visible at all.
- */
-Cesium.Camera.prototype.computeViewRectangle2 = function (ellipsoid, result) {
-  ellipsoid = Cesium.defaultValue(ellipsoid, Cesium.Ellipsoid.default);
-  const cullingVolume = this.frustum.computeCullingVolume(
-    this.positionWC,
-    this.directionWC,
-    this.upWC
-  );
-  const boundingSphere = new Cesium.BoundingSphere(
-    Cesium.Cartesian3.ZERO,
-    ellipsoid.maximumRadius
-  );
-  const visibility = cullingVolume.computeVisibility(boundingSphere);
-  if (visibility === Cesium.Intersect.OUTSIDE) {
-    return undefined;
-  }
-
-  const canvas = this._scene.canvas;
-  const width = canvas.clientWidth;
-  const height = canvas.clientHeight;
-
-  let successfulPickCount = 0;
-
-  const computedHorizonQuad = computeHorizonQuad(this, ellipsoid);
-
-  successfulPickCount += addToResult(
-    0,
-    0,
-    0,
-    this,
-    ellipsoid,
-    computedHorizonQuad
-  );
-  successfulPickCount += addToResult(
-    0,
-    height,
-    1,
-    this,
-    ellipsoid,
-    computedHorizonQuad
-  );
-  successfulPickCount += addToResult(
-    width,
-    height,
-    2,
-    this,
-    ellipsoid,
-    computedHorizonQuad
-  );
-  successfulPickCount += addToResult(
-    width,
-    0,
-    3,
-    this,
-    ellipsoid,
-    computedHorizonQuad
-  );
-
-  if (successfulPickCount < 2) {
-    // If we have space non-globe in 3 or 4 corners then return the whole globe
-    return Cesium.Rectangle.MAX_VALUE;
-  }
-
-  result = Cesium.Rectangle.fromCartographicArray(cartoArray, result);
-  console.log(`${result}`);
-
-  // Detect if we go over the poles
-  let distance = 0;
-  let lastLon = cartoArray[3].longitude;
-  for (let i = 0; i < 4; ++i) {
-    const lon = cartoArray[i].longitude;
-    const diff = Math.abs(lon - lastLon);
-    if (diff > Cesium.Math.PI) {
-      // Crossed the dateline
-      distance += Cesium.Math.TWO_PI - diff;
-    } else {
-      distance += diff;
-    }
-
-    lastLon = lon;
-  }
-
-  // We are over one of the poles so adjust the rectangle accordingly
-  if (
-    Cesium.Math.equalsEpsilon(
-      Math.abs(distance),
-      Cesium.Math.TWO_PI,
-      Cesium.Math.EPSILON9
-    )
-  ) {
-    result.west = -Cesium.Math.PI;
-    result.east = Cesium.Math.PI;
-    if (cartoArray[0].latitude >= 0.0) {
-      result.north = Cesium.Math.PI_OVER_TWO;
-    } else {
-      result.south = -Cesium.Math.PI_OVER_TWO;
-    }
-  }
-
-  return result;
-};
-
-
-/***************************************************************************************************/
+const DEBUG = false;
 /**
  * Describes a camera viewpoint for Cesium.
  * All units are degrees.
@@ -375,14 +128,10 @@ function asDRectangle(rectangle) {
 * Requires that "oboe" is globally available.
 */
 export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollection {
-  constructor(show) {
-    //https://cesium.com/learn/ion-sdk/ref-doc/PointPrimitiveCollection.html#blendOption
-    super(
-      {
-        blendOption: Cesium.BlendOption.TRANSLUCENT,
-        show: show
-      }
-    );
+  constructor(terrain, display) {
+    super(terrain)
+    this.terrain = terrain;
+    this.display = display; // flag that indicates whether we want to fetch points 
   }
 
   clear() {
@@ -391,26 +140,23 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
 
   get farthest() {
     return this.lastPos;
-  } 
+  }
 
   enableDisplay(){
-    this.show = true;
+    this.display = true; 
   }
 
   disableDisplay(){
-    this.show = false;
+    this.display = false; 
   }
 
   // function to query results and add point into cesium
   async load(facet, params) {
-    if (!this.show) return;
+    if (!this.display) return;
     let locations = {};
     // display loading page
-    // TODO: Use an event to turn on / off the loading indicator
     this.loading = document.getElementById("loading");
-    if (this.loading) {
-      this.loading.style.removeProperty("display");
-    }
+    this.loading.style.removeProperty("display");
     this.collection = [];
     this.lastPos = {};
 
@@ -422,11 +168,9 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
       (doc) => {
         // Handle the data records, e.g. response.docs[0].doc
         if (doc.hasOwnProperty('x')) {
-          if (this.loading) {
-            if (!this.loading.style.display) {
-              // remove loading spinner
-              this.loading.style.display = "none";
-            }
+          if (!this.loading.style.display) {
+            // remove loading spinner
+            this.loading.style.display = "none";
           }
           let location = doc.x.toString() + ":" + doc.y.toString();
           if (location in locations) {
@@ -454,6 +198,7 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
         if (this.loading) {
           this.loading.style.display = "none";
         }
+
         console.error(err);
       })
   }
@@ -464,120 +209,112 @@ export class PointStreamPrimitiveCollection extends Cesium.PointPrimitiveCollect
  */
 export class ISamplesSpatial {
 
-  constructor(element) {
-    console.log("ISampleSpatial.constructor");
-    this.tracking_info = {
-      color: Cesium.Color.BLUE,
-      width: 10,
-      tracking: false,
-      polyline: null,
-      positions: [],
-    };
-    this.viewer = null;
-    this.handler = null;
-    this.mouseCoordinateCallback = null;
-    this.selectBoxCallback = null;
-    this.selectedBox = null;
-    // The index to the pointPrimitiveCollection in viewer.scene.primitives
-    this.pointPrimitiveCollectionIndex = -1;
-    // record the last interactive point primitive
-    this.pointprimitive = null;
-    this.gridder = null; 
-    this.gridTrackerListener = null;
-    this.prevNumFound = 0;
 
-    this.viewer = new Cesium.Viewer(element, {
-      timeline: false,
-      animation: false,
-      sceneModePicker: false,
-      terrain: Cesium.Terrain.fromWorldTerrain(),
-      fullscreenElement: element
-    });
-    // limit the map max height
-    // 20000000 is the maxium zoom distance so the users wouldn't zoom too far way from earth
-    // 10 the minimum height for the points so the users wouldn't zoom to the ground.
-    this.viewer.scene.screenSpaceCameraController.maximumZoomDistance = MAXIMUM_ZOOM_DISTANCE;
-    this.viewer.scene.screenSpaceCameraController.minimumZoomDistance = MINIMUM_ZOOM_DISTANCE;
-    // we need to enable allow-scripts to open link in the iframe
-    // but this might not be a safe way if we don't trust the link source
-    this.viewer.infoBox.frame.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms');
-    this.viewer.infoBox.frame.removeAttribute("src");
-
-    this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
-    this.viewer.scene.globe.depthTestAgainstTerrain = true;
-
-    // entity label for point primitive identifier
-    this.pointLabel = this.viewer.entities.add({
-      label: {
-        show: false,
-        showBackground: true,
-        font: "14px monospace",
-        horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
-        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-        pixelOffset: new Cesium.Cartesian2(15, 0),
-        // this attribute will prevent this entity clipped by the terrain
-        disableDepthTestDistance: Number.POSITIVE_INFINITY,
-      },
-    });
-
-    // entity for infoBox
-    this.selectedPoints = this.viewer.entities.add({
-      point: {
-        show: false
-      }
-    });
-    // enable esc key support for closing the info box
-    document.addEventListener("keydown", ({key}) =>{
-      if (key === "Escape"){
-        this.viewer.selectedEntity = undefined; // close the info box
-      }
-    })
-  }
-
-  destroy() {
-    this.viewer && this.viewer.destroy();
-  }
-
-  static async create(element, initialLocation) {
-    const spatial = new ISamplesSpatial(element);
-    await spatial.init(initialLocation);
-    return spatial;
+  constructor() {
+    console.log("initialized isamples spatial");
   }
 
   /**
    * Create a new viewer
    * @param element Element or elementId
    */
-  async init(initialLocation){
+  async init(element, initialLocation){
     /**
      * Call the async methods that are required for building the viewer.
-     * CesiumJS API readyPromise pattern originally allowed to work with the Viewer 
-     * once it is finished initialized and fully loaded. Now this is changed to using 
-     * an async/await pattern.
+     * CesiumJS API readyPromise pattern originally allowed to work with the Viewer once it is finished initialized and fully loaded. Now this is changed to using an async/await pattern.
      */
     try {
-        //this.worldTerrain = await Cesium.createWorldTerrainAsync();
+      this.worldTerrain = await Cesium.createWorldTerrainAsync();
       this.osmBuildingsTileset = await Cesium.createOsmBuildingsAsync();
+      this.tracking_info = {
+        color: Cesium.Color.BLUE,
+        width: 10,
+        tracking: false,
+        polyline: null,
+        positions: [],
+      };
+      this.viewer = new Cesium.Viewer(element, {
+        timeline: false,
+        animation: false,
+        sceneModePicker: false,
+        terrainProvider: this.worldTerrain,
+        fullscreenElement: element
+      });
       this.viewer.scene.primitives.add(this.osmBuildingsTileset);
-
+      this.viewer.scene.terrainProvider = this.worldTerrain;
+      
+      // limit the map max height
+      // 20000000 is the maxium zoom distance so the users wouldn't zoom too far way from earth
+      // 10 the minimum height for the points so the users wouldn't zoom to the ground.
+      this.viewer.scene.screenSpaceCameraController.maximumZoomDistance = MAXIMUM_ZOOM_DISTANCE;
+      this.viewer.scene.screenSpaceCameraController.minimumZoomDistance = MINIMUM_ZOOM_DISTANCE;
       // set camera inital position
       if (initialLocation) {
         this.viewer.camera.setView(initialLocation.getView);
       }
+      this.handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas);
+      this.viewer.scene.globe.depthTestAgainstTerrain = true;
+      this.mouseCoordinateCallback = null;
+      this.selectBoxCallback = null;
+      this.selectedBox = null;
+
+      // entity label for point primitive identifier
+      this.pointLabel = this.viewer.entities.add({
+        label: {
+          show: false,
+          showBackground: true,
+          font: "14px monospace",
+          horizontalOrigin: Cesium.HorizontalOrigin.LEFT,
+          verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+          pixelOffset: new Cesium.Cartesian2(15, 0),
+          // this attribute will prevent this entity clipped by the terrain
+          disableDepthTestDistance: Number.POSITIVE_INFINITY,
+        },
+      });
+
+      // entity for infoBox
+      this.selectedPoints = this.viewer.entities.add({
+        point: {
+          show: false
+        }
+      })
+
+      // record the last interactive point primitive
+      this.pointprimitive = null;
+
+      // we need to enable allow-scripts to open link in the iframe
+      // but this might not be a safe way if we don't trust the link source
+      this.viewer.infoBox.frame.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms');
+      this.viewer.infoBox.frame.removeAttribute("src");
       
+      // enable esc key support for closing the info box
+      document.addEventListener("keydown", ({key}) =>{
+        if (key === "Escape"){
+          this.viewer.selectedEntity = undefined; // close the info box
+        }
+      })
+      this.gridder = null; // save the grid manager
+      this.gridTrackerListener = null;
       this.prevNumFound = store.getState()['results']['numFound']; // first num of points found 
     } catch(error){
       console.log(error);
     }
   }
+
+  static async create(element, initialLocation) {
+    const spatial = new ISamplesSpatial();
+    await spatial.init(element, initialLocation);
+    return spatial;
+  }
+
+
   
   get canvas() {
     return this.viewer.canvas;
   }
 
   get terrain() {
-    //return this.worldTerrain;
-    return this.viewer.terrainProvider;
+    return this.worldTerrain;
   }
 
   get camera(){
@@ -647,7 +384,7 @@ export class ISamplesSpatial {
   /**
    * Get the bounding rectangle of the current view.
    *
-   * Values are in decimal degrees. Note that if the horizon is visible the bounds
+   * Values are in decimal degrees. Note that when zoomed out the bounds
    * will generally be the entire world.
    *
    * @returns {{min_lon: (Number|*), max_lat: (Number|*), max_lon: (Number|*), min_lat: (Number|*)}}
@@ -710,8 +447,7 @@ export class ISamplesSpatial {
    */
   async PrimitiveInfo(api, movement) {
     const selectPoint = this.viewer.scene.pick(movement.position);
-    if (Cesium.defined(selectPoint) && selectPoint.hasOwnProperty("primitive") && (selectPoint.primitive instanceof Cesium.PointPrimitive)) {
-      console.log(`primitiveInfo ${selectPoint.id}`);
+    if (Cesium.defined(selectPoint) && selectPoint.hasOwnProperty("primitive")) {
       this.textToClipboard(`"${selectPoint.id}"`);
       const info = await api.recordInformation(selectPoint.id);
       this.selectedPoints.name = selectPoint.id;
@@ -761,11 +497,6 @@ export class ISamplesSpatial {
     }
   }
 
-  /**
-   * Start tracking the position of the mouse.
-   * 
-   * @param {*} click 
-   */
   startTracking(click) {
     const posn = this.viewer.scene.pickPosition(click.position);
     if (this.tracking_info.tracking) {
@@ -801,10 +532,6 @@ export class ISamplesSpatial {
     }
   }
 
-  /**
-   * Private method for tracking mouse movement.
-   * @param {*} movement 
-   */
   _trackMovement(movement) {
     if (this.tracking_info.tracking) {
       const posn = this.viewer.scene.pickPosition(movement.endPosition);
@@ -827,11 +554,6 @@ export class ISamplesSpatial {
     }
   }
 
-  /**
-   * Stop tracking the mouse position. 
-   * 
-   * @returns rectangle entity representing the selected region.
-   */
   stopTracking() {
     this.tracking_info.tracking = false;
     let xyz = Cesium.Cartographic.fromCartesian(this.tracking_info.positions[0]);
@@ -899,22 +621,10 @@ export class ISamplesSpatial {
   }
 
   addPointPrimitives(primitivesCollection) {
-    this.pointPrimitiveCollectionIndex = this.viewer.scene.primitives.length;
-    return this.viewer.scene.primitives.add(primitivesCollection, this.pointPrimitiveCollectionIndex);
-  }
-
-  /**
-   * Return the pointPrimitiveCollection
-   */
-  getPointPrimitives() {
-    if (this.pointPrimitiveCollectionIndex >= 0) {
-      return this.viewer.scene.primitives.get(this.pointPrimitiveCollectionIndex);
-    }
-    return null;
+    return this.viewer.scene.primitives.add(primitivesCollection);
   }
 
   removeDataSource(dataSource, destroy = false) {
-    this.pointPrimitiveCollectionIndex = -1;
     return this.viewer.dataSources.remove(dataSource, destroy);
   }
 
@@ -928,62 +638,39 @@ export class ISamplesSpatial {
     let y0 = this.d(r.south);
     let y1 = this.d(r.north);
     return `${x0},${y0},${x1},${y1}`;
-  }
+}
 
-  /**
-   * Called on moveEnd to update the H3 grid based on the view.
-   * 
-   * @param {*} viewer 
-   * @param {*} gridder 
-   * @returns 
-   */
   gridTracker(viewer, gridder){
-    if (!gridder) {
+    let scratchRectangle = new Cesium.Rectangle();
+    let rect = viewer.camera.computeViewRectangle(viewer.scene.globe.ellipsoid, scratchRectangle);
+    let resultCntChanged = this.prevNumFound !== store.getState()['results']['numFound'];
+    if (!this.gridder) {
       return;
     }
-    let scratchRectangle = new Cesium.Rectangle();
-    let rect = viewer.camera.computeViewRectangle2(viewer.scene.globe.ellipsoid, scratchRectangle);
-    let resultCntChanged = this.prevNumFound !== store.getState()['results']['numFound'];
-    if (this.r2str(rect) === gridder.global_grid.rect_str && !resultCntChanged){ // when same boundary and count did not change
+    if (this.r2str(rect) === this.gridder.global_grid.rect_str && !resultCntChanged){ // when same boundary and count did not change
       return; // no need to update 
     }
     gridder.update(viewer, rect, resultCntChanged);
     this.prevNumFound = store.getState()['results']['numFound'];
   }
 
-  /**
-   * Add a H3 grid heatmap to the view.
-   * 
-   * The heatmap needs to be regenerated when the view changes in response to 
-   * user interaction with the cesium viewer (since only a selection of the possible
-   * grid cells are displayed) and also in response to changes in the user specied 
-   * query (since that changes the counts of things in the heatmap).
-   * 
-   * The query is maintained in the redux state. 
-   * 
-   * The view is maintained in the Cesium viewer.
-   */
-  async updateHeatmapGrid() {
-    console.log('updateHeatmapGrid()');
-    if (this.gridder === null) { // if not initialized
-      this.gridder = new H3GridManager();
-    }
-    const viewer = this.viewer;
-    this.gridTracker(viewer, this.gridder);
-    // add event listener that is triggered on camera move end 
-    let _this = this;
-    this.gridTrackerListener = function() {_this.gridTracker(viewer, _this.gridder)}
-    this.viewer.camera.moveEnd.addEventListener(this.gridTrackerListener);
+  async addGrid() {
+      // Add Cesium OSM Buildings, a global 3D buildings layer.
+      let buildings = await Cesium.createOsmBuildingsAsync();
+      this.viewer.scene.primitives.add(buildings);
+      if (this.gridder === null) { // if not initialized
+       this.gridder = new H3GridManager();
+      }
+      const viewer = this.viewer;
+      this.gridTracker(viewer, this.gridder);
+      // add event listener that is triggered on camera move end 
+      let _this = this;
+      this.gridTrackerListener = function() {_this.gridTracker(viewer, _this.gridder)}
+      this.viewer.camera.moveEnd.addEventListener(this.gridTrackerListener);
   }
 
-  /**
-   * Remove the H3 grid heat map from the view.
-   */
-  removeHeatmapGrid(){
+  removeGrid(){
     // remove the grid
-    if (this.gridder === null) {
-      return;
-    }
     const viewer = this.viewer;
     this.gridder.remove(viewer);
     if(this.gridTrackerListener){
@@ -991,6 +678,35 @@ export class ISamplesSpatial {
       this.gridTrackerListener = null; 
     }
     this.gridder = null; 
+  }
+
+  //TODO: This should be a separate class for managing the HUD
+  addHud(canvas_id) {
+    // the first div contains mouse location
+    // the following divs contain loading spinner element
+    // see link:
+    //    https://loading.io/css/
+    let hud = html`<div class="spatial-hud" style="position: absolute; top: 0px; left: 0;">
+                    ${DEBUG?  html`<p><code id='position'>0, 0, 0</code></p>`: ""}
+                    <p><button id='clear-bb' class="cesium-button" style='display:none'>Clear BB</button></p>
+                    <div id="selected-record"></div>
+                  </div>
+                  <div id="loading" style="display: none;">
+                    <div class="background-spinner"></div>
+                    <div class="lds-spinner">
+                      <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+                    </div>
+                  </div>`;
+    const v = document.querySelector("div.cesium-viewer");
+    render(hud, v);
+    const cc = this.canvas;
+    const c = document.getElementById(canvas_id);
+    c.height = cc.height;
+    c.width = cc.width;
+    c.style.left = cc.style.left;
+    c.style.top = cc.style.top;
+
+
   }
 
   getScreenPosition(longitude, latitude) {
