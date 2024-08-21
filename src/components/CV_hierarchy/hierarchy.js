@@ -59,7 +59,7 @@ const CreateTree = ({ data, onClick, countMap, renderZeroCount }) => {
         // console.log("getting count for key: " + key);
         labelCnt = countMap && countMap.get(key) ? countMap.get(key) : 0;
       }
-      if (labelCnt === 0 && !renderZeroCount && val["children"].length === 0) { // condition to not render 
+      if (labelCnt === 0 && !renderZeroCount) { // condition to not render 
         // console.log("not rendering " + label);
         return null; 
       }
