@@ -18,7 +18,7 @@ const fields = [
   { field: "description_text", type: "non-search", hidden: true },
   { label: "Context", field: "hasContextCategory", type: "hierarchy-facet", collapse: true },
   { label: "Material", field: "hasMaterialCategory", type: "hierarchy-facet", collapse: true },
-  { label: "Specimen", field: "hasSpecimenCategory", type: "hierarchy-facet", collapse: true },
+  { label: "Sample Object Type", field: "hasSpecimenCategory", type: "hierarchy-facet", collapse: true },
   { label: "Identifier", field: "id", type: "text" },
   { field: "informalClassification", type: "non-search", hidden: true },
   { field: "keywords", type: "text" },
