@@ -5,7 +5,7 @@
     // src/setupTests.js
     
 const enzyme = require('enzyme');
-const enzyme-adapter-react-17 = require('@wojtekmaj/enzyme-adapter-react-17');
+const adapter_react = require('@wojtekmaj/enzyme-adapter-react-17');
 import '@testing-library/jest-dom'
 
-enzyme.configure({ adapter: new enzyme-adapter-react-17.Adapter() });
+enzyme.configure({ adapter: new adapter_react.Adapter() });
