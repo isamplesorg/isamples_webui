@@ -644,6 +644,9 @@ export class ISamplesSpatial {
     let scratchRectangle = new Cesium.Rectangle();
     let rect = viewer.camera.computeViewRectangle(viewer.scene.globe.ellipsoid, scratchRectangle);
     let resultCntChanged = this.prevNumFound !== store.getState()['results']['numFound'];
+    if (!this.gridder) {
+      return;
+    }
     if (this.r2str(rect) === this.gridder.global_grid.rect_str && !resultCntChanged){ // when same boundary and count did not change
       return; // no need to update 
     }
