@@ -41,7 +41,6 @@ const fields = [
   { field: "source", type: "list-facet", facetSort: "index", collapse: true },
   { field: "sourceUpdatedTime", type: "non-search", collapse: true },
   { field: "authorizedBy", type: "list-facet", collapse: true , hidden: true},
-  { field: "compliesWith", type: "non-search", collapse: true },
   // for spatial query
   { label: "Spatial Query", field: "producedBy_samplingSite_location_rpt", type: "spatialquery" },
 ];
