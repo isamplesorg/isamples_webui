@@ -63,9 +63,9 @@ export function ResultWrapper(props) {
     } else if (field.field === "hasMaterialCategory") {
       vocabulary = window.config.vocabularyMaterialType;
     }
-    console.log("looking for key in " + JSON.stringify(vocabulary, null, 2) + " key is " + text);
+    // console.log("looking for key in " + JSON.stringify(vocabulary, null, 2) + " key is " + text);
     let label = findKey(vocabulary, text);
-    console.log("have label: " + JSON.stringify(label, null, 2));
+    // console.log("have label: " + JSON.stringify(label, null, 2));
     if (label !== undefined && label.length !== 0) {
       label = label[0]["label"]["en"];
     } else {
