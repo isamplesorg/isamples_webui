@@ -4,8 +4,8 @@
 // learn more: https://github.com/testing-library/jest-dom
     // src/setupTests.js
     
-import { configure } from 'enzyme';
-import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
-import '@testing-library/jest-dom'
+//import { configure } from 'enzyme';
+//import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+//import '@testing-library/jest-dom'
 
-configure({ adapter: new Adapter() });
+//configure({ adapter: new Adapter() });

@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen} from '@testing-library/react';
 import NavFooter from '../pages/navFooter.js'
+import '@testing-library/jest-dom';
 
 const mockedUsedNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({

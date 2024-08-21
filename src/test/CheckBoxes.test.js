@@ -2,6 +2,7 @@ import React from 'react';
 import { fireEvent, render, screen} from '@testing-library/react';
 import CheckBoxes from 'components/checkBoxes';
 import { store } from '../redux/store.js';
+import '@testing-library/jest-dom';
 
 jest.mock('../fields.js', () => {
   return { colorbind: []};
