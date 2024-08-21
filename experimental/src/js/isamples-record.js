@@ -118,7 +118,7 @@ export const CONCEPTS = {
         "description": "The material category assigned to the samepl",
     },
     "specimenCategory": {
-        "label":"Specimen",
+        "label":"Sample Object Type",
         "description": "The type of specimen represented by the sample",
     },
     "keywords": {

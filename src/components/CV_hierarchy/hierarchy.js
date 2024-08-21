@@ -51,9 +51,16 @@ const CreateTree = ({ data, onClick, countMap, renderZeroCount }) => {
   // The function to create tree items
   const treeItems = (json) => {
     return Object.entries(json).map(([key, val]) => {
+      // console.log("Creating tree item for value " + val);
       const label = val["label"]["en"];
-      let labelCnt = countMap && countMap.get(label) ? countMap.get(label) : 0 ;
+      // console.log("using label for value: " + label);
+      var labelCnt = countMap && countMap.get(label) ? countMap.get(label) : 0;
+      if (labelCnt === 0) {
+        // console.log("getting count for key: " + key);
+        labelCnt = countMap && countMap.get(key) ? countMap.get(key) : 0;
+      }
       if (labelCnt === 0 && !renderZeroCount) { // condition to not render 
+        // console.log("not rendering " + label);
         return null; 
       }
       else {
@@ -81,16 +88,22 @@ const CreateTree = ({ data, onClick, countMap, renderZeroCount }) => {
   return treeItems(data);
 };
 
-// Use BFS to find all possible paths of expaneded nodes
+// Use BFS to find all possible paths of expanded nodes
 const findPath = (tree, target) => {
+  // console.log("looking for " + target + " in tree");  
+  // for (let [key, value] of tree) {
+  //   console.log(`Key: ${key}, Value: ${value}`);
+  // }
   let res = [];
   const expanded = [{ obj: tree, path: [] }];
   while (expanded.length > 0) {
     let { obj, path } = expanded.shift();
     const val = Object.entries(obj)[0][1];
-    const label = val["label"]["en"];
+    const label = Object.entries(obj)[0][0];
+    // console.log("examining " + val + " in label " + label);
     path = [...path, label];
     if (label.toLocaleLowerCase().includes(target.trim().toLocaleLowerCase())) {
+      // console.log("pushing path " + path);
       res.push(path);
     }
 
@@ -126,31 +139,45 @@ function CustomizedTreeView(props) {
   */ 
   const calculateCounts = useCallback( (currSchema) => {
     // when all facetValues are fetched
+    // console.log("facetValues are " + facetValues);
     if(Array.isArray(facetValues)){
+      // console.log("currSchema is " + currSchema);
       for (const key in currSchema){
         const childLabels = []; // the child labels of this label 
         for (const childSchema of currSchema[key]["children"]){
           // recursively save the counts in countMap
           // and get the child node labels
+          // console.log("child schema is " + childSchema);
           let childLabel = calculateCounts(childSchema);
           if (childLabel){
+            // console.log("pushing child label " + childLabel);
             childLabels.push(childLabel);
           } 
         }
-        const label = currSchema[key]["label"]["en"];
+        // console.log("checking against key " + key + " and value " + value);
+        const currVocab = currSchema[key];
+        const label = currVocab["label"]["en"];
         let totalCnt = 0; // total cnt of this label 
         // leaf node
+        var facetValueLabel = "";
         if (childLabels.length === 0 ) {
           // get the count by directly comparing to facetValues
           for (const idx in facetValues){
             const facetValue = facetValues[idx];
-            if (value.length === 0 && facetValue.toLocaleLowerCase()=== label.toLocaleLowerCase()){ 
+            const vocabularyDict = currSchema[facetValue];
+            if (typeof vocabularyDict !== "undefined") {
+              // console.log("found vocabulary dict!" + vocabularyDict);
+              facetValueLabel = vocabularyDict["label"]["en"];
+            }
+            // Value is the selected facet value we are comparing against.
+            if (value.length === 0 && facetValueLabel.toLocaleLowerCase()=== label.toLocaleLowerCase()){ 
               // when no labels are selected for search,
               // display all label count
               totalCnt += facetCounts[idx];
-            }
-            else if (value.indexOf(facetValue) !== -1 && facetValue.toLocaleLowerCase()=== label.toLocaleLowerCase() ){
+            } else if (value.length !== 0 && value.indexOf(facetValueLabel) !== -1 && facetValueLabel.toLocaleLowerCase()=== label.toLocaleLowerCase() ){
               // display only selected labels cnt 
+              totalCnt += facetCounts[idx];
+            } else if (value.length !== 0 && value.indexOf(key) !== -1) {
               totalCnt += facetCounts[idx];
             }
           }
@@ -159,10 +186,16 @@ function CustomizedTreeView(props) {
           // add itself label count
           for (const idx in facetValues){
             const facetValue = facetValues[idx];
-            if ( (value.length === 0 || value.indexOf(facetValue) !== -1) && facetValue.toLocaleLowerCase()=== label.toLocaleLowerCase()){ 
+            const vocabularyDict = currSchema[facetValue];
+            if (typeof vocabularyDict !== "undefined") {
+              facetValueLabel = vocabularyDict["label"]["en"];
+            }
+            if ( (value.length === 0 || value.indexOf(facetValueLabel) !== -1) && facetValueLabel.toLocaleLowerCase()=== label.toLocaleLowerCase()){ 
               // when no labels are selected for search, or itself is selected for search
               // when another label is selected, do not add up counts 
               // add itself's label count 
+              totalCnt += facetCounts[idx];
+            } else if (value.length !== 0 && value.indexOf(key) !== -1) {
               totalCnt += facetCounts[idx];
             }
           }
@@ -171,6 +204,7 @@ function CustomizedTreeView(props) {
             totalCnt += countMap.get(childLabel); 
           }
         }
+        // console.log("setting count " + totalCnt + " for label " + label);
         setCountMap(countMap.set(label, totalCnt))
         return label;
       }
@@ -197,6 +231,10 @@ function CustomizedTreeView(props) {
    * Convert an array of labels to its ids
    */
   const parseLabelArrayToIdArray = (labelArray, labelToIdMap) => {
+    // console.log("going to select result of " + labelArray + " out of labelToIdMap");
+    // for (let [key, value] of labelToIdMap) {
+    //   console.log(`Key: ${key}, Value: ${value}`);
+    // }
       let idArray = [];
       // Apply map values to each element in the original array
       labelArray.forEach(element => {
@@ -205,6 +243,10 @@ function CustomizedTreeView(props) {
           }
       });
       return idArray;
+  }
+
+  const valueForSelection = (value) => {
+    return (value && value.length > 0) ? value : [];  
   }
 
   // Update tree view based on the facet filter
@@ -232,17 +274,20 @@ function CustomizedTreeView(props) {
       setIdToLabelMap(newIdToLabelMap);
       setLabelToIdMap(newLabelToIdMap);
     }
+    // console.log("Looking for value: " + value);
     const path = Array.from(new Set(value.map(v => findPath(schema, v)).flat()));
-    setExpandedItems(prevExpaned => path.length !== prevExpaned.length ? parseLabelArrayToIdArray(path, labelToIdMap) : prevExpaned)
+    // console.log("Setting expanded items to " + valueForSelection(value));
+    setExpandedItems(prevExpaned => path.length !== prevExpaned.length ? valueForSelection(path) : prevExpaned)
     // calculate the counts 
     if (Array.isArray(facetValues)){
       setCountMap(new Map()); // initialize counts 
       calculateCounts(schema);
     }
-    setSelectedItems(parseLabelArrayToIdArray(value, labelToIdMap));
+    setSelectedItems(valueForSelection(value));
   }, [schema, value, facetValues, calculateCounts, labelToIdMap, idToLabelMap])
 
   const handleToggle = (event, itemIds) => {
+    // console.log("handling toggle");
     const difference = itemIds
       .filter(x => !expandedItems.includes(x))
       .concat(expandedItems.filter(x => !itemIds.includes(x)));
@@ -255,24 +300,24 @@ function CustomizedTreeView(props) {
   };
 
   const handleSelect = (event, itemIds) => {
-    // itemIds[0] is the selected label 
-    let labelIds = parseIdArrayToLabelArray(itemIds, idToLabelMap)
-    if (value.includes(labelIds[0])){
+    // console.log("handling select");
+    if (value.includes(itemIds[0])){
       // remove the selected label
-      onClick(labelIds[0], "delete");
+      onClick(itemIds[0], "delete");
     } else{
       // add the selected label
-      onClick(labelIds[0], "add" )
+      onClick(itemIds[0], "add" )
     }
   };
 
   const handleFilter = (event) => {
     const { value } = event.target;
+    // console.log("handling filter using value " + value);
     setFilter(value);
     if (value.trim().length === 0) {
       setExpandedItems(parseLabelArrayToIdArray([firstLevel], labelToIdMap));
     } else {
-      setExpandedItems(parseLabelArrayToIdArray(findPath(schema, value), labelToIdMap));
+      setExpandedItems(valueForSelection(findPath(schema, value)));
     }
   };
 

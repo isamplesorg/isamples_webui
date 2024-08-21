@@ -1,6 +1,34 @@
 // The utilities files to store functions that would be used in mutiple components.
 import parse from 'html-react-parser'
 
+
+
+function findKey(obj, targetKey) {
+  let result = [];
+
+  function search(current) {
+      if (typeof current === 'object' && current !== null) {
+          if (Array.isArray(current)) {
+              // If the current item is an array, iterate through it
+              current.forEach(item => search(item));
+          } else {
+              // If the current item is an object, check each key
+              for (const key in current) {
+                  if (key === targetKey) {
+                      result.push(current[key]);
+                  }
+                  // Recursively search the value associated with the key
+                  search(current[key]);
+              }
+          }
+      }
+  }
+
+  search(obj);
+  return result;
+}
+
+
 // functional components to highlight search text and covert indentifers to the links
 // same function from iSamples_results.js
 export function ResultWrapper(props) {
@@ -23,8 +51,29 @@ export function ResultWrapper(props) {
       return text;
     })
   }
-
-  return field.field === 'id' ? <a href={window.config.original_source + "/" + value} target="_blank" rel="noopener noreferrer">{parse(text)}</a> : parse(text)
+  let result = parse(text);
+  if (field.field === "id") {
+    result = <a href={window.config.original_source + "/" + value} target="_blank" rel="noopener noreferrer">{parse(text)}</a>
+  } if (field.field === "hasContextCategory" || field.field === "hasSpecimenCategory" || field.field === "hasMaterialCategory") {
+    let vocabulary;
+    if (field.field === "hasContextCategory") {
+      vocabulary = window.config.vocabularySampledFeatureType;
+    } else if (field.field === "hasSpecimenCategory") {
+      vocabulary = window.config.vocabularyMaterialSampleType;
+    } else if (field.field === "hasMaterialCategory") {
+      vocabulary = window.config.vocabularyMaterialType;
+    }
+    // console.log("looking for key in " + JSON.stringify(vocabulary, null, 2) + " key is " + text);
+    let label = findKey(vocabulary, text);
+    // console.log("have label: " + JSON.stringify(label, null, 2));
+    if (label !== undefined && label.length !== 0) {
+      label = label[0]["label"]["en"];
+    } else {
+      label = text;
+    }
+    result = <a href={text} target="_blank" rel="noopener noreferrer">{label}</a>
+}
+  return result;
 }
 
 // default function to convert field names to well format one
