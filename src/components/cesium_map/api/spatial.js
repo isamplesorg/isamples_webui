@@ -20,6 +20,148 @@ const MAXIMUM_ZOOM_DISTANCE = 20000000;
 const MINIMUM_ZOOM_DISTANCE = 10;
 const DEFAULT_ELEVATION = 1;
 const DEBUG = false;
+
+
+/*********************************************************************
+ * Implements an alternative version of Cesium.Camera.computeViewRectangle()
+ * as Cesium.Camera.computeViewRectangle2().
+ * 
+ * The default implementation fals when the camera is oriented southerly, and also when 
+ * various portions of the horizon are visible. The implementation is not exact, but
+ * "looks" good enough for computing a bounding rectangle for data retrieval.
+ */
+// The global bounding box latitude and longitude values.
+const GLOBAL_RECT = new Cesium.Rectangle(-Cesium.Math.PI, -Cesium.Math.PI_OVER_TWO, Cesium.Math.PI, Cesium.Math.PI_OVER_TWO);
+
+/**
+ * Scans vertically at x pixels min_y to max_y to find a pixel that intersect 
+ * the ellipsoid. 
+ *
+ * In screen space canvas, 0,0 is the top left corner.
+ * Returns the cartographic coordinates of the picked point or null if 
+ * there is no intersection.
+ */
+function computeHorizonPointY(camera, ellips, x, min_y, max_y) {
+  for (let j=min_y; j < max_y; j += 5) {
+      const cp = camera.pickEllipsoid(new Cesium.Cartesian2(x, j), ellips);
+      if (cp) {
+          return ellips.cartesianToCartographic(cp);
+      }
+  }
+  return null;
+}
+
+
+/**
+* Compute if point is visible in current view
+* p: Cartographic3
+*/
+function isPositionVisible(camera, ellips, cartesian) {
+  const frustum = camera.frustum;
+  const cullingVolume = frustum.computeCullingVolume(
+      camera.position,
+      camera.direction,
+      camera.up
+  );
+  const intersection = cullingVolume.computeVisibility(new Cesium.BoundingSphere(cartesian, 0.0));
+  if (intersection === Cesium.Intersect.INSIDE) {
+      const globeBoundingSphere = new Cesium.BoundingSphere(
+          Cesium.Cartesian3.ZERO,
+          ellips.minimumRadius
+      );
+      const occluder = new Cesium.Occluder(
+          globeBoundingSphere,
+          camera.position
+      )
+      return occluder.isPointVisible(cartesian);
+  }
+  return false;
+}
+
+
+/**
+* Return 0 if neither visible, -1 for south, 1 for north
+*/
+function isPoleVisible(camera, ellips) {
+const NORTH_POLE = Cesium.Cartographic.toCartesian(
+    Cesium.Cartographic.fromDegrees(0.0, 90.0, 1.0, new Cesium.Cartographic()), 
+    ellips,
+    new Cesium.Cartesian3()
+);
+if (isPositionVisible(camera, ellips, NORTH_POLE)) {
+    return 1;
+}
+const SOUTH_POLE = Cesium.Cartographic.toCartesian(
+  Cesium.Cartographic.fromDegrees(0.0, -90.0, 1.0, new Cesium.Cartographic()), 
+  ellips,
+  new Cesium.Cartesian3()
+);
+if (isPositionVisible(camera, ellips, SOUTH_POLE)) {
+    return -1;
+}
+return 0;
+}
+
+
+/**
+* Computes five cartographic points corresponding with the canvas top left,
+* top middle, top right, lower right, and lower left.
+* 
+* The top three points are computed at the intersection of that column of pixels
+* with the ellpsoid.
+* 
+* null is returned for any point that does not intersect with the ellpsoid.
+*/
+function computeViewHorizonPoints(canvas, camera, ellips) {
+  const xs = [0, Math.floor(canvas.width/2), canvas.width];
+  const points = [null, null, null, null, null];
+  for (let i=0; i<3; i++) {
+      points[i] = computeHorizonPointY(camera, ellips, xs[i], 0, canvas.height);        
+  }
+  points[3] = computeHorizonPointY(camera, ellips, xs[0], canvas.height-1, canvas.height);
+  points[4] = computeHorizonPointY(camera, ellips, xs[2], canvas.height-1, canvas.height);
+  return points;
+}
+
+
+/**
+* Given a list of cartographic points, compute
+* the bounding rectangle for the points.
+*/
+function pointsToBoundingRectangle(camera, ellips, points, result) {
+  for (let i=0; i < points.length; i++) {
+      if (!points[i]) {
+          return GLOBAL_RECT;
+      }
+  }    
+  result = Cesium.Rectangle.fromCartographicArray(points, result);
+  const pvisible = isPoleVisible(camera, ellips);
+  if (pvisible === 1) {
+      result.west = -Cesium.Math.PI;
+      result.east = Cesium.Math.PI;
+      result.north = Cesium.Math.PI_OVER_TWO;
+  } else if (pvisible === -1) {
+      result.west = -Cesium.Math.PI;
+      result.east = Cesium.Math.PI;
+      result.south = -Cesium.Math.PI_OVER_TWO;
+  }
+  return result;
+}
+
+
+/**
+* Compute the (approximate) bounding rectangle of the camera view.
+* 
+* returns Cesium.Rectangle
+*/
+Cesium.Camera.prototype.computeViewRectangle2 = function(ellips, result) {
+const points = computeViewHorizonPoints(this._scene.canvas, this, ellips);
+return pointsToBoundingRectangle(this, ellips, points, result);
+}
+
+/** END computeViewRectangle patch */
+
+
 /**
  * Describes a camera viewpoint for Cesium.
  * All units are degrees.
@@ -642,7 +784,7 @@ export class ISamplesSpatial {
 
   gridTracker(viewer, gridder){
     let scratchRectangle = new Cesium.Rectangle();
-    let rect = viewer.camera.computeViewRectangle(viewer.scene.globe.ellipsoid, scratchRectangle);
+    let rect = viewer.camera.computeViewRectangle2(viewer.scene.globe.ellipsoid, scratchRectangle);
     let resultCntChanged = this.prevNumFound !== store.getState()['results']['numFound'];
     if (!this.gridder) {
       return;
