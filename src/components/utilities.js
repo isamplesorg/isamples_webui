@@ -63,15 +63,27 @@ export function ResultWrapper(props) {
     } else if (field.field === "hasMaterialCategory") {
       vocabulary = window.config.vocabularyMaterialType;
     }
-    // console.log("looking for key in " + JSON.stringify(vocabulary, null, 2) + " key is " + text);
-    let label = findKey(vocabulary, text);
-    // console.log("have label: " + JSON.stringify(label, null, 2));
-    if (label !== undefined && label.length !== 0) {
-      label = label[0]["label"]["en"];
-    } else {
-      label = text;
+    const uriPieces = text.split(", ");
+    result = [];
+    const seenUris = new Set();
+    for (let i = 0; i < uriPieces.length; i++) {
+      let text = uriPieces[i];
+      if (seenUris.has(text)) {
+        continue;
+      } else {
+        seenUris.add(text);
+      }
+      // console.log("looking for key in " + JSON.stringify(vocabulary, null, 2) + " key is " + text);
+      let label = findKey(vocabulary, text);
+      console.log("have label: " + JSON.stringify(label, null, 2));
+      if (label !== undefined && label.length !== 0) {
+        label = label[0]["label"]["en"];
+      } else {
+        console.log("Unable to find label, text is " + text);
+        label = text;
+      }
+      result.push(<span><a href={text} target="_blank" rel="noopener noreferrer">{label}</a><span>&nbsp;&nbsp;</span></span>)
     }
-    result = <a href={text} target="_blank" rel="noopener noreferrer">{label}</a>
 }
   return result;
 }
