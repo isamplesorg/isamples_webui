@@ -6,14 +6,18 @@ import { store } from "redux/store";
 const GLOBAL_RECT1 = "-180,90,180,-90";
 const GLOBAL_RECT2 = "-180,-90,180,90";
 const color_scale = chroma.scale(["yellow","red"]).padding(0.1).classes(16);
+
 let COLORS = [];
 for (let i=0; i < 16; i++) {
     COLORS.push(Cesium.Color.fromCssColorString(color_scale(i/15.0).hex()));
 }
 
-
 function d(rd) {
     return Cesium.Math.toDegrees(rd);
+}
+
+function rad(dg) {
+    return Cesium.Math.toRadians(dg);
 }
 
 function r2str(r) {
@@ -22,6 +26,19 @@ function r2str(r) {
     let y0 = d(r.south);
     let y1 = d(r.north);
     return `${x0},${y0},${x1},${y1}`;
+}
+
+function rectArea(r) {
+    // returns approximate area in km2
+    const earthRadius = 6371008.8;
+    return Math.abs(
+        (earthRadius *
+          earthRadius *
+          Math.PI *
+          Math.abs(Math.sin(rad(r.south)) - Math.sin(rad(r.north))) *
+          (r.east - r.west)
+        ) / 180.0
+      );
 }
 
 
@@ -39,7 +56,8 @@ function v2color(v) {
     return COLORS[idx].withAlpha(0.5);
 }
 
-
+//TODO: Turn this into a Cesium DataSource derived class. 
+// See for example https://sandcastle.cesium.com/?src=Custom%20DataSource.html&label=DataSources
 export class H3Grid {
     constructor() {
         this._service = window.config.h3_count
@@ -47,7 +65,43 @@ export class H3Grid {
         this.data = null;
     }
 
-    async load(rstr) {
+    /**
+     * Compute zoom level from the area of the visible rectangle.
+     * data at: https://docs.google.com/spreadsheets/d/1u05F-uusqfWWQThqUu8MPaa_w1WvlnV3OioTvJGdBys/edit?gid=0#gid=0
+     * @param {Cesium.Rectangle} area 
+     * @returns H3 resolution
+     */
+    areaToZoom(area) {        
+        if (area > 300000000) {
+            return 2;
+        }
+        if (area < 1000) {
+            return 12;
+        }
+        return Math.round(15.891 + Math.log10(area)*-1.643);
+    }
+
+    heightToZoom(height) {
+        if (height > 3556341) {
+            return 2;
+        }
+        if (height < 1000) {
+            return 12;
+        }
+        return Math.round(19.608 - Math.log10(height)*2.789);
+    }
+
+    /**
+     * Load the grid data based t=on the current view and query.
+     * Notes:
+     * This BB works ok:
+     *   bb=-152.45990827428585,-17.57710964725285,-147.0228532260467,-14.980197339199439
+     * This not so good:
+     *   bb=-152.3837203700605,-17.503284650992086,-147.28884121154445,-14.944143360801418
+     * @param {*} rstr 
+     * @returns 
+     */
+    async load(rstr, rarea, cheight) {
         if (rstr === this.rect_str) {
             if (this.data !== null) {
                 return this.data;
@@ -56,18 +110,27 @@ export class H3Grid {
         this.rect_str = rstr;
         this.loading = true;
         // read q and fq solr query param values
-        let qArray = solrQuery.getQFQSolrQueryParamValues(store.getState()['query']).q.split(",")
-        let fqArray = solrQuery.getQFQSolrQueryParamValues(store.getState()['query']).fq.split(",")
+        //const __state = store.getState();
+        const queryState = store.getState()['query'];
+        const queryParams = solrQuery.getQFQSolrQueryParamValues(queryState);
+        //TODO: This fails if there's a comma in the query value...
+        let qArray = queryParams.q.split(",")
+        let fqArray = queryParams.fq.split(",")
         let url = new URL(this._service + "/");
         if (this.rect_str === GLOBAL_RECT1 || this.rect_str === GLOBAL_RECT2) { 
             url.searchParams.set('resolution', 1); // globe view resolution value should be small
         } else {
+            // This works ok, but might be better to use the camera distance or elevation rather than bounding box.
+            //const zoomLevel = this.areaToZoom(rarea);
+            const zoomLevel = this.heightToZoom(cheight);
+            console.log(`Area: ${rarea} Zoom: ${zoomLevel}`);
             url.searchParams.set('bb', this.rect_str);
-            url.searchParams.set('resolution', 5);
+            url.searchParams.set('resolution', zoomLevel);
         }
         // convert it to q query param values
         let queryArray = [...qArray, ...fqArray];
         let combinedQuery = queryArray.join(' AND ');
+        console.log(`H3Grid.load rstr = ${rstr}  combinedQuery = ${combinedQuery}`);
         url.searchParams.set('q', combinedQuery);
         url = decodeURIComponent(url);
         const options = {
@@ -105,6 +168,10 @@ export class H3GridManager {
 
     update(cview, rect, resultCntChanged) {
         const rstr = r2str(rect);
+        const rarea = rectArea(rect);
+        const cheight = Math.round(cview.camera.positionCartographic.height);
+        console.log(`rect: ${rstr} area: ${rarea} height: ${cheight}`);
+        console.log(`H3GridManager.update rstr=${rstr} resultCntChanged=${resultCntChanged}`);
         const existing = cview.dataSources.getByName(rstr);
         if (existing.length > 0 && !resultCntChanged) {
             console.log(`Grid ${rstr} already in collection`);
@@ -114,10 +181,9 @@ export class H3GridManager {
             this.global_grid = new H3Grid();
         }
         this.global_grid.rect_str = rstr;
-        let toRemove = cview.dataSources.getByName(this.old_grid_rstr)[0];
-        cview.dataSources.remove(toRemove, true);
+        const toRemove = cview.dataSources.getByName(this.old_grid_rstr)[0];
         const _this = this;
-        this.global_grid.load(rstr).then((ds) => {
+        this.global_grid.load(rstr, rarea, cheight).then((ds) => {
             // delete existing grid
             try {
                 cview.dataSources.add(ds);
@@ -133,9 +199,9 @@ export class H3GridManager {
                                 let ln = parseFloat(entity.properties.ln);
                                 entity.polygon.material = v2color(ln);
                                 entity.polygon.outline = false;
-                                entity.polygon.extrudedHeight = entity.properties.n;
-                                entity.polygon.height = 0;
-                        
+                                //entity.polygon.extrudedHeight = entity.properties.n;
+                                //entity.polygon.height = 0;                                
+                                entity.polygon.clampToGround = true;                        
                         } catch (err) {
                             console.log(err);
                             entity.polygon.material = Cesium.Color.RED.withAlpha(0.5);
@@ -147,13 +213,17 @@ export class H3GridManager {
                         try {
                             let ln = parseFloat(entity.properties.ln);
                             entity.polygon.material = v2color(ln);
-                            entity.polygon.extrudedHeight = entity.properties.parent_id;
+                            //entity.polygon.extrudedHeight = entity.properties.parent_id;
+                            entity.polygon.outline = false;
+                            //entity.polygon.extrudedHeight = entity.properties.n;
+                            entity.polygon.clampToGround = true;
                         }catch (err) {
                             console.log(err);
                             entity.polygon.material = Cesium.Color.RED.withAlpha(0.5);
                         }
                     }
                 }
+                cview.dataSources.remove(toRemove, true);
             } catch (err) {
                 console.log(err);
             }
