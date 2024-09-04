@@ -64,7 +64,7 @@ class HierarchyFacet extends React.Component{
             return window.config.vocabularyMaterialType;
         case "Context":
             return window.config.vocabularySampledFeatureType;
-        case "Specimen":
+        case "Sample Object Type":
             return window.config.vocabularyMaterialSampleType;
         default:
             return null;
