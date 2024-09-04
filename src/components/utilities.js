@@ -3,19 +3,37 @@ import parse from 'html-react-parser'
 
 
 
-function findKey(obj, targetKey) {
+function findKey(obj, targetKey, flexible = false) {
   let result = [];
 
   function search(current) {
+      // console.log("performing search, flexible is " + flexible);
       if (typeof current === 'object' && current !== null) {
+          let regex = null;
           if (Array.isArray(current)) {
               // If the current item is an array, iterate through it
               current.forEach(item => search(item));
           } else {
               // If the current item is an object, check each key
               for (const key in current) {
+                  if (flexible) {
+                    // Escape special regex characters in the URL except for the numeric part
+                    const escapedUrl = key.replace(/[*+?^${}()|[\]\\]/g, '\\$&');
+                    // Replace the numeric version part with a regex pattern that matches any version
+                    const versionedUrl = escapedUrl.replace(/(\d+)\.(\d+)/, '\\d+\\.\\d+');
+                    // Construct the final regex
+                    const regexPattern = `^${versionedUrl}$`;
+                    regex = new RegExp(regexPattern, "i");
+                    // console.log("Just created regex " + regex + " for flexible searching");
+                  }
                   if (key === targetKey) {
                       result.push(current[key]);
+                  } else if (flexible) {
+                      // console.log("Going to test if key " + targetKey + " matches regex " + regex);
+                      if (regex.test(targetKey)) {
+                        // console.log("Didn't find an exact match, but matched a regex");
+                        result.push(current[key]);
+                      }
                   }
                   // Recursively search the value associated with the key
                   search(current[key]);
@@ -75,11 +93,15 @@ export function ResultWrapper(props) {
       }
       // console.log("looking for key in " + JSON.stringify(vocabulary, null, 2) + " key is " + text);
       let label = findKey(vocabulary, text);
-      console.log("have label: " + JSON.stringify(label, null, 2));
+      if (label === undefined || label.length === 0) {
+        // If we didn't find an exact match, then try the flexible matching based on the url version
+        label = findKey(vocabulary, text, true);
+      }
+      // console.log("have label: " + JSON.stringify(label, null, 2));
       if (label !== undefined && label.length !== 0) {
         label = label[0]["label"]["en"];
       } else {
-        console.log("Unable to find label, text is " + text);
+        // console.log("Unable to find label, text is " + text);
         label = text;
       }
       result.push(<span><a href={text} target="_blank" rel="noopener noreferrer">{label}</a><span>&nbsp;&nbsp;</span></span>)
